@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { RegisterForm } from '@/components/auth/register-form-fixed';
+import { RegisterForm } from '@/components/auth/register-form';
 
 export const metadata: Metadata = {
   title: 'Sign Up | Credenza',
