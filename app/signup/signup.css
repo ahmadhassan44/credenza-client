@@ -1,0 +1,19 @@
+/* styles for the signup layout */
+.signup-layout {
+  width: 100vw;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.register-form-container {
+  width: 100vw;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Space Grotesk font styling */
+.font-space-grotesk {
+  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+}

@@ -1,0 +1,18 @@
+/* Common styles for authentication pages */
+.auth-page-container {
+  width: 100vw;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Space Grotesk font styling */
+.font-space-grotesk {
+  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif !important;
+}
+
+/* Ensure all Space_Grotesk elements use the variable */
+[class*="font-['Space_Grotesk']"] {
+  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif !important;
+}
