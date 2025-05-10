@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@heroui/button";
 
-export default function WelcomePage() {
+function WelcomePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -139,3 +139,6 @@ export default function WelcomePage() {
     </div>
   );
 }
+
+
+export default WelcomePage;

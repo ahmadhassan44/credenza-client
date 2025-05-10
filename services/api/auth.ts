@@ -35,13 +35,13 @@ const authApi = {
 
   // Login with email and password
   login: async (params: LoginParams): Promise<AuthResponse> => {
-    const response = await apiClient.post("/auth/login", params); // Removed duplicate /api/v1
+    const response = await apiClient.post("api/v1/auth/login", params); // Removed duplicate /api/v1
     return response.data;
   },
 
   // Refresh an expired access token
   refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
-    const response = await apiClient.post("/auth/refresh", { refreshToken }); // Removed duplicate /api/v1
+    const response = await apiClient.post("api/v1/auth/refresh", { refreshToken }); // Removed duplicate /api/v1
     return response.data;
   },
 
