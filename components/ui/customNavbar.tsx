@@ -1,6 +1,7 @@
 "use client";
 
 import NextLink from "next/link";
+import Image from "next/image";
 import {
   Navbar,
   NavbarBrand,
@@ -14,8 +15,6 @@ import {
   Link as HeroLink,
   Avatar,
 } from "@heroui/react";
-
-import { CredenzaLogo } from "./credenzaLogo";
 
 import { useAuth } from "@/context/auth.context";
 
@@ -35,7 +34,13 @@ export function CustomNavbar() {
     >
       <NavbarBrand>
         <NextLink passHref href="/">
-          <CredenzaLogo />
+          <Image 
+            src="/credenzaLogo.svg"
+            alt="Credenza Logo"
+            width={120}
+            height={40}
+            priority
+          />
         </NextLink>
       </NavbarBrand>
 
