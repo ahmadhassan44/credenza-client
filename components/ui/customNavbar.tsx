@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import NextLink from 'next/link';
+import NextLink from "next/link";
 import {
   Navbar,
   NavbarBrand,
@@ -12,10 +12,12 @@ import {
   Dropdown,
   DropdownMenu,
   Link as HeroLink,
-  Avatar
+  Avatar,
 } from "@heroui/react";
-import { useAuth } from '@/context/auth.context';
-import { CredenzaLogo } from './credenzaLogo';
+
+import { CredenzaLogo } from "./credenzaLogo";
+
+import { useAuth } from "@/context/auth.context";
 
 export function CustomNavbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -32,29 +34,49 @@ export function CustomNavbar() {
       }}
     >
       <NavbarBrand>
-        <NextLink href="/" passHref>
+        <NextLink passHref href="/">
           <CredenzaLogo />
         </NextLink>
       </NavbarBrand>
 
       <NavbarContent className="hidden sm:flex gap-6" justify="center">
         <NavbarItem>
-          <HeroLink as={NextLink} color="foreground" href="/" className="text-white font-medium">
+          <HeroLink
+            as={NextLink}
+            className="text-white font-medium"
+            color="foreground"
+            href="/"
+          >
             Home
           </HeroLink>
         </NavbarItem>
         <NavbarItem>
-          <HeroLink as={NextLink} color="foreground" href="/#features" className="text-white font-medium">
+          <HeroLink
+            as={NextLink}
+            className="text-white font-medium"
+            color="foreground"
+            href="/#features"
+          >
             Features
           </HeroLink>
         </NavbarItem>
         <NavbarItem>
-          <HeroLink as={NextLink} color="foreground" href="/#pricing" className="text-white font-medium">
+          <HeroLink
+            as={NextLink}
+            className="text-white font-medium"
+            color="foreground"
+            href="/#pricing"
+          >
             Pricing
           </HeroLink>
         </NavbarItem>
         <NavbarItem>
-          <HeroLink as={NextLink} color="foreground" href="/about" className="text-white font-medium">
+          <HeroLink
+            as={NextLink}
+            className="text-white font-medium"
+            color="foreground"
+            href="/about"
+          >
             About
           </HeroLink>
         </NavbarItem>
@@ -77,7 +99,7 @@ export function CustomNavbar() {
                 <p className="font-semibold">{user?.email}</p>
               </DropdownItem>
               <DropdownItem key="dashboard">
-                <NextLink href="/dashboard" className="w-full">
+                <NextLink className="w-full" href="/dashboard">
                   Dashboard
                 </NextLink>
               </DropdownItem>
@@ -90,17 +112,17 @@ export function CustomNavbar() {
         ) : (
           <>
             <NavbarItem className="hidden sm:flex">
-              <HeroLink as={NextLink} href="/login" className="text-white">
+              <HeroLink as={NextLink} className="text-white" href="/login">
                 Login
               </HeroLink>
             </NavbarItem>
             <NavbarItem>
               <Button
                 as={NextLink}
+                className="text-white"
                 color="primary"
                 href="/signup"
                 variant="flat"
-                className="text-white"
               >
                 Sign Up
               </Button>

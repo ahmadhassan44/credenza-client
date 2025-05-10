@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui/card';
+import { Card } from "@/components/ui/card";
 import { RegisterForm } from "@/components/auth/register-form";
 
 export default function SignupPage() {

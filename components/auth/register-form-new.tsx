@@ -5,24 +5,26 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import { Input, Button } from "@heroui/react";
+
+import { EyeFilledIcon, EyeSlashFilledIcon } from "../ui/icons/icons";
+
 import { RegisterFormValues, registerSchema } from "@/lib/validations/auth";
 import { useAuth } from "@/context/auth.context";
-import { EyeFilledIcon, EyeSlashFilledIcon } from "../ui/icons/icons";
 
 export function RegisterForm() {
   const { register: registerUser, error: authError, clearError } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const togglePasswordVisibility = () => 
+  const togglePasswordVisibility = () =>
     setIsPasswordVisible(!isPasswordVisible);
 
-  const toggleConfirmPasswordVisibility = () => 
+  const toggleConfirmPasswordVisibility = () =>
     setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
 
   const form = useForm<RegisterFormValues>({
@@ -50,11 +52,11 @@ export function RegisterForm() {
       );
       router.push("/dashboard");
     } catch (err: any) {
-      const errorMessage = 
-        err?.response?.data?.message || 
-        err?.message || 
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.message ||
         "An error occurred during registration. Please try again.";
-      
+
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -75,20 +77,20 @@ export function RegisterForm() {
                 Enter your personal data to create an account
               </p>
             </div>
-            
+
             <div className="flex self-stretch justify-start items-center flex-row gap-[34px]">
-              <Button 
+              <Button
                 className="flex justify-center items-center gap-2 px-[24px] border-solid border-[#52525B] border-2 rounded-xl w-full h-[48px] bg-transparent"
                 startContent={
-                  <svg 
+                  <svg
                     fill="none"
                     height="20"
-                    viewBox="0 0 20 20" 
+                    viewBox="0 0 20 20"
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path 
-                      d="M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z" 
+                    <path
+                      d="M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z"
                       fill="#4285F4"
                     />
                   </svg>
@@ -98,19 +100,19 @@ export function RegisterForm() {
                   Google
                 </span>
               </Button>
-              
-              <Button 
+
+              <Button
                 className="flex justify-center items-center gap-2 px-[24px] border-solid border-[#52525B] border-2 rounded-xl w-full h-[48px] bg-transparent"
                 startContent={
-                  <svg 
+                  <svg
                     fill="none"
                     height="20"
-                    viewBox="0 0 21 20" 
+                    viewBox="0 0 21 20"
                     width="21"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path 
-                      d="M10.5 17.5C14.6421 17.5 18 14.1421 18 10C18 5.85786 14.6421 2.5 10.5 2.5C6.35786 2.5 3 5.85786 3 10C3 14.1421 6.35786 17.5 10.5 17.5Z" 
+                    <path
+                      d="M10.5 17.5C14.6421 17.5 18 14.1421 18 10C18 5.85786 14.6421 2.5 10.5 2.5C6.35786 2.5 3 5.85786 3 10C3 14.1421 6.35786 17.5 10.5 17.5Z"
                       fill="#000000"
                     />
                   </svg>
@@ -131,15 +133,15 @@ export function RegisterForm() {
             <div className="flex-grow border-t border-[#8F8F8F]" />
           </div>
 
-          <form 
+          <form
             className="flex flex-col gap-[30px] w-full"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <div className="grid grid-cols-1 gap-[30px] sm:grid-cols-2">
               <div className="flex flex-col">
-                <label 
+                <label
                   className="text-[#52525B] text-sm font-['Space_Grotesk'] leading-4 pb-3 pr-2"
-                  htmlFor="firstName" 
+                  htmlFor="firstName"
                 >
                   First Name
                 </label>
@@ -153,11 +155,11 @@ export function RegisterForm() {
                   {...form.register("firstName")}
                 />
               </div>
-              
+
               <div className="flex flex-col">
-                <label 
+                <label
                   className="text-[#52525B] text-sm font-['Space_Grotesk'] leading-4 pb-3 pr-2"
-                  htmlFor="lastName" 
+                  htmlFor="lastName"
                 >
                   Last Name
                 </label>
@@ -172,11 +174,11 @@ export function RegisterForm() {
                 />
               </div>
             </div>
-            
+
             <div className="flex flex-col">
-              <label 
+              <label
                 className="text-[#52525B] text-sm font-['Space_Grotesk'] leading-4 pb-3 pr-2"
-                htmlFor="email" 
+                htmlFor="email"
               >
                 Email
               </label>
@@ -190,11 +192,11 @@ export function RegisterForm() {
                 {...form.register("email")}
               />
             </div>
-            
+
             <div className="flex flex-col">
-              <label 
+              <label
                 className="text-[#52525B] text-sm font-['Space_Grotesk'] leading-4 pb-3 pr-2"
-                htmlFor="password" 
+                htmlFor="password"
               >
                 Password
               </label>
@@ -202,10 +204,10 @@ export function RegisterForm() {
                 className="bg-[#1A1A1A] text-white border-[#52525B] rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] font-['Space_Grotesk']"
                 color={form.formState.errors.password ? "danger" : "default"}
                 endContent={
-                  <button 
+                  <button
                     className="focus:outline-none text-gray-400"
+                    type="button"
                     onClick={togglePasswordVisibility}
-                    type="button" 
                   >
                     {isPasswordVisible ? (
                       <EyeSlashFilledIcon className="w-4 h-4" />
@@ -221,22 +223,24 @@ export function RegisterForm() {
                 {...form.register("password")}
               />
             </div>
-            
+
             <div className="flex flex-col">
-              <label 
+              <label
                 className="text-[#52525B] text-sm font-['Space_Grotesk'] leading-4 pb-3 pr-2"
-                htmlFor="confirmPassword" 
+                htmlFor="confirmPassword"
               >
                 Confirm Password
               </label>
               <Input
                 className="bg-[#1A1A1A] text-white border-[#52525B] rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] font-['Space_Grotesk']"
-                color={form.formState.errors.confirmPassword ? "danger" : "default"}
+                color={
+                  form.formState.errors.confirmPassword ? "danger" : "default"
+                }
                 endContent={
-                  <button 
+                  <button
                     className="focus:outline-none text-gray-400"
+                    type="button"
                     onClick={toggleConfirmPasswordVisibility}
-                    type="button" 
                   >
                     {isConfirmPasswordVisible ? (
                       <EyeSlashFilledIcon className="w-4 h-4" />
@@ -252,13 +256,13 @@ export function RegisterForm() {
                 {...form.register("confirmPassword")}
               />
             </div>
-            
+
             {(error || authError) && (
               <div className="text-red-400 text-sm font-['Space_Grotesk']">
                 {error || authError}
               </div>
             )}
-            
+
             <div className="flex self-stretch justify-center items-center flex-col gap-3">
               <Button
                 className="flex self-stretch justify-center items-center bg-white text-black rounded-xl h-[48px] w-full font-['Space_Grotesk'] text-sm font-medium"
@@ -269,10 +273,10 @@ export function RegisterForm() {
               >
                 {isLoading ? "Creating Account..." : "Sign Up"}
               </Button>
-              
+
               <p className="self-stretch font-['Space_Grotesk'] text-center font-medium leading-6">
                 <span className="text-[#8F8F8F]">Already have an account?</span>
-                <Link 
+                <Link
                   className="text-white hover:text-gray-300 ml-1"
                   href="/login"
                 >
@@ -283,7 +287,7 @@ export function RegisterForm() {
           </form>
         </div>
       </div>
-      
+
       {/* Right side - Gradient background section */}
       <div className="hidden md:flex justify-center items-center flex-col rounded-[35px] col-span-6 bg-gradient-radial from-purple-800 via-transparent to-black">
         <div className="flex justify-start items-center flex-col gap-[30px] px-20">

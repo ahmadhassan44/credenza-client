@@ -3,13 +3,15 @@ import { Metadata, Viewport } from "next";
 import clsx from "clsx";
 
 import { Providers } from "./providers";
+
 import { AuthProvider } from "@/context/auth.context";
 import { ToastProvider } from "@/components/ui/toast";
 import { fontSans, fontSpaceGrotesk } from "@/config/fonts";
 
 export const metadata: Metadata = {
   title: "Credenza | Credit Scoring for Digital Creators",
-  description: "Evaluate creditworthiness for digital creators by analyzing platform metrics, income stability, and growth patterns",
+  description:
+    "Evaluate creditworthiness for digital creators by analyzing platform metrics, income stability, and growth patterns",
   icons: {
     icon: "/favicon.ico",
   },
@@ -34,14 +36,12 @@ export default function RootLayout({
         className={clsx(
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable,
-          fontSpaceGrotesk.variable
+          fontSpaceGrotesk.variable,
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <AuthProvider>
-            <ToastProvider>
-              {children}
-            </ToastProvider>
+            <ToastProvider>{children}</ToastProvider>
           </AuthProvider>
         </Providers>
       </body>

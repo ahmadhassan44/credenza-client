@@ -1,8 +1,9 @@
-import { Metadata } from 'next';
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Credenza | Credit Scoring for Digital Creators',
-  description: 'Evaluate creditworthiness for digital creators by analyzing platform metrics, income stability, and growth patterns',
+  title: "Credenza | Credit Scoring for Digital Creators",
+  description:
+    "Evaluate creditworthiness for digital creators by analyzing platform metrics, income stability, and growth patterns",
 };
 
 export default function HomeLayout({

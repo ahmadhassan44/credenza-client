@@ -1,15 +1,22 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authApi } from '@/services/api';
-import { useRouter } from 'next/navigation';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { useRouter } from "next/navigation";
+
+import { authApi } from "@/services/api";
 
 interface User {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: 'USER' | 'CREATOR' | 'ADMIN';
+  role: "USER" | "CREATOR" | "ADMIN";
   creatorId?: string;
 }
 
@@ -28,8 +35,17 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   error: string | null;
-  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
-  register: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
+  login: (
+    email: string,
+    password: string,
+    rememberMe?: boolean,
+  ) => Promise<void>;
+  register: (
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+  ) => Promise<void>;
   logout: () => Promise<void>;
   testModeLogin: () => Promise<void>;
   clearError: () => void;
@@ -46,23 +62,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Check for existing token and fetch user data on initial load
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("accessToken")
+          : null;
 
       if (token) {
         try {
           // Fetch current user details using the authApi service
           const userData = await authApi.getCurrentUser();
+
           setUser(userData);
         } catch (error) {
           // If token is invalid or expired, clear it
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
           }
-          setError('Session expired. Please login again.');
+          setError("Session expired. Please login again.");
         }
       }
-      
+
       setIsLoading(false);
     };
 
@@ -72,63 +92,76 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string, rememberMe = false) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await authApi.login({ email, password });
-      
+
       const { accessToken, refreshToken, user } = response;
-      
+
       // Store tokens in localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        
+      if (typeof window !== "undefined") {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+
         // Store user email if remember me is checked
         if (rememberMe) {
-          localStorage.setItem('rememberedEmail', email);
+          localStorage.setItem("rememberedEmail", email);
         } else {
-          localStorage.removeItem('rememberedEmail');
+          localStorage.removeItem("rememberedEmail");
         }
       }
-      
+
       // Update user state
       setUser(user);
       setIsLoading(false);
     } catch (error) {
       const apiError = error as ApiError;
-      const errorMessage = apiError.response?.data?.message || apiError.message || 'An error occurred during login';
+      const errorMessage =
+        apiError.response?.data?.message ||
+        apiError.message ||
+        "An error occurred during login";
+
       setError(errorMessage);
       setIsLoading(false);
       throw error;
     }
   };
 
-  const register = async (firstName: string, lastName: string, email: string, password: string) => {
+  const register = async (
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+  ) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await authApi.register({
         firstName,
         lastName,
         email,
-        password
+        password,
       });
-      
+
       const { accessToken, refreshToken, user } = response;
-      
+
       // Store tokens in localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
       }
-      
+
       // Update user state
       setUser(user);
       setIsLoading(false);
     } catch (error) {
       const apiError = error as ApiError;
-      const errorMessage = apiError.response?.data?.message || apiError.message || 'An error occurred during registration';
+      const errorMessage =
+        apiError.response?.data?.message ||
+        apiError.message ||
+        "An error occurred during registration";
+
       setError(errorMessage);
       setIsLoading(false);
       throw error;
@@ -143,17 +176,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Call logout API
       await authApi.logout();
     } catch (error: unknown) {
-      console.error('Logout API error:', error);
+      console.error("Logout API error:", error);
       // Continue with client-side logout even if API call fails
     } finally {
       // Clear tokens and user state
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       setUser(null);
       setIsLoading(false);
-      
+
       // Redirect to login
-      router.push('/login');
+      router.push("/login");
     }
   };
 
@@ -161,21 +194,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const testModeLogin = async () => {
     try {
       const response = await authApi.testModeLogin();
-      
+
       const { accessToken, refreshToken, user } = response;
-      
+
       // Store tokens in localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
       }
-      
+
       // Update user state
       setUser(user);
       setIsLoading(false);
     } catch (error) {
       const apiError = error as ApiError;
-      const errorMessage = apiError.response?.data?.message || apiError.message || 'An error occurred during test login';
+      const errorMessage =
+        apiError.response?.data?.message ||
+        apiError.message ||
+        "An error occurred during test login";
+
       setError(errorMessage);
       setIsLoading(false);
       throw error;
@@ -204,9 +241,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
+
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
+
   return context;
 };
 

@@ -1,34 +1,39 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { cn } from '@/utils/classnames';
+import React from "react";
+
+import { cn } from "@/utils/classnames";
 
 interface SpinnerProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: "sm" | "md" | "lg" | "xl";
   color?: string;
   className?: string;
 }
 
-export function Spinner({ 
-  size = 'md', 
-  color = 'primary', 
-  className 
+export function Spinner({
+  size = "md",
+  color = "primary",
+  className,
 }: SpinnerProps) {
   const sizeClass = {
-    sm: 'h-4 w-4',
-    md: 'h-6 w-6',
-    lg: 'h-8 w-8',
-    xl: 'h-10 w-10',
+    sm: "h-4 w-4",
+    md: "h-6 w-6",
+    lg: "h-8 w-8",
+    xl: "h-10 w-10",
   }[size];
 
-  const colorClass = {
-    primary: 'text-primary',
-    white: 'text-white',
-    grey: 'text-textSecondary',
-  }[color] || 'text-primary';
+  const colorClass =
+    {
+      primary: "text-primary",
+      white: "text-white",
+      grey: "text-textSecondary",
+    }[color] || "text-primary";
 
   return (
-    <div className={cn('animate-spin', sizeClass, colorClass, className)} role="status">
+    <div
+      className={cn("animate-spin", sizeClass, colorClass, className)}
+      role="status"
+    >
       <svg
         className="h-full w-full"
         fill="none"

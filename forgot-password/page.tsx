@@ -1,10 +1,11 @@
-import { Metadata } from 'next';
-import { Card } from '@/components/ui/card';
-import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
+import { Metadata } from "next";
+
+import { Card } from "@/components/ui/card";
+import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 export const metadata: Metadata = {
-  title: 'Forgot Password | Credenza',
-  description: 'Reset your Credenza account password',
+  title: "Forgot Password | Credenza",
+  description: "Reset your Credenza account password",
 };
 
 export default function ForgotPasswordPage() {

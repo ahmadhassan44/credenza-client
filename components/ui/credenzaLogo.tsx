@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface CredenzaLogoProps {
   width?: number;
@@ -13,12 +13,12 @@ export const CredenzaLogo: React.FC<CredenzaLogoProps> = ({
 }) => {
   return (
     <svg
-      width={width}
+      className={className}
+      fill="none"
       height={height}
       viewBox="0 0 120 40"
-      fill="none"
+      width={width}
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
     >
       {/* Simplified logo representation */}
       <path
@@ -29,10 +29,7 @@ export const CredenzaLogo: React.FC<CredenzaLogoProps> = ({
         d="M26.4148 10.86V25.08H36.9348V28.14H22.1548V10.86H26.4148Z"
         fill="white"
       />
-      <path
-        d="M44.7797 10.86V28.14H40.5197V10.86H44.7797Z"
-        fill="white"
-      />
+      <path d="M44.7797 10.86V28.14H40.5197V10.86H44.7797Z" fill="white" />
       <path
         d="M58.2545 28.5C56.3945 28.5 54.7145 28.06 53.2145 27.18C51.7345 26.3 50.5745 25.07 49.7345 23.49C48.8945 21.89 48.4745 20.1 48.4745 18.12C48.4745 16.14 48.8945 14.36 49.7345 12.78C50.5745 11.2 51.7345 9.97 53.2145 9.09C54.7145 8.21 56.3945 7.77 58.2545 7.77C59.8345 7.77 61.2445 8.1 62.4845 8.76C63.7445 9.4 64.7345 10.35 65.4545 11.61L62.1545 13.83C61.2745 12.33 60.0145 11.58 58.3745 11.58C57.2945 11.58 56.3345 11.84 55.4945 12.36C54.6545 12.86 53.9945 13.6 53.5145 14.58C53.0345 15.56 52.7945 16.74 52.7945 18.12C52.7945 19.5 53.0345 20.68 53.5145 21.66C53.9945 22.64 54.6545 23.39 55.4945 23.91C56.3345 24.41 57.2945 24.66 58.3745 24.66C60.0145 24.66 61.2745 23.91 62.1545 22.41L65.4545 24.63C64.7345 25.89 63.7445 26.85 62.4845 27.51C61.2445 28.17 59.8345 28.5 58.2545 28.5Z"
         fill="white"
