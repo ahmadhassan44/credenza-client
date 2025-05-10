@@ -58,7 +58,7 @@ export function RegisterForm() {
         data.email,
         data.password,
       );
-      router.push("/login?registered=true");
+      router.push("/welcome");
     } catch (err: any) {
       const errorMessage =
         err?.response?.data?.message ||

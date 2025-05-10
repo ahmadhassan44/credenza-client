@@ -103,6 +103,11 @@ export function CustomNavbar() {
                 <p className="font-semibold">Signed in as</p>
                 <p className="font-semibold">{user?.email}</p>
               </DropdownItem>
+              <DropdownItem key="welcome">
+                <NextLink className="w-full" href="/welcome">
+                  Welcome
+                </NextLink>
+              </DropdownItem>
               <DropdownItem key="dashboard">
                 <NextLink className="w-full" href="/dashboard">
                   Dashboard

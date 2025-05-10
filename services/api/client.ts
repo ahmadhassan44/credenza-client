@@ -1,12 +1,19 @@
 import axios from "axios";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/v1";
+
 // Create an Axios instance with the base URL and default settings
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/v2",
+  baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
+    "Accept": "application/json"
   },
+  withCredentials: false // Keep this if you use cookies or auth headers
 });
+
+console.log("API URL 2:", API_URL);
 
 // Add a request interceptor for authentication
 apiClient.interceptors.request.use(

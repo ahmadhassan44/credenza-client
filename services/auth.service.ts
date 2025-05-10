@@ -141,7 +141,7 @@ export async function register(
   data: RegisterData,
 ): Promise<{ message: string; user: User }> {
   const response = await api.post<{ message: string; user: User }>(
-    "/auth/register",
+    "/api/v1/auth/register",
     {
       firstName: data.firstName,
       lastName: data.lastName,

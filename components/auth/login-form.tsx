@@ -37,7 +37,7 @@ export function LoginForm() {
 
     try {
       await login(data.email, data.password, data.rememberMe);
-      router.push("/dashboard");
+      router.push("/welcome");
     } catch (err: any) {
       const errorMessage =
         err?.response?.data?.message ||
