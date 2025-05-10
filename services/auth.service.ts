@@ -104,6 +104,7 @@ export interface RegisterData {
   lastName: string;
   email: string;
   password: string;
+  role?: "USER" | "CREATOR" | "ADMIN";
 }
 
 export interface AuthResponse {
@@ -147,6 +148,7 @@ export async function register(
       lastName: data.lastName,
       email: data.email,
       password: data.password,
+      role: data.role || "USER",
     },
   );
 

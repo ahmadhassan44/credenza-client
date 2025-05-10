@@ -5,7 +5,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Input } from "@heroui/react";
+import { 
+  Button, 
+  Input, 
+  Dropdown, 
+  DropdownTrigger, 
+  DropdownMenu, 
+  DropdownItem 
+} from "@heroui/react";
 
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../ui/icons/icons";
 import { useToast } from "../ui/toast";
@@ -22,8 +29,6 @@ export function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
 
-  const toggleVisibility = () => setIsVisible(!isVisible);
-
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -32,8 +37,18 @@ export function RegisterForm() {
       email: "",
       password: "",
       confirmPassword: "",
+      role: "CREATOR",
     },
   });
+
+  const [selectedRole, setSelectedRole] = useState<"USER" | "CREATOR" | "ADMIN">(form.getValues("role") as "USER" | "CREATOR" | "ADMIN");
+
+  const handleRoleChange = (role: "USER" | "CREATOR" | "ADMIN") => {
+    setSelectedRole(role);
+    form.setValue("role", role);
+  };
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
   async function onSubmit(data: RegisterFormValues) {
     if (!agreeTerms) {
@@ -57,6 +72,7 @@ export function RegisterForm() {
         data.lastName,
         data.email,
         data.password,
+        data.role
       );
       router.push("/welcome");
     } catch (err: any) {
@@ -294,6 +310,43 @@ export function RegisterForm() {
                     {...form.register("confirmPassword")}
                   />
                 </div>
+              </div>
+
+              {/* Role Selection */}
+              <div className="min-w-[116px] flex flex-col">
+                <div className="pb-3 pr-2">
+                  <span className="text-white text-sm leading-4 font-['Space_Grotesk']">
+                    Your Role
+                  </span>
+                </div>
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button 
+                      className="bg-[#1A1A1A] text-white border border-[#52525B] rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] font-['Space_Grotesk'] p-2 h-[42px] w-full justify-between"
+                      disabled={isLoading}
+                      variant="flat"
+                    >
+                      {selectedRole === "USER" && "Regular User"}
+                      {selectedRole === "CREATOR" && "Content Creator"}
+                      {selectedRole === "ADMIN" && "Administrator"}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu 
+                    aria-label="Role selection" 
+                    onAction={(key) => handleRoleChange(key as "USER" | "CREATOR" | "ADMIN")}
+                    variant="flat"
+                  >
+                    <DropdownItem key="USER">Regular User</DropdownItem>
+                    <DropdownItem key="CREATOR">Content Creator</DropdownItem>
+                    <DropdownItem key="ADMIN">Administrator</DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+                <input type="hidden" {...form.register("role")} value={selectedRole} />
+                {form.formState.errors.role && (
+                  <p className="text-red-400 text-sm mt-1">
+                    {form.formState.errors.role.message}
+                  </p>
+                )}
               </div>
 
               {/* Terms and conditions agreement */}

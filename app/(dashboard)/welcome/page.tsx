@@ -59,14 +59,21 @@ function WelcomePage() {
         <div className="grid md:grid-cols-2 gap-8 mb-8">
           <div className="p-6 border border-gray-800 rounded-lg">
             <h2 className="text-xl font-semibold mb-4">Your Account</h2>
-            <div className="space-y-3">
-              <div>
+            <div className="space-y-3">              <div>
                 <Text className="text-gray-400">Email:</Text>
                 <Text className="font-medium">{user?.email}</Text>
               </div>
               <div>
                 <Text className="text-gray-400">Name:</Text>
                 <Text className="font-medium">{user ? `${user.firstName} ${user.lastName}` : 'N/A'}</Text>
+              </div>
+              <div>
+                <Text className="text-gray-400">Role:</Text>
+                <Text className="font-medium">
+                  {user?.role === 'USER' && 'Regular User'}
+                  {user?.role === 'CREATOR' && 'Content Creator'}
+                  {user?.role === 'ADMIN' && 'Administrator'}
+                </Text>
               </div>
               <div>
                 <Text className="text-gray-400">Account Created:</Text>

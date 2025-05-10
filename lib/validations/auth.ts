@@ -15,6 +15,13 @@ export const loginSchema = z.object({
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 
+// Role enum
+export enum Role {
+  USER = "USER",
+  CREATOR = "CREATOR",
+  ADMIN = "ADMIN"
+}
+
 // Registration validation schema
 export const registerSchema = z
   .object({
@@ -38,6 +45,11 @@ export const registerSchema = z
     confirmPassword: z
       .string()
       .min(1, { message: "Please confirm your password" }),
+    role: z
+      .enum([Role.USER, Role.CREATOR, Role.ADMIN], { 
+        message: "Please select a valid role" 
+      })
+      .default(Role.USER),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

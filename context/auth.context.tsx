@@ -45,6 +45,7 @@ interface AuthContextType {
     lastName: string,
     email: string,
     password: string,
+    role?: "USER" | "CREATOR" | "ADMIN",
   ) => Promise<void>;
   logout: () => Promise<void>;
   testModeLogin: () => Promise<void>;
@@ -132,6 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     lastName: string,
     email: string,
     password: string,
+    role: "USER" | "CREATOR" | "ADMIN" = "USER",
   ) => {
     setIsLoading(true);
     setError(null);
@@ -142,6 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         lastName,
         email,
         password,
+        role,
       });
 
       const { accessToken, refreshToken, user } = response;

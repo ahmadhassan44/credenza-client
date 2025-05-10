@@ -5,6 +5,7 @@ export interface RegisterParams {
   password: string;
   firstName: string;
   lastName: string;
+  role?: "USER" | "CREATOR" | "ADMIN";
 }
 
 export interface LoginParams {
