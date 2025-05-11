@@ -49,6 +49,7 @@ interface AuthContextType {
   ) => Promise<void>;
   logout: () => Promise<void>;
   testModeLogin: () => Promise<void>;
+  guestLogin: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -222,6 +223,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Guest login for frontend-only development (no backend required)
+  const guestLogin = async () => {
+    setIsLoading(true);
+    setError(null);
+    // Simulate a guest user
+    const guestUser = {
+      id: "guest",
+      email: "guest@credenza.app",
+      firstName: "Guest",
+      lastName: "User",
+      role: "CREATOR" as const,
+    };
+    setTimeout(() => {
+      setUser(guestUser);
+      setIsLoading(false);
+    }, 500); // Simulate async delay
+  };
+
   // Clear error message
   const clearError = () => {
     setError(null);
@@ -236,6 +255,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     register,
     logout,
     testModeLogin,
+    guestLogin, // <-- add guestLogin to context
     clearError,
   };
 
