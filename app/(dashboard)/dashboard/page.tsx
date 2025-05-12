@@ -34,9 +34,9 @@ export default function DashboardPage() {
   const barChartData = dummyData.youtubeMonthlyStats;
 
   return (
-    <div className="flex min-h-screen bg-black">
-      {/* Sidebar */}
-      <div className="flex flex-col justify-between bg-[#080808] rounded-xl m-8 p-8 min-w-[260px] max-w-[260px]">
+    <div className="w-full bg-black">
+      {/* Sidebar: fixed, pinned, only as tall as viewport */}
+      <aside className="fixed top-0 left-0 h-screen w-1/4 max-w-xs min-w-[200px] bg-[#080808] p-8 flex flex-col justify-between z-30">
         <div>
           <p className="text-white text-[28px] font-['Space_Grotesk'] font-medium tracking-tighter text-center mb-12">
             Credenza
@@ -121,12 +121,12 @@ export default function DashboardPage() {
             </Button>
           ))}
         </div>
-      </div>
+      </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col pt-[63px] pb-[60px] px-[33px]">
+      {/* Main Content: add left margin to account for sidebar */}
+      <main className="ml-[25%] flex flex-col pt-[63px] pb-[60px] px-[33px] min-w-0">
         <div className="flex flex-col gap-7">
-          <div className="flex flex-col gap-[33px] w-full max-w-[982px]">
+          <div className="flex flex-col gap-[33px] w-full">
             <p className="text-white text-5xl font-['Space_Grotesk'] font-medium leading-6">
               Dashboard
             </p>
@@ -202,7 +202,8 @@ export default function DashboardPage() {
           {/* Bar Chart Section */}
           <YouTubeBarChart data={barChartData} />
         </div>
-      </div>
+      </main>
     </div>
   );
 }
+
