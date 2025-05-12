@@ -1,10 +1,12 @@
 "use client";
 
 import { Card } from "@heroui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchYouTubeMetrics } from "@/services/api/metrics";
 
 import YouTubeBarChart from "./youtubeBarChart";
 import CreditScoreLineChart from "./creditScoreLineChart";
+import ScoreProgress from "./ScoreProgress";
 
 import { dummyData } from "@/data/dummyData";
 import DashboardSidebar from "@/app/(dashboard)/dashboard/sidebar";
@@ -34,6 +36,23 @@ export default function DashboardPage() {
 
   // Use bar chart data from dummyData
   const barChartData = dummyData.youtubeMonthlyStats;
+
+  useEffect(() => {
+    const getMetrics = async () => {
+      try {
+        const data = await fetchYouTubeMetrics({
+          creatorId: "e0583f69-0220-4ccd-8cac-154b1f4b0b85",
+          platformType: "YOUTUBE",
+          startDate: "2025-04-12T00:00:00.000Z",
+          endDate: "2025-05-12T23:59:59.999Z",
+        });
+        console.log("YouTube Metrics:", data);
+      } catch (err) {
+        // Already logged in fetchYouTubeMetrics
+      }
+    };
+    getMetrics();
+  }, []);
 
   return (
     <div className="w-full bg-black">
@@ -114,6 +133,23 @@ export default function DashboardPage() {
                 </p>
               </div>
             </Card>
+          </div>
+          {/* Progress Bars Section */}
+          <div className="flex flex-row gap-6 w-full mt-2 px-1">
+            <ScoreProgress
+              label="Consistency Score"
+              value={dummyData.creditScore.scoreFactors.consistency}
+              color="#9E00F9" // App's accent color
+              description="Based on upload frequency and schedule"
+              barClassName="bg-[#9E00F9]"
+            />
+            <ScoreProgress
+              label="Engagement Score"
+              value={dummyData.creditScore.scoreFactors.engagement}
+              color="#FDBA74" // Secondary accent color
+              description="Avg engagement vs. audience size"
+              barClassName="bg-[#FDBA74]"
+            />
           </div>
           {/* Chart Section */}
           <div className="flex-1 min-h-[350px] w-full flex">
