@@ -1,7 +1,8 @@
 "use client";
 
-import { Card } from "@heroui/react";
+import { Card, Button } from "@heroui/react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import YouTubeBarChart from "./youtubeBarChart";
 import CreditScoreLineChart from "./creditScoreLineChart";
@@ -23,6 +24,7 @@ const sidebarItems = [
 
 export default function DashboardPage() {
   const [active, setActive] = useState("Dashboard");
+  const router = useRouter();
   const creditScore = dummyData.creditScore;
   const ytIncome = dummyData.incomeSources.find(
     (i) => i.platform === "YOUTUBE",
@@ -32,8 +34,12 @@ export default function DashboardPage() {
   );
   const subscribersGained = 2400; // Example static value
 
-  // Use bar chart data from dummyData
-  const barChartData = dummyData.youtubeMonthlyStats;
+  // Use only the first 4 months for the bar chart to make space
+  const barChartData = dummyData.youtubeMonthlyStats.slice(0, 4);
+
+  // Simulate top video data (replace with real API data in production)
+  const topVideo = dummyData.topVideo || null;
+  const youtubeConnected = Boolean(ytIncome && ytMetrics);
 
   return (
     <div className="w-full bg-black">
@@ -115,17 +121,54 @@ export default function DashboardPage() {
               </div>
             </Card>
           </div>
-          {/* Chart Section */}
+          {/* Credit Score Chart Section */}
           <div className="flex-1 min-h-[350px] w-full flex">
             <div className="flex-1 flex">
               <CreditScoreLineChart data={creditScore.trendData} />
             </div>
           </div>
-          {/* Bar Chart Section */}
-          <div className="flex-1 min-h-[350px] w-full flex">
+          {/* Chart Section with Top Video Card */}
+          <div className="flex-1 min-h-[350px] w-full flex gap-6">
             <div className="flex-1 flex">
               <YouTubeBarChart data={barChartData} />
             </div>
+            <Card className="flex flex-col justify-between bg-[#080808] rounded-xl p-6 shadow-lg w-[350px] min-w-[300px] max-w-[400px] min-h-[350px] h-full">
+              {youtubeConnected && topVideo ? (
+                <>
+                  <span className="text-xs text-purple-400 font-bold mb-1">NEW</span>
+                  <h3 className="text-white text-xl font-bold mb-2">Top Video</h3>
+                  <p className="text-white/80 text-lg mb-2">"{topVideo.title}"</p>
+                  <img src={topVideo.thumbnailUrl} alt="Top Video Thumbnail" className="rounded-lg w-full h-32 object-cover mb-3" />
+                  <div className="flex flex-col gap-1 mb-4">
+                    <span className="text-white/70 text-sm">Views: {topVideo.views.toLocaleString()}</span>
+                    <span className="text-white/70 text-sm">Est. Revenue: ${topVideo.estimatedRevenue}</span>
+                  </div>
+                  <Button
+                    className="w-full"
+                    style={{ backgroundColor: "#9E00F9", color: "#fff" }}
+                    variant="flat"
+                  >
+                    View Metrics
+                  </Button>
+                </>
+              ) : (
+                <div className="flex flex-col h-full justify-between">
+                  <div>
+                    <span className="text-xs text-purple-400 font-bold mb-1">YOUTUBE</span>
+                    <h3 className="text-white text-xl font-bold mb-2">Top Video</h3>
+                    <p className="text-white/80 text-lg mb-4">No channel connected</p>
+                  </div>
+                  <Button
+                    className="w-full mt-auto"
+                    style={{ backgroundColor: "#9E00F9", color: "#fff" }}
+                    variant="solid"
+                    onClick={() => router.push("/income")}
+                  >
+                    Link YouTube Channel
+                  </Button>
+                </div>
+              )}
+            </Card>
           </div>
         </div>
       </DashboardMain>

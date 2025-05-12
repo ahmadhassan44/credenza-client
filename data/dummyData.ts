@@ -150,6 +150,15 @@ export const dummyYoutubeMonthlyStats = [
   { month: "Dec", views: 120000, cpm: 4.5 },
 ];
 
+export const dummyTopVideo = {
+  id: "yt-video-1",
+  title: "How to Grow on YouTube in 2025",
+  thumbnailUrl: "/top-video-thumb.jpg",
+  views: 80000,
+  estimatedRevenue: 250,
+  publishedAt: "2025-04-20T12:00:00.000Z",
+};
+
 export const dummyData = {
   user: dummyUser,
   creator: dummyCreator,
@@ -159,4 +168,5 @@ export const dummyData = {
   activityLogs: dummyActivityLogs,
   insights: dummyInsights,
   youtubeMonthlyStats: dummyYoutubeMonthlyStats,
+  topVideo: dummyTopVideo,
 };
