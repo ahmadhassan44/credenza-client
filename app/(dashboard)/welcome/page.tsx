@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Button } from "@heroui/button";
 
 import { Text } from "@/components/ui/text";
-import { Card } from "@/components/ui/card";
+import { Card } from "@heroui/react";  
 import { useAuth } from "@/context/auth.context";
 
 function WelcomePage() {
