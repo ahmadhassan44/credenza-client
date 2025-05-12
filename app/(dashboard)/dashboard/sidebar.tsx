@@ -1,4 +1,5 @@
 import { Button } from "@heroui/react";
+import { useRouter } from "next/navigation";
 
 interface SidebarProps {
   active: string;
@@ -11,6 +12,8 @@ export default function DashboardSidebar({
   setActive,
   sidebarItems,
 }: SidebarProps) {
+  const router = useRouter();
+
   // Map tab labels to icon filenames in /public
   const iconMap: Record<string, string> = {
     Profile: "/profileTab.svg",
@@ -38,7 +41,12 @@ export default function DashboardSidebar({
               style={{ height: 48 }}
               tabIndex={0}
               variant="flat"
-              onClick={() => setActive(item.label)}
+              onClick={() => {
+                setActive(item.label);
+                if (item.label === "Income Streams") {
+                  router.push("/income");
+                }
+              }}
             >
               <img
                 alt={`${item.label} icon`}

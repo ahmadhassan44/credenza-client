@@ -31,9 +31,18 @@ export interface AuthResponse {
 const authApi = {
   // Register a new user
   register: async (params: RegisterParams): Promise<AuthResponse> => {
-    const response = await apiClient.post("api/v1/auth/register", params); // Removed duplicate /api/v1
-
-    return response.data;
+    const response = await apiClient.post("api/v1/auth/register", params);
+    const data = response.data;
+    // Save user info including creatorId to localStorage
+    if (typeof window !== "undefined") {
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+      if (data.user.creatorId) {
+        localStorage.setItem("creatorId", data.user.creatorId);
+      }
+    }
+    return data;
   },
 
   // Login with email and password

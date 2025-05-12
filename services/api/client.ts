@@ -13,8 +13,6 @@ const apiClient = axios.create({
   withCredentials: false, // Keep this if you use cookies or auth headers
 });
 
-console.log("API URL 2:", API_URL);
-
 // Add a request interceptor for authentication
 apiClient.interceptors.request.use(
   (config) => {
@@ -93,5 +91,9 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+export function getApiUrl() {
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/v1";
+}
 
 export default apiClient;
