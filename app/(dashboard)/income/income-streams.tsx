@@ -1,8 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  Button,
+  Card,
+  Modal,
+  ModalContent,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { Button, Card, Modal, ModalContent } from "@heroui/react";
 
 import DashboardSidebar from "../dashboard/sidebar";
 
@@ -29,7 +38,65 @@ export default function IncomeStreamsPage() {
   const [error, setError] = useState("");
   const [active, setActive] = useState("Income Streams");
   const [showModal, setShowModal] = useState(false);
+  const [metricsQuality, setMetricsQuality] = useState<string>("");
+  const [hasMockData, setHasMockData] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const data = localStorage.getItem("mockMetricsData");
+
+    setHasMockData(!!data);
+  }, []);
+
+  const handleMockMetrics = async (creatorId: string, quality: string) => {
+    const baseurl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/v1";
+
+    const body = {
+      creatorId,
+      lastXMonths: 6,
+      platformType: "YOUTUBE",
+      metricsQuality: quality,
+    };
+
+    const accessToken =
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken")
+        : null;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
+
+    const response = await fetch(`${baseurl}/api/v1/mock/metric`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) throw new Error("Failed to generate mock metrics");
+
+    const data = await response.json();
+
+    localStorage.setItem("mockMetricsData", JSON.stringify(data));
+    setHasMockData(true);
+
+    // Store the fetched data in the data directory (server-side file)
+    try {
+      await fetch("/api/write-metrics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ metrics: data }),
+      });
+    } catch (e) {
+      // Ignore file write errors in dev
+      console.error("Failed to write metrics to file:", e);
+    }
+
+    return data;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +111,8 @@ export default function IncomeStreamsPage() {
         type: "YOUTUBE",
         handle,
       });
-      setSuccess("YouTube channel linked successfully!");
+      await handleMockMetrics(creatorId, metricsQuality);
+      setSuccess("YouTube channel linked and mock metrics generated!");
       setHandle("");
     } catch (err: any) {
       setError(err.message || "Something went wrong");
@@ -84,6 +152,23 @@ export default function IncomeStreamsPage() {
     }
   };
 
+  const handleOpenModal = () => {
+    if (hasMockData) {
+      setShowConfirm(true);
+    } else {
+      setShowModal(true);
+    }
+  };
+
+  const handleConfirmReplace = () => {
+    setShowConfirm(false);
+    setShowModal(true);
+  };
+
+  const handleCancelReplace = () => {
+    setShowConfirm(false);
+  };
+
   return (
     <div className="flex w-full bg-black min-h-screen font-['Space_Grotesk']">
       <DashboardSidebar
@@ -111,7 +196,7 @@ export default function IncomeStreamsPage() {
             </div>
             <Button
               className="w-full bg-red-600 hover:bg-red-700"
-              onClick={() => setShowModal(true)}
+              onClick={handleOpenModal}
             >
               Link YouTube Account
             </Button>
@@ -165,6 +250,39 @@ export default function IncomeStreamsPage() {
                       onChange={(e) => setHandle(e.target.value)}
                     />
                   </label>
+                  <label
+                    className="text-white/80 font-medium"
+                    htmlFor="metrics-quality"
+                  >
+                    Metrics Quality
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button
+                          className="mt-2 w-full text-white bg-[#232326] font-['Space_Grotesk'] justify-between"
+                          variant="flat"
+                        >
+                          {metricsQuality || "Select quality"}
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu
+                        aria-label="Metrics Quality"
+                        className="bg-[#232326] text-white font-['Space_Grotesk']"
+                        selectedKeys={metricsQuality ? [metricsQuality] : []}
+                        variant="flat"
+                        onAction={(key) => setMetricsQuality(key as string)}
+                      >
+                        <DropdownItem key="BAD" variant="flat">
+                          BAD
+                        </DropdownItem>
+                        <DropdownItem key="NORMAL" variant="flat">
+                          NORMAL
+                        </DropdownItem>
+                        <DropdownItem key="GOOD" variant="flat">
+                          GOOD
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </label>
                   {success && (
                     <div className="text-green-500 mt-2">{success}</div>
                   )}
@@ -179,13 +297,39 @@ export default function IncomeStreamsPage() {
                     </Button>
                     <Button
                       className="bg-red-600 hover:bg-red-700"
-                      disabled={loading || !handle}
+                      disabled={loading || !handle || !metricsQuality}
                       type="submit"
                     >
                       {loading ? "Linking..." : "Link YouTube"}
                     </Button>
                   </div>
                 </form>
+              </div>
+            </ModalContent>
+          </Modal>
+        )}
+        {showConfirm && (
+          <Modal isOpen={showConfirm} onClose={handleCancelReplace}>
+            <ModalContent>
+              <div className="bg-[#18181b] p-8 rounded-xl w-full max-w-md mx-auto font-['Space_Grotesk'] text-white">
+                <div className="text-xl font-bold mb-4">
+                  Replace Metrics Data?
+                </div>
+                <p className="mb-6">
+                  Are you sure you want to disconnect the old data and retrieve
+                  new data?
+                </p>
+                <div className="flex justify-end gap-2">
+                  <Button className="bg-gray-700" onClick={handleCancelReplace}>
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-red-600 hover:bg-red-700"
+                    onClick={handleConfirmReplace}
+                  >
+                    Yes, Replace
+                  </Button>
+                </div>
               </div>
             </ModalContent>
           </Modal>
