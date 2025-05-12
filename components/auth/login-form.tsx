@@ -183,7 +183,14 @@ export function LoginForm() {
                     endContent={
                       <div
                         className="cursor-pointer text-gray-400"
+                        role="button"
+                        tabIndex={0}
                         onClick={toggleVisibility}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            toggleVisibility();
+                          }
+                        }}
                       >
                         {isVisible ? <EyeFilledIcon /> : <EyeSlashFilledIcon />}
                       </div>
@@ -242,9 +249,10 @@ export function LoginForm() {
                 </Button>
                 {/* Continue as Guest Button */}
                 <Button
-                  variant="bordered"
                   className="cursor-pointer w-full flex justify-center items-center rounded-xl h-[48px] text-white border font-['Space_Grotesk']"
                   isDisabled={isLoading}
+                  type="button"
+                  variant="bordered"
                   onClick={async (e) => {
                     e.preventDefault();
                     setIsLoading(true);
@@ -255,13 +263,14 @@ export function LoginForm() {
                       setIsLoading(false);
                     }
                   }}
-                  type="button"
                 >
                   Continue as Guest
                 </Button>
 
                 <p className="font-['Space_Grotesk'] text-center font-medium leading-6">
-                  <span className="text-[#8F8F8F]">Don't have an account?</span>
+                  <span className="text-[#8F8F8F]">
+                    {`Don't have an account?`}
+                  </span>
                   <Link
                     className="text-white hover:text-gray-300"
                     href="/signup"

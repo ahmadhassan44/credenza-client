@@ -8,9 +8,9 @@ const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
-    "Accept": "application/json"
+    Accept: "application/json",
   },
-  withCredentials: false // Keep this if you use cookies or auth headers
+  withCredentials: false, // Keep this if you use cookies or auth headers
 });
 
 console.log("API URL 2:", API_URL);

@@ -135,6 +135,21 @@ export const dummyInsights = [
   },
 ];
 
+export const dummyYoutubeMonthlyStats = [
+  { month: "Jan", views: 90000, cpm: 4.1 },
+  { month: "Feb", views: 95000, cpm: 4.0 },
+  { month: "Mar", views: 100000, cpm: 4.3 },
+  { month: "Apr", views: 110000, cpm: 4.2 },
+  { month: "May", views: 120000, cpm: 4.2 },
+  { month: "Jun", views: 115000, cpm: 4.4 },
+  { month: "Jul", views: 105000, cpm: 4.3 },
+  { month: "Aug", views: 98000, cpm: 4.1 },
+  { month: "Sep", views: 102000, cpm: 4.2 },
+  { month: "Oct", views: 108000, cpm: 4.3 },
+  { month: "Nov", views: 112000, cpm: 4.2 },
+  { month: "Dec", views: 120000, cpm: 4.5 },
+];
+
 export const dummyData = {
   user: dummyUser,
   creator: dummyCreator,
@@ -143,4 +158,5 @@ export const dummyData = {
   platformMetrics: dummyPlatformMetrics,
   activityLogs: dummyActivityLogs,
   insights: dummyInsights,
+  youtubeMonthlyStats: dummyYoutubeMonthlyStats,
 };

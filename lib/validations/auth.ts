@@ -19,7 +19,7 @@ export type LoginFormValues = z.infer<typeof loginSchema>;
 export enum Role {
   USER = "USER",
   CREATOR = "CREATOR",
-  ADMIN = "ADMIN"
+  ADMIN = "ADMIN",
 }
 
 // Registration validation schema
@@ -46,8 +46,8 @@ export const registerSchema = z
       .string()
       .min(1, { message: "Please confirm your password" }),
     role: z
-      .enum([Role.USER, Role.CREATOR, Role.ADMIN], { 
-        message: "Please select a valid role" 
+      .enum([Role.USER, Role.CREATOR, Role.ADMIN], {
+        message: "Please select a valid role",
       })
       .default(Role.USER),
   })
