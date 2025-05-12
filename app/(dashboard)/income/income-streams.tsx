@@ -85,7 +85,7 @@ export default function IncomeStreamsPage() {
   };
 
   return (
-    <div className="flex w-full bg-black min-h-screen">
+    <div className="flex w-full bg-black min-h-screen font-['Space_Grotesk']">
       <DashboardSidebar
         active={active}
         setActive={handleSetActive}
@@ -93,14 +93,14 @@ export default function IncomeStreamsPage() {
         sidebarWidth="15vw"
       />
       <main
-        className="flex-1 flex flex-col items-center justify-center p-4 md:p-8"
+        className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 font-['Space_Grotesk']"
         style={{ marginLeft: "15vw" }}
       >
-        <h2 className="text-3xl font-bold mb-8 text-white text-center">
+        <h2 className="text-3xl font-bold mb-8 text-white text-center font-['Space_Grotesk']">
           Link Your Accounts
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
-          <Card className="bg-[#18181b] text-white flex flex-col justify-between shadow-lg p-6 rounded-xl">
+          <Card className="bg-[#18181b] text-white flex flex-col justify-between shadow-lg p-6 rounded-xl font-['Space_Grotesk']">
             <div className="mb-4">
               <div className="text-xl font-semibold mb-2">YouTube</div>
               <p className="mb-4 text-white/80">
@@ -116,7 +116,7 @@ export default function IncomeStreamsPage() {
               Link YouTube Account
             </Button>
           </Card>
-          <Card className="bg-[#18181b] text-white flex flex-col justify-between shadow-lg p-6 rounded-xl opacity-70">
+          <Card className="bg-[#18181b] text-white flex flex-col justify-between shadow-lg p-6 rounded-xl opacity-70 font-['Space_Grotesk']">
             <div className="mb-4">
               <div className="text-xl font-semibold mb-2">Patreon</div>
               <p className="mb-4 text-white/80">
@@ -129,7 +129,7 @@ export default function IncomeStreamsPage() {
               Coming Soon
             </Button>
           </Card>
-          <Card className="bg-[#18181b] text-white flex flex-col justify-between shadow-lg p-6 rounded-xl opacity-70">
+          <Card className="bg-[#18181b] text-white flex flex-col justify-between shadow-lg p-6 rounded-xl opacity-70 font-['Space_Grotesk']">
             <div className="mb-4">
               <div className="text-xl font-semibold mb-2">Instagram</div>
               <p className="mb-4 text-white/80">
@@ -145,7 +145,7 @@ export default function IncomeStreamsPage() {
         {showModal && (
           <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
             <ModalContent>
-              <div className="bg-[#18181b] p-8 rounded-xl w-full max-w-md mx-auto">
+              <div className="bg-[#18181b] p-8 rounded-xl w-full max-w-md mx-auto font-['Space_Grotesk']">
                 <div className="text-2xl font-bold mb-4 text-white">
                   Link Your YouTube Channel
                 </div>
@@ -190,7 +190,7 @@ export default function IncomeStreamsPage() {
             </ModalContent>
           </Modal>
         )}
-        <div className="mt-12 max-w-3xl text-center text-white/80">
+        <div className="mt-12 max-w-3xl text-center text-white/80 font-['Space_Grotesk']">
           <h3 className="text-xl font-semibold mb-2">
             Why Link Your Accounts?
           </h3>
