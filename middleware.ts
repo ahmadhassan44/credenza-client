@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 // Define which paths are protected (require authentication)
-const protectedPaths = ["/dashboard"];
+const protectedPaths: string[] = [];
 
 // Define which paths are auth-only (only for non-authenticated users)
 const authOnlyPaths = ["/login", "/signup", "/forgot-password"];

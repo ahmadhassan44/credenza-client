@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 
 import { authApi } from "@/services/api";
+import { dummyData } from "@/data/dummyData";
 
 interface User {
   id: string;
@@ -68,6 +69,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         typeof window !== "undefined"
           ? localStorage.getItem("accessToken")
           : null;
+
+      // Check for guest session if no token
+      if (!token && typeof window !== "undefined") {
+        const guestUser = localStorage.getItem("guestUser");
+        if (guestUser) {
+          setUser(JSON.parse(guestUser));
+          setIsLoading(false);
+          return;
+        }
+      }
 
       if (token) {
         try {
@@ -186,11 +197,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Clear tokens and user state
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
+      localStorage.removeItem("guestUser"); // Clear guest session
       setUser(null);
       setIsLoading(false);
 
-      // Redirect to login
-      router.push("/login");
+      // Redirect to dashboard
+      router.push("/dashboard");
     }
   };
 
@@ -227,18 +239,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const guestLogin = async () => {
     setIsLoading(true);
     setError(null);
-    // Simulate a guest user
+    // Use dummy data for guest session, matching User interface
+    const [firstName, ...lastNameArr] = dummyData.user.fullName.split(" ");
+    const lastName = lastNameArr.join(" ") || "Guest";
     const guestUser = {
-      id: "guest",
-      email: "guest@credenza.app",
-      firstName: "Guest",
-      lastName: "User",
-      role: "CREATOR" as const,
+      id: dummyData.user.id,
+      email: dummyData.user.email,
+      firstName,
+      lastName,
+      role: dummyData.user.role,
+      creatorId: dummyData.creator.id,
     };
     setTimeout(() => {
       setUser(guestUser);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("guestUser", JSON.stringify(guestUser));
+      }
       setIsLoading(false);
-    }, 500); // Simulate async delay
+    }, 500);
   };
 
   // Clear error message

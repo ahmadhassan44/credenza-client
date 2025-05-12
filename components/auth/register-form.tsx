@@ -5,23 +5,27 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { 
-  Button, 
-  Input, 
-  Dropdown, 
-  DropdownTrigger, 
-  DropdownMenu, 
-  DropdownItem 
+import {
+  Button,
+  Input,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@heroui/react";
 
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../ui/icons/icons";
 import { useToast } from "../ui/toast";
 
 import { useAuth } from "@/context/auth.context";
-import { RegisterFormValues, registerSchema, Role } from "@/lib/validations/auth";
+import {
+  RegisterFormValues,
+  registerSchema,
+  Role,
+} from "@/lib/validations/auth";
 
 export function RegisterForm() {
-  const { 
+  const {
     register: registerUser,
     error: authError,
     clearError,
@@ -46,7 +50,9 @@ export function RegisterForm() {
     },
   });
 
-  const [selectedRole, setSelectedRole] = useState<Role>(form.getValues("role") as Role);
+  const [selectedRole, setSelectedRole] = useState<Role>(
+    form.getValues("role") as Role
+  );
 
   const handleRoleChange = (role: Role) => {
     setSelectedRole(role);
@@ -60,7 +66,7 @@ export function RegisterForm() {
       showToast
         ? showToast(
             "You must agree to the Terms of Service and Privacy Policy",
-            "error",
+            "error"
           )
         : setError("You must agree to the Terms of Service and Privacy Policy");
 
@@ -77,9 +83,9 @@ export function RegisterForm() {
         data.lastName,
         data.email,
         data.password,
-        data.role
+        data.role,
       );
-      router.push("/welcome");
+      router.push("/dashboard");
     } catch (err: any) {
       const errorMessage =
         err?.response?.data?.message ||
@@ -424,27 +430,6 @@ export function RegisterForm() {
                 >
                   {isLoading ? "Creating account..." : "Sign Up"}
                 </Button>
-
-                {/* Guest Login Button */}
-                <Button
-                  variant="bordered"
-                  className="cursor-pointer w-full flex justify-center items-center rounded-xl h-[48px] text-white border font-['Space_Grotesk']"
-                  isDisabled={isLoading}
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    setIsLoading(true);
-                    try {
-                      await guestLogin();
-                      router.push("/welcome");
-                    } finally {
-                      setIsLoading(false);
-                    }
-                  }}
-                  type="button"
-                >
-                  Continue as Guest
-                </Button>
-
                 <p className="font-['Space_Grotesk'] text-center font-medium leading-6">
                   <span className="text-[#8F8F8F]">
                     Already have an account?
