@@ -25,12 +25,7 @@ import {
 } from "@/lib/validations/auth";
 
 export function RegisterForm() {
-  const {
-    register: registerUser,
-    error: authError,
-    clearError,
-    guestLogin,
-  } = useAuth();
+  const { register: registerUser, error: authError, clearError } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -51,7 +46,7 @@ export function RegisterForm() {
   });
 
   const [selectedRole, setSelectedRole] = useState<Role>(
-    form.getValues("role") as Role
+    form.getValues("role") as Role,
   );
 
   const handleRoleChange = (role: Role) => {
@@ -66,7 +61,7 @@ export function RegisterForm() {
       showToast
         ? showToast(
             "You must agree to the Terms of Service and Privacy Policy",
-            "error"
+            "error",
           )
         : setError("You must agree to the Terms of Service and Privacy Policy");
 
@@ -269,6 +264,9 @@ export function RegisterForm() {
                     className="bg-[#1A1A1A] text-white border-[#52525B] rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] font-['Space_Grotesk']"
                     endContent={
                       <div
+                        aria-label={
+                          isVisible ? "Hide password" : "Show password"
+                        }
                         className="cursor-pointer text-gray-400"
                         role="button"
                         tabIndex={0}
@@ -279,7 +277,6 @@ export function RegisterForm() {
                             toggleVisibility();
                           }
                         }}
-                        aria-label={isVisible ? "Hide password" : "Show password"}
                       >
                         {isVisible ? <EyeFilledIcon /> : <EyeSlashFilledIcon />}
                       </div>
@@ -313,6 +310,9 @@ export function RegisterForm() {
                     className="bg-[#1A1A1A] text-white border-[#52525B] rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] font-['Space_Grotesk']"
                     endContent={
                       <div
+                        aria-label={
+                          isVisible ? "Hide password" : "Show password"
+                        }
                         className="cursor-pointer text-gray-400"
                         role="button"
                         tabIndex={0}
@@ -323,7 +323,6 @@ export function RegisterForm() {
                             toggleVisibility();
                           }
                         }}
-                        aria-label={isVisible ? "Hide password" : "Show password"}
                       >
                         {isVisible ? <EyeFilledIcon /> : <EyeSlashFilledIcon />}
                       </div>
@@ -361,9 +360,9 @@ export function RegisterForm() {
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
-                    variant="flat"
-                    className="bg-[#1A1A1A] "
                     aria-label="Role selection"
+                    className="bg-[#1A1A1A] "
+                    variant="flat"
                     onAction={(key) => handleRoleChange(key as Role)}
                   >
                     <DropdownItem key={Role.USER} variant="flat">

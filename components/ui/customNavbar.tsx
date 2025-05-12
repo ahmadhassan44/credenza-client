@@ -34,12 +34,12 @@ export function CustomNavbar() {
     >
       <NavbarBrand>
         <NextLink passHref href="/">
-          <Image 
-            src="/credenzaLogo.svg"
-            alt="Credenza Logo"
-            width={120}
-            height={40}
+          <Image
             priority
+            alt="Credenza Logo"
+            height={40}
+            src="/credenzaLogo.svg"
+            width={120}
           />
         </NextLink>
       </NavbarBrand>

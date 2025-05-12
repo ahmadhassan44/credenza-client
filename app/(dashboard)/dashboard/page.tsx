@@ -1,9 +1,21 @@
 "use client";
 
 import { Button, Card } from "@heroui/react";
-import { dummyData } from "@/data/dummyData";
 import { useState } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Legend,
+} from "recharts";
+
+import { dummyData } from "@/data/dummyData";
+import YouTubeBarChart from "./youtubeBarChart";
 
 const sidebarItems = [
   { label: "Profile" },
@@ -19,50 +31,103 @@ const sidebarItems = [
 export default function DashboardPage() {
   const [active, setActive] = useState("Dashboard");
   const creditScore = dummyData.creditScore;
-  const ytIncome = dummyData.incomeSources.find((i) => i.platform === "YOUTUBE");
-  const ytMetrics = dummyData.platformMetrics.find((m) => m.platform === "YOUTUBE");
+  const ytIncome = dummyData.incomeSources.find(
+    (i) => i.platform === "YOUTUBE",
+  );
+  const ytMetrics = dummyData.platformMetrics.find(
+    (m) => m.platform === "YOUTUBE",
+  );
   const subscribersGained = 2400; // Example static value
+
+  // Use bar chart data from dummyData
+  const barChartData = dummyData.youtubeMonthlyStats;
 
   return (
     <div className="flex min-h-screen bg-black">
       {/* Sidebar */}
       <div className="flex flex-col justify-between bg-[#080808] rounded-xl m-8 p-8 min-w-[260px] max-w-[260px]">
         <div>
-          <p className="text-white text-[28px] font-['Space_Grotesk'] font-medium tracking-tighter text-center mb-12">Credenza</p>
+          <p className="text-white text-[28px] font-['Space_Grotesk'] font-medium tracking-tighter text-center mb-12">
+            Credenza
+          </p>
           <div className="flex flex-col gap-2">
             {sidebarItems.slice(0, 6).map((item) => (
-              <div
+              <Button
                 key={item.label}
-                className={`flex items-center gap-2 px-6 rounded-xl h-12 cursor-pointer font-['Space_Grotesk'] ${item.active || active === item.label ? "bg-gradient-to-b from-[#9E00F9] to-[#9E00F9] text-white" : "text-white/80 hover:bg-[#18181b]"}`}
+                aria-pressed={active === item.label}
+                className={`flex items-center gap-2 px-6 rounded-xl h-12 font-['Space_Grotesk'] text-base ${active === item.label ? "bg-gradient-to-b from-[#9E00F9] to-[#9E00F9] text-white" : "text-white/80 bg-transparent hover:bg-transparent"}`}
                 style={{ height: 48 }}
+                tabIndex={0}
+                variant="flat"
                 onClick={() => setActive(item.label)}
               >
                 {item.label === "Dashboard" && (
                   <span className="mr-2">
                     {/* Dashboard icon SVG */}
-                    <svg width="20" height="20" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path fillRule="evenodd" clipRule="evenodd" d="M5.418 7.00051H2.582C2.16587 6.99709 1.76541 7.15911 1.46873 7.45091C1.17204 7.74271 1.00343 8.14041 1 8.55651V14.4455C1.0077 15.3117 1.71584 16.0078 2.582 16.0005H5.418C5.8341 16.004 6.2346 15.842 6.5313 15.5502C6.828 15.2584 6.9966 14.8607 7 14.4445V8.55651C6.9966 8.14041 6.828 7.74271 6.5313 7.45091C6.2346 7.15911 5.8341 6.99709 5.418 7.00051Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path fillRule="evenodd" clipRule="evenodd" d="M5.418 1.0006H2.582C1.73326 0.977064 1.02559 1.64492 1 2.4936V3.5076C1.02559 4.35629 1.73326 5.02415 2.582 5.0006H5.418C6.2667 5.02415 6.9744 4.35629 7 3.5076V2.4936C6.9744 1.64492 6.2667 0.977064 5.418 1.0006Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path fillRule="evenodd" clipRule="evenodd" d="M10.582 10.0007H13.417C13.8333 10.0044 14.234 9.8425 14.5309 9.5507C14.8278 9.2588 14.9966 8.86101 15 8.44471V2.55666C14.9966 2.14054 14.828 1.74282 14.5313 1.45101C14.2346 1.1592 13.8341 0.997205 13.418 1.00066H10.582C10.1659 0.997205 9.7654 1.1592 9.4687 1.45101C9.172 1.74282 9.0034 2.14054 9 2.55666V8.44471C9.0034 8.86081 9.172 9.2585 9.4687 9.5503C9.7654 9.8421 10.1659 10.0041 10.582 10.0007Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path fillRule="evenodd" clipRule="evenodd" d="M10.582 16.0006H13.417C14.2661 16.0247 14.9744 15.3567 15 14.5076V13.4936C14.9744 12.6449 14.2667 11.9771 13.418 12.0006H10.582C9.7333 11.9771 9.0256 12.6449 9 13.4936V14.5066C9.025 15.3557 9.7329 16.0241 10.582 16.0006Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg
+                      fill="none"
+                      height="20"
+                      viewBox="0 0 16 17"
+                      width="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M5.418 7.00051H2.582C2.16587 6.99709 1.76541 7.15911 1.46873 7.45091C1.17204 7.74271 1.00343 8.14041 1 8.55651V14.4455C1.0077 15.3117 1.71584 16.0078 2.582 16.0005H5.418C5.8341 16.004 6.2346 15.842 6.5313 15.5502C6.828 15.2584 6.9966 14.8607 7 14.4445V8.55651C6.9966 8.14041 6.828 7.74271 6.5313 7.45091C6.2346 7.15911 5.8341 6.99709 5.418 7.00051Z"
+                        fillRule="evenodd"
+                        stroke="white"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                      />
+                      <path
+                        clipRule="evenodd"
+                        d="M5.418 1.0006H2.582C1.73326 0.977064 1.02559 1.64492 1 2.4936V3.5076C1.02559 4.35629 1.73326 5.02415 2.582 5.0006H5.418C6.2667 5.02415 6.9744 4.35629 7 3.5076V2.4936C6.9744 1.64492 6.2667 0.977064 5.418 1.0006Z"
+                        fillRule="evenodd"
+                        stroke="white"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                      />
+                      <path
+                        clipRule="evenodd"
+                        d="M10.582 10.0007H13.417C13.8333 10.0044 14.234 9.8425 14.5309 9.5507C14.8278 9.2588 14.9966 8.86101 15 8.44471V2.55666C14.9966 2.14054 14.828 1.74282 14.5313 1.45101C14.2346 1.1592 13.8341 0.997205 13.418 1.00066H10.582C10.1659 0.997205 9.7654 1.1592 9.4687 1.45101C9.172 1.74282 9.0034 2.14054 9 2.55666V8.44471C9.0034 8.86081 9.172 9.2585 9.4687 9.5503C9.7654 9.8421 10.1659 10.0041 10.582 10.0007Z"
+                        fillRule="evenodd"
+                        stroke="white"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                      />
+                      <path
+                        clipRule="evenodd"
+                        d="M10.582 16.0006H13.417C14.2661 16.0247 14.9744 15.3567 15 14.5076V13.4936C14.9744 12.6449 14.2667 11.9771 13.418 12.0006H10.582C9.7333 11.9771 9.0256 12.6449 9 13.4936V14.5066C9.025 15.3557 9.7329 16.0241 10.582 16.0006Z"
+                        fillRule="evenodd"
+                        stroke="white"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                      />
                     </svg>
                   </span>
                 )}
                 <span>{item.label}</span>
-              </div>
+              </Button>
             ))}
           </div>
         </div>
         <div className="flex flex-col gap-2 mt-8">
           {sidebarItems.slice(6).map((item) => (
-            <div
+            <Button
               key={item.label}
-              className="flex items-center gap-2 px-6 rounded-xl h-12 cursor-pointer font-['Space_Grotesk'] text-white/80 hover:bg-[#18181b]"
+              aria-pressed={active === item.label}
+              className="flex items-center gap-2 px-6 rounded-xl h-12 font-['Space_Grotesk'] text-white/80 hover:bg-[#18181b] text-base"
               style={{ height: 48 }}
+              tabIndex={0}
+              variant="flat"
               onClick={() => setActive(item.label)}
             >
               <span>{item.label}</span>
-            </div>
+            </Button>
           ))}
         </div>
       </div>
@@ -71,64 +136,153 @@ export default function DashboardPage() {
       <div className="flex-1 flex flex-col pt-[63px] pb-[60px] px-[33px]">
         <div className="flex flex-col gap-7">
           <div className="flex flex-col gap-[33px] w-full max-w-[982px]">
-            <p className="text-white text-5xl font-['Space_Grotesk'] font-medium leading-6">Dashboard</p>
-            <p className="text-white text-2xl font-['Space_Grotesk'] font-medium leading-6">Overview of your creator metrics and income performance from YouTube</p>
+            <p className="text-white text-5xl font-['Space_Grotesk'] font-medium leading-6">
+              Dashboard
+            </p>
+            <p className="text-white text-2xl font-['Space_Grotesk'] font-medium leading-6">
+              Overview of your creator metrics and income performance from
+              YouTube
+            </p>
           </div>
           <div className="flex flex-wrap gap-y-2 gap-x-3.5">
             <Card className="bg-[#9E00F9] rounded-xl w-[243px] h-[120px]">
               <div className="flex flex-col h-full justify-between p-3">
                 <div>
-                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">Credit Score →</p>
-                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">{creditScore.overallScore}</p>
+                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
+                    Credit Score →
+                  </p>
+                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
+                    {creditScore.overallScore}
+                  </p>
                 </div>
-                <p className="text-[#F4F4F5] text-sm font-['Inter'] leading-[14px]">Based on your consistency, engagement, and income</p>
+                <p className="text-[#F4F4F5] text-sm font-['Inter'] leading-[14px]">
+                  Based on your consistency, engagement, and income
+                </p>
               </div>
             </Card>
             <Card className="bg-[#080808] rounded-xl w-[243px] h-[120px]">
               <div className="flex flex-col h-full justify-between p-3">
                 <div>
-                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">Monthly Income Estimate (YouTube)</p>
-                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">${ytIncome ? ytIncome.monthlyIncome.toLocaleString() : "-"}</p>
+                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
+                    Monthly Income Estimate (YouTube)
+                  </p>
+                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
+                    ${ytIncome ? ytIncome.monthlyIncome.toLocaleString() : "-"}
+                  </p>
                 </div>
-                <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">Estimated from current CPM and view trends</p>
+                <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
+                  Estimated from current CPM and view trends
+                </p>
               </div>
             </Card>
             <Card className="bg-[#080808] rounded-xl w-[243px] h-[120px]">
               <div className="flex flex-col h-full justify-between p-3">
                 <div>
-                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">Views</p>
-                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">{ytMetrics ? ytMetrics.views.toLocaleString() : "-"}</p>
+                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
+                    Views
+                  </p>
+                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
+                    {ytMetrics ? ytMetrics.views.toLocaleString() : "-"}
+                  </p>
                 </div>
-                <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">Views across your entire channel</p>
+                <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
+                  Views across your entire channel
+                </p>
               </div>
             </Card>
             <Card className="bg-[#080808] rounded-xl w-[243px] h-[120px]">
               <div className="flex flex-col h-full justify-between p-3">
                 <div>
-                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">Subscribers (Gained This Month)</p>
-                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">+{subscribersGained.toLocaleString()}</p>
+                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
+                    Subscribers (Gained This Month)
+                  </p>
+                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
+                    +{subscribersGained.toLocaleString()}
+                  </p>
                 </div>
-                <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">New subscribers in last 30 days</p>
+                <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
+                  New subscribers in last 30 days
+                </p>
               </div>
             </Card>
           </div>
           {/* Chart Section */}
           <Card className="bg-[#080808] rounded-xl w-[1014px] h-[373px] flex flex-col items-center justify-center mt-8">
+            <div className="w-full flex flex-col items-start px-8 pt-8">
+              <span className="text-[#F4F4F5] font-['Space_Grotesk'] text-base mb-2">
+                Credit score over the last month (May)
+              </span>
+            </div>
             <div className="w-full h-[240px] flex flex-row">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={creditScore.trendData} margin={{ left: 40, right: 40, top: 20, bottom: 20 }}>
-                  <YAxis domain={[60, 100]} tick={{ fill: '#F4F4F5', fontSize: 12, fontFamily: 'Roboto' }} ticks={[100, 90, 80, 60, 40, 20, 0]} />
-                  <XAxis dataKey="date" tick={{ fill: '#F4F4F5', fontSize: 12, fontFamily: 'Roboto' }} />
-                  <Tooltip contentStyle={{ background: '#18181b', border: 'none', color: '#F4F4F5' }} />
-                  <Line type="monotone" dataKey="score" stroke="#9E00F9" strokeWidth={2} dot={{ r: 6, fill: '#fff', stroke: '#9E00F9', strokeWidth: 2 }} />
+              <ResponsiveContainer height="100%" width="100%">
+                <LineChart
+                  data={creditScore.trendData}
+                  margin={{ left: 40, right: 40, top: 20, bottom: 20 }}
+                >
+                  <YAxis
+                    domain={[60, 100]}
+                    label={{
+                      value: "Credit Score",
+                      angle: -90,
+                      position: "insideLeft",
+                      style: {
+                        fill: "#F4F4F5",
+                        fontSize: 14,
+                        fontFamily: "Space Grotesk",
+                      },
+                      dx: -10,
+                      dy: 40,
+                    }}
+                    tick={{
+                      fill: "#F4F4F5",
+                      fontSize: 12,
+                      fontFamily: "Space Grotesk",
+                    }}
+                    ticks={[100, 90, 80, 60, 40, 20, 0]}
+                  />
+                  <XAxis
+                    dataKey="date"
+                    label={{
+                      value: "Day",
+                      position: "insideBottom",
+                      style: {
+                        fill: "#F4F4F5",
+                        fontSize: 14,
+                        fontFamily: "Space Grotesk",
+                      },
+                      dy: 16,
+                    }}
+                    tick={{
+                      fill: "#F4F4F5",
+                      fontSize: 12,
+                      fontFamily: "Space Grotesk",
+                    }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: "#18181b",
+                      border: "none",
+                      color: "#F4F4F5",
+                    }}
+                  />
+                  <Line
+                    dataKey="score"
+                    dot={{
+                      r: 6,
+                      fill: "#fff",
+                      stroke: "#9E00F9",
+                      strokeWidth: 2,
+                    }}
+                    stroke="#9E00F9"
+                    strokeWidth={2}
+                    type="monotone"
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
-            <div className="flex flex-row justify-between w-full px-8 mt-2">
-              <span className="text-[#F4F4F5] font-['Roboto'] text-xs">Credit score over the last month (May)</span>
-              <span className="text-[#F4F4F5] font-['Space_Grotesk'] text-sm">Day</span>
-            </div>
           </Card>
+          {/* Bar Chart Section */}
+          <YouTubeBarChart data={barChartData} />
         </div>
       </div>
     </div>

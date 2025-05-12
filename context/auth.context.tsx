@@ -73,9 +73,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Check for guest session if no token
       if (!token && typeof window !== "undefined") {
         const guestUser = localStorage.getItem("guestUser");
+
         if (guestUser) {
           setUser(JSON.parse(guestUser));
           setIsLoading(false);
+
           return;
         }
       }
@@ -250,6 +252,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       role: dummyData.user.role,
       creatorId: dummyData.creator.id,
     };
+
     setTimeout(() => {
       setUser(guestUser);
       if (typeof window !== "undefined") {
