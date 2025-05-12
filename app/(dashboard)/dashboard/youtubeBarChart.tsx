@@ -57,7 +57,7 @@ export default function YouTubeBarChart({
   data: { month: string; views: number; cpm: number }[];
 }) {
   return (
-    <Card className="bg-[#080808] rounded-xl w-[1014px] h-[373px] flex flex-col items-center justify-center mt-8">
+    <Card className="bg-[#080808] rounded-xl w-full h-[373px] flex flex-col items-center justify-center mt-8">
       <div className="w-full flex flex-col items-start px-8 pt-8">
         <span className="text-[#F4F4F5] font-['Space_Grotesk'] text-base mb-2">
           YouTube Views &amp; CPM by Month
