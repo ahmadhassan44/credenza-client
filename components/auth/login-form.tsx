@@ -13,7 +13,7 @@ import { LoginFormValues, loginSchema } from "@/lib/validations/auth";
 import { useAuth } from "@/context/auth.context";
 
 export function LoginForm() {
-  const { login, error: authError, clearError } = useAuth();
+  const { login, error: authError, clearError, guestLogin } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -37,7 +37,7 @@ export function LoginForm() {
 
     try {
       await login(data.email, data.password, data.rememberMe);
-      router.push("/welcome");
+      router.push("/dashboard");
     } catch (err: any) {
       const errorMessage =
         err?.response?.data?.message ||
@@ -239,6 +239,25 @@ export function LoginForm() {
                   type="submit"
                 >
                   {isLoading ? "Logging in..." : "Log in"}
+                </Button>
+                {/* Continue as Guest Button */}
+                <Button
+                  variant="bordered"
+                  className="cursor-pointer w-full flex justify-center items-center rounded-xl h-[48px] text-white border font-['Space_Grotesk']"
+                  isDisabled={isLoading}
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    setIsLoading(true);
+                    try {
+                      await guestLogin();
+                      router.push("/dashboard");
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                  type="button"
+                >
+                  Continue as Guest
                 </Button>
 
                 <p className="font-['Space_Grotesk'] text-center font-medium leading-6">
