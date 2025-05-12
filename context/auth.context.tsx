@@ -92,8 +92,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } catch (error) {
           // If token is invalid or expired, clear it
           if (typeof window !== "undefined") {
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
+            // Only remove tokens if the error is NOT a network error (i.e., actually unauthorized)
+            if (
+              error &&
+              (error as any).response &&
+              (error as any).response.status === 401
+            ) {
+              localStorage.removeItem("accessToken");
+              localStorage.removeItem("refreshToken");
+            }
           }
           setError("Session expired. Please login again.");
         }
@@ -195,9 +202,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       // Call logout API
       await authApi.logout();
-    } catch (error: unknown) {
-      console.error("Logout API error:", error);
-      // Continue with client-side logout even if API call fails
+    } catch {
+      // API error during logout, continue with client-side logout
     } finally {
       // Clear tokens and user state
       localStorage.removeItem("accessToken");

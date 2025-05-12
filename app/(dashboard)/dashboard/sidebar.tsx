@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -7,12 +7,14 @@ interface SidebarProps {
   active: string;
   setActive: (label: string) => void;
   sidebarItems: { label: string; active?: boolean }[];
+  sidebarWidth?: string;
 }
 
 export default function DashboardSidebar({
   active,
   setActive,
   sidebarItems,
+  sidebarWidth = "15vw",
 }: SidebarProps) {
   const router = useRouter();
 
@@ -29,7 +31,14 @@ export default function DashboardSidebar({
   };
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-1/4 max-w-xs min-w-[25%] bg-[#080808] p-8 flex flex-col justify-between z-30">
+    <aside
+      className="fixed top-0 left-0 h-screen bg-[#080808] p-8 flex flex-col justify-between z-30"
+      style={{
+        width: sidebarWidth,
+        minWidth: sidebarWidth,
+        maxWidth: sidebarWidth,
+      }}
+    >
       <div>
         <p className="text-white text-[28px] font-['Space_Grotesk'] font-medium tracking-tighter text-center mb-12">
           Credenza
@@ -98,5 +107,3 @@ export default function DashboardSidebar({
     </aside>
   );
 }
-
-
