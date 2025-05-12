@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/context/auth.context";
 import { Text } from "@/components/ui/text";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Button } from "@heroui/button";
+import { Card } from "@heroui/react";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function DashboardPage() {
@@ -41,7 +41,7 @@ export default function DashboardPage() {
                 ? `${user.firstName} ${user.lastName || ""}`
                 : user?.email}
             </Text>
-            <Button variant="outline" onClick={logout}>
+            <Button variant="bordered" onClick={logout}>
               Sign out
             </Button>
           </div>

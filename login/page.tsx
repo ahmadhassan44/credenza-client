@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-import { Card } from "@/components/ui/card";
+import { Card } from "@heroui/react"; 
 import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = {
