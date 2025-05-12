@@ -1,11 +1,12 @@
 "use client";
 
-import { Card, Button } from "@heroui/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Button, Card } from "@heroui/react";
+import { useState, useEffect } from "react";
+import { fetchYouTubeMetrics } from "@/services/api/metrics";
 
 import YouTubeBarChart from "./youtubeBarChart";
 import CreditScoreLineChart from "./creditScoreLineChart";
+import ScoreProgress from "./ScoreProgress";
 
 import { dummyData } from "@/data/dummyData";
 import DashboardSidebar from "@/app/(dashboard)/dashboard/sidebar";
@@ -34,12 +35,8 @@ export default function DashboardPage() {
   );
   const subscribersGained = 2400; // Example static value
 
-  // Use only the first 4 months for the bar chart to make space
-  const barChartData = dummyData.youtubeMonthlyStats.slice(0, 4);
-
-  // Simulate top video data (replace with real API data in production)
-  const topVideo = dummyData.topVideo || null;
-  const youtubeConnected = Boolean(ytIncome && ytMetrics);
+  // Use bar chart data from dummyData
+  const barChartData = dummyData.youtubeMonthlyStats;
 
   return (
     <div className="w-full bg-black">
@@ -121,7 +118,7 @@ export default function DashboardPage() {
               </div>
             </Card>
           </div>
-          {/* Credit Score Chart Section */}
+          {/* Chart Section */}
           <div className="flex-1 min-h-[350px] w-full flex">
             <div className="flex-1 flex">
               <CreditScoreLineChart data={creditScore.trendData} />
