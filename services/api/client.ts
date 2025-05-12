@@ -94,4 +94,8 @@ apiClient.interceptors.response.use(
   },
 );
 
+export function getApiUrl() {
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/v1";
+}
+
 export default apiClient;
