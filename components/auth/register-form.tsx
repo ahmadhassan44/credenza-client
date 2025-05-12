@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -32,6 +32,27 @@ export function RegisterForm() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  // Prompt for location access when the component mounts
+  useEffect(() => {
+    if (typeof window !== "undefined" && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          setLocationError("Location access denied or unavailable.");
+        }
+      );
+    } else {
+      setLocationError("Geolocation is not supported by your browser.");
+    }
+  }, []);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -68,6 +89,11 @@ export function RegisterForm() {
       return;
     }
 
+    if (!location) {
+      setError("Location permission is required to sign up.");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     clearError();
@@ -79,6 +105,7 @@ export function RegisterForm() {
         data.email,
         data.password,
         data.role,
+        location // Pass location as an extra argument
       );
       router.push("/dashboard");
     } catch (err: any) {
@@ -413,9 +440,9 @@ export function RegisterForm() {
               </div>
 
               {/* Error Messages */}
-              {(error || authError) && (
+              {(error || authError || locationError) && (
                 <div className="text-red-400 text-sm font-['Space_Grotesk']">
-                  {error || authError}
+                  {error || authError || locationError}
                 </div>
               )}
 

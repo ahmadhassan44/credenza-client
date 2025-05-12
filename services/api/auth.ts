@@ -6,6 +6,7 @@ export interface RegisterParams {
   firstName: string;
   lastName: string;
   role?: "USER" | "CREATOR" | "ADMIN";
+  location?: { latitude: number; longitude: number };
 }
 
 export interface LoginParams {

@@ -47,6 +47,7 @@ interface AuthContextType {
     email: string,
     password: string,
     role?: "USER" | "CREATOR" | "ADMIN",
+    location?: { latitude: number; longitude: number },
   ) => Promise<void>;
   logout: () => Promise<void>;
   testModeLogin: () => Promise<void>;
@@ -148,6 +149,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     email: string,
     password: string,
     role: "USER" | "CREATOR" | "ADMIN" = "USER",
+    location?: { latitude: number; longitude: number },
   ) => {
     setIsLoading(true);
     setError(null);
@@ -159,6 +161,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         password,
         role,
+        location,
       });
 
       const { accessToken, refreshToken, user } = response;
