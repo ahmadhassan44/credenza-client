@@ -1,10 +1,19 @@
 import { Card } from "@heroui/react";
-import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload || !payload.length) return null;
   const views = payload.find((p: any) => p.dataKey === "views");
   const cpm = payload.find((p: any) => p.dataKey === "cpm");
+
   return (
     <div
       style={{

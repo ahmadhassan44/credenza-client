@@ -13,7 +13,9 @@ interface CreditScoreLineChartProps {
   data: Array<{ date: string; score: number }>;
 }
 
-export default function CreditScoreLineChart({ data }: CreditScoreLineChartProps) {
+export default function CreditScoreLineChart({
+  data,
+}: CreditScoreLineChartProps) {
   return (
     <div className="bg-[#080808] rounded-xl w-[1014px] h-[373px] flex flex-col items-center justify-center mt-8">
       <div className="w-full flex flex-col items-start px-8 pt-8">
