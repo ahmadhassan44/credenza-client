@@ -3,6 +3,7 @@
 import { Button, Card } from "@heroui/react";
 import { useState, useEffect } from "react";
 import { fetchYouTubeMetrics } from "@/services/api/metrics";
+import { useRouter } from "next/navigation";
 
 import YouTubeBarChart from "./youtubeBarChart";
 import CreditScoreLineChart from "./creditScoreLineChart";
@@ -35,8 +36,19 @@ export default function DashboardPage() {
   );
   const subscribersGained = 2400; // Example static value
 
-  // Use bar chart data from dummyData
-  const barChartData = dummyData.youtubeMonthlyStats;
+  // Simulate YouTube connection and top video for demo
+  const youtubeConnected = true; // or false to test the fallback UI
+  const topVideo = youtubeConnected
+    ? {
+        title: "How to Grow on YouTube in 2025",
+        thumbnailUrl: "/credenzaLogo.svg",
+        views: 120000,
+        estimatedRevenue: 320.5,
+      }
+    : null;
+
+  // Use bar chart data from dummyData (limit to last 6 months for better fit)
+  const barChartData = dummyData.youtubeMonthlyStats.slice(-6);
 
   return (
     <div className="w-full bg-black">
@@ -118,7 +130,7 @@ export default function DashboardPage() {
               </div>
             </Card>
           </div>
-          {/* Chart Section */}
+          {/* Line graph Section */}
           <div className="flex-1 min-h-[350px] w-full flex">
             <div className="flex-1 flex">
               <CreditScoreLineChart data={creditScore.trendData} />
@@ -166,6 +178,25 @@ export default function DashboardPage() {
                 </div>
               )}
             </Card>
+          </div>
+          {/* Progress Bars Section */}
+          <div className="flex flex-row gap-6 w-full mt-2">
+            <ScoreProgress
+              label="Consistency Score"
+              value={creditScore.scoreFactors.consistency}
+              max={100}
+              color="#9E00F9"
+              background="#232329"
+              description="Based on upload frequency and schedule"
+            />
+            <ScoreProgress
+              label="Engagement Score"
+              value={creditScore.scoreFactors.engagement}
+              max={100}
+              color="#9E00F9"
+              background="#232329"
+              description="Avg engagement vs. audience size"
+            />
           </div>
         </div>
       </DashboardMain>

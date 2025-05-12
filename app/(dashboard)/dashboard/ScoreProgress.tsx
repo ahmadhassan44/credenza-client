@@ -14,22 +14,27 @@ const ScoreProgress: React.FC<ScoreProgressProps> = ({
   label,
   value,
   max = 100,
-  color = "#181C23",
+  color = "#9E00F9",
   description,
   barClassName = "",
 }) => {
   return (
-    <div className="bg-white rounded-xl p-4 flex-1 min-w-[320px] max-w-[500px] shadow-sm border border-[#E5E7EB]">
-      <div className="font-semibold text-gray-900 text-base mb-2">{label}</div>
-      <Progress
-        value={value}
-        max={max}
-        className="h-3 rounded-full bg-[#F1F3F6]"
-        barClassName={`rounded-full transition-all duration-500 ${barClassName}`}
-        style={{ backgroundColor: "#F1F3F6" }}
-        barStyle={{ backgroundColor: color }}
-      />
-      <div className="mt-2 text-sm text-gray-600">
+    <div className="bg-[#18181B] rounded-xl p-5 flex-1 min-w-[320px] max-w-[500px] border border-[#27272A]">
+      <div className="text-white text-base font-semibold mb-2">{label}</div>
+      <div className="w-full flex items-center mb-2">
+        <div className="w-full">
+          <div className="h-3 w-full bg-[#232329] rounded-full overflow-hidden">
+            <div
+              className={`h-3 rounded-full transition-all duration-500 ${barClassName}`}
+              style={{
+                width: `${(value / max) * 100}%`,
+                background: color,
+              }}
+            ></div>
+          </div>
+        </div>
+      </div>
+      <div className="text-[#A1A1AA] text-sm mt-1">
         {value} / {max}
         {description && <span> – {description}</span>}
       </div>
