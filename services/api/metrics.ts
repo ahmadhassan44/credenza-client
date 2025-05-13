@@ -13,7 +13,26 @@ export async function fetchYouTubeMetrics(body: MetricsRequestBody) {
     const response = await apiClient.get("/api/v1/metrics", { params: body });
     return response.data;
   } catch (error) {
-    console.error("Error fetching YouTube metrics:", error);
+    throw error;
+  }
+}
+
+export async function fetchLatestCreditScore(creatorId: string) {
+  try {
+    const response = await apiClient.get(`/credit-scoring/latest/${creatorId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function fetchCreditScoreHistory(creatorId: string) {
+  try {
+    const response = await apiClient.get(
+      `/credit-scoring/history/${creatorId}`,
+    );
+    return response.data;
+  } catch (error) {
     throw error;
   }
 }

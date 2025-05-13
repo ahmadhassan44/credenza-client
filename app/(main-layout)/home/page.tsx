@@ -1,177 +1,330 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@heroui/react";
+import Image from "next/image";
+import { Button, Card } from "@heroui/react";
+
+import { CustomNavbar } from "@/components/ui/customNavbar";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
-      {/* Hero section */}
-      <div className="py-24 sm:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-              Credit Scoring for Digital Creators
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-300">
-              Credenza helps digital creators access fair financial products by
-              evaluating creditworthiness through platform metrics, income
-              stability, and growth patterns.
-            </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Link href="/signup">
-                <Button color="primary" size="lg">
-                  Get started
-                </Button>
-              </Link>
-              <Link
-                className="text-sm font-semibold leading-6 text-white"
-                href="/about"
-              >
-                Learn more <span aria-hidden="true">→</span>
-              </Link>
-            </div>
+    <div
+      className="min-h-screen font-space-grotesk relative overflow-x-hidden flex flex-col"
+      style={{
+        fontFamily: "Space Grotesk, sans-serif",
+        background: "#000",
+      }}
+    >
+      {/* Custom Navbar */}
+      <CustomNavbar />
+
+      {/* Hero Section */}
+      <section className="relative flex flex-col items-center justify-center min-h-[90vh] pt-24 pb-20 z-10">
+        {/* Animated Glow/Particles */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute left-1/2 top-1/3 -translate-x-1/2 w-[700px] h-[400px] bg-gradient-radial from-[#9E00F9]/40 via-[#CA6EFF]/20 to-transparent blur-3xl opacity-80 animate-pulse" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-3xl text-center">
+          <h1 className="text-4xl sm:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-[0_0_30px_#9E00F9aa]">
+            Powering Creator Finance With Intelligent Credit Scoring
+          </h1>
+          <p className="text-xl text-gray-200 mb-8">
+            Credenza empowers creators with AI-driven insights into income, creditworthiness, and financial tools.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button
+              as={Link}
+              className="bg-[#9E00F9] font-semibold hover:scale-105 hover:shadow-xl px-8 py-3 rounded-xl shadow-lg shadow-[#9E00F9]/40 text-white transition-all duration-200"
+              href="/signup"
+              size="lg"
+            >
+              Sign Up Free
+            </Button>
+            <Button
+              as={Link}
+              className="bg-transparent border border-[#9E00F9] font-semibold hover:bg-[#9E00F9]/10 hover:scale-105 hover:text-white px-8 py-3 rounded-xl text-[#9E00F9] transition-all duration-200"
+              href="/login"
+              size="lg"
+              variant="bordered"
+            >
+              Log In
+            </Button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Features section */}
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl lg:text-center">
-          <h2 className="text-base font-semibold leading-7 text-indigo-600">
-            Faster credit decisions
+      {/* Solution Statement Section */}
+      <section className="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 px-6 py-24">
+        {/* Left: Text Block */}
+        <div className="flex-1 max-w-xl">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            Built for modern creators, powered by intelligent finance.
           </h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Everything you need to evaluate digital creators
+          <p className="text-lg text-gray-300 mb-8">
+            Whether you&apos;re a YouTuber, streamer, or freelancer — Credenza
+            transforms your platform data into credit scores and actionable
+            income insights to unlock financial opportunities.
           </p>
-          <p className="mt-6 text-lg leading-8 text-gray-300">
-            Our platform analyzes creator metrics across multiple platforms to
-            provide a comprehensive credit assessment.
-          </p>
-        </div>
-        <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-          <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-            <div className="flex flex-col">
-              <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-                <svg
-                  aria-hidden="true"
-                  className="h-5 w-5 flex-none text-indigo-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    clipRule="evenodd"
-                    d="M5.5 17a4.5 4.5 0 01-1.44-8.765 4.5 4.5 0 018.302-3.046 3.5 3.5 0 014.504 4.272A4 4 0 0115 17H5.5zm3.75-2.75a.75.75 0 001.5 0V9.66l1.95 2.1a.75.75 0 101.1-1.02l-3.25-3.5a.75.75 0 00-1.1 0l-3.25 3.5a.75.75 0 101.1 1.02l1.95-2.1v4.59z"
-                    fillRule="evenodd"
-                  />
-                </svg>
-                Platform Integration
-              </dt>
-              <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
-                <p className="flex-auto">
-                  Connect YouTube, TikTok, Instagram, and other platforms to get
-                  a holistic view of creator metrics.
-                </p>
-              </dd>
+          <div className="flex gap-4 mt-4">
+            <div className="flex flex-col items-center group cursor-pointer">
+              <Image
+                alt="YouTube"
+                className="w-10 h-10 rounded-full bg-[#222] group-hover:ring-2 group-hover:ring-[#9E00F9] transition"
+                height={40}
+                src="/youtube.svg"
+                width={40}
+              />
+              <span className="text-xs text-gray-400 mt-2 group-hover:text-[#9E00F9] transition">
+                YouTube
+              </span>
             </div>
-            <div className="flex flex-col">
-              <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-                <svg
-                  aria-hidden="true"
-                  className="h-5 w-5 flex-none text-indigo-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    clipRule="evenodd"
-                    d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z"
-                    fillRule="evenodd"
-                  />
-                </svg>
-                Advanced Analytics
-              </dt>
-              <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
-                <p className="flex-auto">
-                  Our proprietary algorithms analyze growth trends, audience
-                  engagement, and income stability.
-                </p>
-              </dd>
+            <div className="flex flex-col items-center group cursor-pointer">
+              <Image
+                alt="Instagram"
+                className="w-10 h-10 rounded-full bg-[#222] group-hover:ring-2 group-hover:ring-[#9E00F9] transition"
+                height={40}
+                src="/instagram.svg"
+                width={40}
+              />
+              <span className="text-xs text-gray-400 mt-2 group-hover:text-[#9E00F9] transition">
+                Instagram
+              </span>
             </div>
-            <div className="flex flex-col">
-              <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
-                <svg
-                  aria-hidden="true"
-                  className="h-5 w-5 flex-none text-indigo-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    clipRule="evenodd"
-                    d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z"
-                    fillRule="evenodd"
-                  />
-                </svg>
-                Instant Decisions
-              </dt>
-              <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
-                <p className="flex-auto">
-                  Get instant credit decisions based on your platform
-                  performance, not just traditional credit scores.
-                </p>
-              </dd>
-            </div>
-          </dl>
-        </div>
-      </div>
-
-      {/* CTA section */}
-      <div className="mt-32 sm:mt-56">
-        <div className="relative isolate overflow-hidden bg-gray-900">
-          <div className="px-6 py-24 sm:px-8 sm:py-32 lg:px-16">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Ready to get started?
-              </h2>
-              <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-300">
-                Sign up today and discover how Credenza can help you access
-                financial products tailored for digital creators.
-              </p>
-              <div className="mt-10 flex items-center justify-center gap-x-6">
-                <Link href="/signup">
-                  <Button color="primary" size="lg">
-                    Get started
-                  </Button>
-                </Link>
-                <Link
-                  className="text-sm font-semibold leading-6 text-white"
-                  href="/docs"
-                >
-                  Learn more <span aria-hidden="true">→</span>
-                </Link>
-              </div>
+            <div className="flex flex-col items-center group cursor-pointer">
+              <Image
+                alt="Patreon"
+                className="w-10 h-10 rounded-full bg-[#222] group-hover:ring-2 group-hover:ring-[#9E00F9] transition"
+                height={40}
+                src="/patreon.svg"
+                width={40}
+              />
+              <span className="text-xs text-gray-400 mt-2 group-hover:text-[#9E00F9] transition">
+                Patreon
+              </span>
             </div>
           </div>
-          <svg
-            aria-hidden="true"
-            className="absolute left-1/2 top-1/2 -z-10 h-[64rem] w-[64rem] -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(closest-side,white,transparent)]"
-            viewBox="0 0 1024 1024"
-          >
-            <circle
-              cx="512"
-              cy="512"
-              fill="url(#radial-gradient)"
-              fillOpacity="0.7"
-              r="512"
-            />
-            <defs>
-              <radialGradient id="radial-gradient">
-                <stop stopColor="#7775D6" />
-                <stop offset="1" stopColor="#E935C1" />
-              </radialGradient>
-            </defs>
-          </svg>
         </div>
-      </div>
+        {/* Right: Animated Graph/Illustration */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-full max-w-md aspect-[4/3] bg-gradient-to-br from-[#9E00F9]/30 via-[#CA6EFF]/20 to-[#F1C7FF]/10 rounded-3xl shadow-2xl flex items-center justify-center relative overflow-hidden">
+            {/* Placeholder for animated graph/illustration */}
+            <Image
+              alt="Animated Graph"
+              className="w-3/4 mx-auto animate-pulse"
+              height={240}
+              src="/creditScoreTab.svg"
+              width={320}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Services Grid */}
+      <section className="relative z-10 max-w-7xl mx-auto px-6 py-24">
+        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-12 text-center">
+          What Credenza Offers
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <Card className="bg-[#18122B]/80 border border-[#9E00F9]/20 shadow-xl rounded-2xl p-8 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl hover:border-[#CA6EFF] transition-all duration-300">
+            <div className="text-4xl mb-4">💰</div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Income Tracking
+            </h3>
+            <p className="text-gray-300">
+              Real-time performance analytics from YouTube and more.
+            </p>
+          </Card>
+          <Card className="bg-[#18122B]/80 border border-[#9E00F9]/20 shadow-xl rounded-2xl p-8 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl hover:border-[#CA6EFF] transition-all duration-300">
+            <div className="text-4xl mb-4">📊</div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Credit Score Engine
+            </h3>
+            <p className="text-gray-300">
+              Custom-built algorithm scores creators based on consistency,
+              income, and engagement.
+            </p>
+          </Card>
+          <Card className="bg-[#18122B]/80 border border-[#9E00F9]/20 shadow-xl rounded-2xl p-8 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl hover:border-[#CA6EFF] transition-all duration-300">
+            <div className="text-4xl mb-4">🔧</div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Fintech Tools
+            </h3>
+            <p className="text-gray-300">
+              Unlock insights, optimize your growth, and prepare for financial
+              services.
+            </p>
+          </Card>
+        </div>
+      </section>
+
+      {/* Credit Score Generation Process */}
+      <section className="relative z-10 max-w-7xl mx-auto px-6 py-24">
+        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-12 text-center">
+          How Your Score is Built
+        </h2>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4">
+          {[
+            {
+              icon: <span className="text-3xl">🔌</span>,
+              title: "Connect Platforms",
+              desc: "Securely link your creator accounts.",
+            },
+            {
+              icon: <span className="text-3xl">📅</span>,
+              title: "Analyze Consistency",
+              desc: "Review your content and income patterns.",
+            },
+            {
+              icon: <span className="text-3xl">🤖</span>,
+              title: "Score Generation",
+              desc: "AI-powered scoring tailored for creators.",
+            },
+            {
+              icon: <span className="text-3xl">🚀</span>,
+              title: "Unlock Features",
+              desc: "Access financial tools and offers.",
+            },
+          ].map((step, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center text-center flex-1 min-w-[150px] max-w-[200px]"
+            >
+              <div className="mb-3 flex items-center justify-center w-14 h-14 rounded-full bg-[#9E00F9]/20 border border-[#9E00F9]/40 text-3xl shadow-lg">
+                {step.icon}
+              </div>
+              <h4 className="text-lg font-semibold text-white mb-1">
+                {step.title}
+              </h4>
+              <p className="text-gray-400 text-sm mb-2">{step.desc}</p>
+              {i < 4 && (
+                <div className="hidden md:block w-12 h-1 bg-gradient-to-r from-[#9E00F9] to-[#CA6EFF] rounded-full my-2" />
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="relative z-10 w-full bg-[#18122B] border-t border-[#9E00F9]/20 py-12 px-6 mt-auto">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex-1 mb-8 md:mb-0">
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Ready to understand your creator credit score?
+            </h3>
+            <Button
+              as={Link}
+              className="bg-gradient-to-r from-[#9E00F9] to-[#CA6EFF] font-semibold hover:scale-105 px-8 py-3 rounded-xl shadow-lg text-white transition-all duration-200"
+              href="/signup"
+              size="lg"
+            >
+              Get Started for Free
+            </Button>
+          </div>
+          <div className="flex-[2] grid grid-cols-2 sm:grid-cols-4 gap-8 w-full">
+            <div>
+              <h4 className="text-white font-semibold mb-2">Company</h4>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>
+                  <Link
+                    className="hover:text-[#9E00F9] transition"
+                    href="/about"
+                  >
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="hover:text-[#9E00F9] transition"
+                    href="/blog"
+                  >
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    className="hover:text-[#9E00F9] transition"
+                    href="/careers"
+                  >
+                    Careers
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-2">Resources</h4>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>
+                  <a className="hover:text-[#9E00F9] transition" href="/help">
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="hover:text-[#9E00F9] transition"
+                    href="/api-docs"
+                  >
+                    API Docs
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-2">Contact</h4>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>
+                  <a
+                    className="hover:text-[#9E00F9] transition"
+                    href="mailto:support@credenza.ai"
+                  >
+                    support@credenza.ai
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="hover:text-[#9E00F9] transition"
+                    href="https://linkedin.com"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    LinkedIn
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="hover:text-[#9E00F9] transition"
+                    href="https://twitter.com"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Twitter
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-2">Legal</h4>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>
+                  <a className="hover:text-[#9E00F9] transition" href="/terms">
+                    Terms of Service
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="hover:text-[#9E00F9] transition"
+                    href="/privacy"
+                  >
+                    Privacy Policy
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div className="mt-10 text-center text-gray-500 text-xs">
+          © 2025 Credenza Technologies Inc. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 }

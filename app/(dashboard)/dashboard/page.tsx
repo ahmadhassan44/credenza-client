@@ -11,6 +11,10 @@ import ScoreProgress from "./ScoreProgress";
 import { dummyData } from "@/data/dummyData";
 import DashboardSidebar from "@/app/(dashboard)/dashboard/sidebar";
 import DashboardMain from "@/app/(dashboard)/dashboard/main";
+import {
+  fetchLatestCreditScore,
+  fetchCreditScoreHistory,
+} from "@/services/api/metrics";
 
 const sidebarItems = [
   { label: "Profile" },
@@ -54,6 +58,39 @@ function mapFetchedMetricsToDashboard(metricsArr: Metric[]): any {
     const db = new Date(b.date).getTime();
     return da - db;
   });
+
+  // Calculate monthly view deltas
+  const monthlyViewDeltas = sorted.map((m, i, arr) => {
+    if (i === 0) return m.views || 0;
+    return (m.views || 0) - (arr[i - 1].views || 0);
+  });
+
+  // Bar chart data: use monthly deltas
+  const barChartData = sorted.map((m, i) => {
+    let cpm = 0;
+    const viewsDelta = monthlyViewDeltas[i];
+    if (m.estimatedRevenueUsd && viewsDelta > 0) {
+      cpm = m.estimatedRevenueUsd / (viewsDelta / 1000);
+    }
+    // Use full month and year for clarity and uniqueness
+    const dateObj = new Date(m.date);
+    const monthLabel = dateObj.toLocaleString("default", { month: "short" }) +
+      " " + dateObj.getFullYear();
+    return {
+      month: monthLabel,
+      views: viewsDelta,
+      cpm: cpm || 0,
+    };
+  });
+
+  // Total YouTube views (sum of monthly deltas)
+  const totalViews = monthlyViewDeltas.reduce((sum, v) => sum + v, 0);
+
+  // Subscribers gained: difference between first and last audienceSize
+  const subscribersGained =
+    (sorted[sorted.length - 1].audienceSize || 0) -
+    (sorted[0].audienceSize || 0);
+
   const creditScore = {
     overallScore: 80,
     scoreFactors: {
@@ -70,18 +107,10 @@ function mapFetchedMetricsToDashboard(metricsArr: Metric[]): any {
     monthlyIncome: latest.estimatedRevenueUsd || 0,
   };
   const ytMetrics = {
-    views: latest.views || 0,
+    views: totalViews,
     audienceSize: latest.audienceSize || 0,
     postCount: latest.postCount || 0,
   };
-  const subscribersGained =
-    (sorted[sorted.length - 1].audienceSize || 0) -
-    (sorted[0].audienceSize || 0);
-  const barChartData = sorted.map((m) => ({
-    month: new Date(m.date).toLocaleString("default", { month: "short" }),
-    views: m.views || 0,
-    cpm: m.cpm || 0,
-  }));
   const topVideo = null;
   return {
     creditScore,
@@ -90,12 +119,44 @@ function mapFetchedMetricsToDashboard(metricsArr: Metric[]): any {
     subscribersGained,
     barChartData,
     topVideo,
+    totalViews,
   };
 }
 
 export default function DashboardPage() {
   const [active, setActive] = useState("Dashboard");
   const [dashboardData, setDashboardData] = useState<any>(null);
+  const [creditScore, setCreditScore] = useState<any>(null);
+  const [creditScoreHistory, setCreditScoreHistory] = useState<any[]>([]);
+
+  // Replace with actual creatorId from auth/user context if available
+  const creatorId =
+    typeof window !== "undefined"
+      ? localStorage.getItem("creatorId") ||
+        "e0583f69-0220-4ccd-8cac-154b1f4b0b85"
+      : "";
+
+  useEffect(() => {
+    async function fetchCreditScoreData() {
+      if (!creatorId) return;
+      try {
+        const [latest, history] = await Promise.all([
+          fetchLatestCreditScore(creatorId),
+          fetchCreditScoreHistory(creatorId),
+        ]);
+        setCreditScore(latest);
+        setCreditScoreHistory(history);
+        // Store in localStorage for persistence (optional)
+        localStorage.setItem("creditScore", JSON.stringify(latest));
+        localStorage.setItem("creditScoreHistory", JSON.stringify(history));
+      } catch (err) {
+        // fallback to dummyData if needed
+        setCreditScore(dummyData.creditScore);
+        setCreditScoreHistory(dummyData.creditScore.trendData);
+      }
+    }
+    fetchCreditScoreData();
+  }, [creatorId]);
 
   useEffect(() => {
     const updateData = () => {
@@ -121,9 +182,16 @@ export default function DashboardPage() {
   }, []);
 
   const isFetched = !!dashboardData;
-  const creditScore = isFetched
-    ? dashboardData.creditScore
-    : dummyData.creditScore;
+  // Use fetched credit score and history if available
+  const creditScoreData =
+    creditScore ||
+    (isFetched ? dashboardData.creditScore : dummyData.creditScore);
+  const creditScoreTrend =
+    creditScoreHistory.length > 0
+      ? creditScoreHistory
+      : isFetched
+        ? dashboardData.creditScore.trendData
+        : dummyData.creditScore.trendData;
   const ytIncome = isFetched
     ? dashboardData.ytIncome
     : dummyData.incomeSources.find((i) => i.platform === "YOUTUBE");
@@ -170,7 +238,7 @@ export default function DashboardPage() {
                     Credit Score →
                   </p>
                   <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
-                    {creditScore.overallScore}
+                    {creditScoreData.overallScore}
                   </p>
                 </div>
                 <p className="text-[#F4F4F5] text-sm font-['Inter'] leading-[14px]">
@@ -185,7 +253,8 @@ export default function DashboardPage() {
                     Monthly Income Estimate (YouTube)
                   </p>
                   <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
-                    ${ytIncome.monthlyIncome?.toLocaleString(undefined, {
+                    $
+                    {ytIncome.monthlyIncome?.toLocaleString(undefined, {
                       maximumFractionDigits: 2,
                     })}
                   </p>
@@ -229,40 +298,14 @@ export default function DashboardPage() {
           {/* Line graph Section */}
           <div className="flex-1 min-h-[350px] w-full flex">
             <div className="flex-1 flex">
-              <CreditScoreLineChart data={creditScore.trendData} />
+              <CreditScoreLineChart data={creditScoreTrend} />
             </div>
           </div>
-          {/* Chart Section with Top Video Card */}
+          {/* Chart Section */}
           <div className="flex-1 min-h-[350px] w-full flex gap-6">
             <div className="flex-1 flex">
               <YouTubeBarChart data={barChartData} />
             </div>
-            <Card className="flex flex-col justify-between bg-[#080808] rounded-xl p-6 shadow-lg w-[350px] min-w-[300px] max-w-[400px] min-h-[350px] h-full">
-              {youtubeConnected && topVideo ? (
-                <div className="flex flex-col items-center justify-center h-full">
-                  <img
-                    alt={topVideo.title}
-                    className="w-full h-40 object-cover rounded-lg mb-4"
-                    src={topVideo.thumbnailUrl}
-                  />
-                  <div className="text-white text-lg font-['Space_Grotesk'] font-semibold mb-2 text-center">
-                    {topVideo.title}
-                  </div>
-                  <div className="text-[#A1A1AA] text-base font-['Space_Grotesk'] mb-1">
-                    {topVideo.views?.toLocaleString()} views
-                  </div>
-                  <div className="text-[#A1A1AA] text-base font-['Space_Grotesk']">
-                    Est. Revenue: ${topVideo.estimatedRevenue?.toLocaleString(undefined, {
-                      maximumFractionDigits: 2,
-                    })}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full text-[#A1A1AA] text-base font-['Space_Grotesk']">
-                  No top video data available
-                </div>
-              )}
-            </Card>
           </div>
           {/* Progress Bars Section */}
           <div className="flex flex-row gap-6 w-full mt-2">
@@ -271,14 +314,14 @@ export default function DashboardPage() {
               description="Based on upload frequency and schedule"
               label="Consistency Score"
               max={100}
-              value={creditScore.scoreFactors.consistency}
+              value={creditScoreData.scoreFactors.consistency}
             />
             <ScoreProgress
               color="#9E00F9"
               description="Avg engagement vs. audience size"
               label="Engagement Score"
               max={100}
-              value={creditScore.scoreFactors.engagement}
+              value={creditScoreData.scoreFactors.engagement}
             />
           </div>
         </div>
@@ -286,4 +329,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

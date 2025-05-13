@@ -27,10 +27,12 @@ export function CustomNavbar() {
 
   return (
     <Navbar
-      className="bg-black/60 backdrop-blur-sm border-b border-gray-800"
+      className="fixed top-6 left-1/2 z-50 bg-black/60 backdrop-blur-md rounded-xl shadow-lg max-w-4xl w-[95vw] -translate-x-1/2 flex items-center"
       classNames={{
-        wrapper: "max-w-full px-6",
+        wrapper: "w-full px-6 flex items-center justify-between min-h-14",
       }}
+      isBordered={false}
+      style={{ boxShadow: "0 2px 24px 0 #00000040" }}
     >
       <NavbarBrand>
         <NextLink passHref href="/">
@@ -129,7 +131,7 @@ export function CustomNavbar() {
             <NavbarItem>
               <Button
                 as={NextLink}
-                className="text-white"
+                className="bg-[#9E00F9] text-white font-semibold hover:bg-[#CA6EFF] hover:text-white transition-all duration-200"
                 color="primary"
                 href="/signup"
                 variant="flat"
