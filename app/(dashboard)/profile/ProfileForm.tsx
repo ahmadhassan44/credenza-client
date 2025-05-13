@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Text } from "@/components/ui/text";
+import authApi from "@/services/api/auth";
+import { useRouter } from "next/navigation";
 
 interface ProfileData {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   address: string;
@@ -17,12 +20,9 @@ interface ProfileData {
 }
 
 const initialProfile: ProfileData = {
-  name: "John Doe",
-  email: "john.doe@email.com",
-  phone: "+1 234 567 8901",
-  address: "123 Main St, City, Country",
-  occupation: "Product Manager",
-  company: "Credenza Inc.",
+  firstName: "",
+  lastName: "",
+  email: "",
   profilePicture: "/credenzaLogo.svg",
 };
 
@@ -31,6 +31,33 @@ export default function ProfileForm() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  // Fetch user profile from API on mount
+  useEffect(() => {
+    setLoading(true);
+    authApi
+      .getCurrentUser()
+      .then((user) => {
+        console.log("[Profile] Received user from API:", user);
+        setProfile((prev) => ({
+          ...prev,
+          firstName: user.firstName ?? "",
+          lastName: user.lastName ?? "",
+          email: user.email ?? "",
+        }));
+        // Update localStorage with latest user info for consistency
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(user));
+        }
+      })
+      .catch(() => {
+        setError("Failed to load profile from server");
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -38,15 +65,49 @@ export default function ProfileForm() {
 
   const handleEdit = () => setEditing(true);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-      setEditing(false);
+    setError(null);
+    try {
+      const updatePayload = {
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.email,
+      };
+      console.log("[Profile] Sending update payload:", updatePayload);
+      const updatedUser = await authApi.updateProfile(updatePayload);
+      console.log("[Profile] Received updated user from API:", updatedUser);
+      // Update localStorage with new user info to prevent logout
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
       setSuccess(true);
+      setEditing(false);
       setTimeout(() => setSuccess(false), 2000);
-    }, 1200);
+    } catch (e) {
+      setError("Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await authApi.deleteProfile();
+      // Clear localStorage and redirect to login
+      localStorage.clear();
+      router.push("/login");
+    } catch (e) {
+      setError("Failed to delete account");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="text-white">Loading...</div>;
 
   return (
     <div className="max-w-xl w-full mx-auto bg-zinc-900 rounded-xl shadow-lg p-8 flex flex-col gap-6">
@@ -57,25 +118,37 @@ export default function ProfileForm() {
           alt="Profile Picture"
         />
         <Text className="text-white" fontSize="xl" fontWeight="semibold">
-          {profile.name}
-        </Text>
-        <Text color="textSecondary">
-          {profile.occupation} at {profile.company}
+          {profile.firstName} {profile.lastName}
         </Text>
       </div>
       <form className="flex flex-col gap-4">
-        <div>
-          <label className="block text-sm text-zinc-400 mb-1" htmlFor="name">
-            Name
-          </label>
-          <Input
-            id="name"
-            name="name"
-            value={profile.name}
-            className="bg-zinc-800 text-white border-zinc-700"
-            disabled={!editing}
-            onChange={handleChange}
-          />
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <label className="block text-sm text-zinc-400 mb-1" htmlFor="firstName">
+              First Name
+            </label>
+            <Input
+              id="firstName"
+              name="firstName"
+              value={profile.firstName}
+              className="bg-zinc-800 text-white border-zinc-700"
+              disabled={!editing}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm text-zinc-400 mb-1" htmlFor="lastName">
+              Last Name
+            </label>
+            <Input
+              id="lastName"
+              name="lastName"
+              value={profile.lastName}
+              className="bg-zinc-800 text-white border-zinc-700"
+              disabled={!editing}
+              onChange={handleChange}
+            />
+          </div>
         </div>
         <div>
           <label className="block text-sm text-zinc-400 mb-1" htmlFor="email">
@@ -90,77 +163,35 @@ export default function ProfileForm() {
             onChange={handleChange}
           />
         </div>
-        <div>
-          <label className="block text-sm text-zinc-400 mb-1" htmlFor="phone">
-            Phone
-          </label>
-          <Input
-            id="phone"
-            name="phone"
-            value={profile.phone}
-            className="bg-zinc-800 text-white border-zinc-700"
-            disabled={!editing}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-zinc-400 mb-1" htmlFor="address">
-            Address
-          </label>
-          <Input
-            id="address"
-            name="address"
-            value={profile.address}
-            className="bg-zinc-800 text-white border-zinc-700"
-            disabled={!editing}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-zinc-400 mb-1" htmlFor="occupation">
-            Occupation
-          </label>
-          <Input
-            id="occupation"
-            name="occupation"
-            value={profile.occupation}
-            className="bg-zinc-800 text-white border-zinc-700"
-            disabled={!editing}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-zinc-400 mb-1" htmlFor="company">
-            Company
-          </label>
-          <Input
-            id="company"
-            name="company"
-            value={profile.company}
-            className="bg-zinc-800 text-white border-zinc-700"
-            disabled={!editing}
-            onChange={handleChange}
-          />
-        </div>
       </form>
-      <div className="flex gap-4 justify-end mt-4">
-        {!editing ? (
+      <div className="flex flex-col gap-2 mt-4">
+        <div className="flex gap-4 justify-end">
+          {!editing ? (
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={handleEdit}
+            >
+              Edit
+            </Button>
+          ) : (
+            <Button
+              className="bg-green-600 hover:bg-green-700 text-white"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? "Saving..." : "Save"}
+            </Button>
+          )}
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={handleEdit}
-          >
-            Edit
-          </Button>
-        ) : (
-          <Button
-            className="bg-green-600 hover:bg-green-700 text-white"
-            onClick={handleSave}
+            className="bg-red-600 hover:bg-red-700 text-white"
+            onClick={handleDelete}
             disabled={saving}
           >
-            {saving ? "Saving..." : "Save"}
+            Delete Account
           </Button>
-        )}
+        </div>
         {success && <span className="text-green-400 ml-2">Saved!</span>}
+        {error && <span className="text-red-400 ml-2">{error}</span>}
       </div>
     </div>
   );
