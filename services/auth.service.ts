@@ -1,3 +1,4 @@
+import { useAuth } from "@/context/auth.context";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
 // Define API base URL
@@ -78,7 +79,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 // User interfaces
@@ -123,11 +124,13 @@ export function isAuthenticated(): boolean {
 
 // Login user
 export async function login(data: LoginData): Promise<AuthResponse> {
+  const { setUser } = useAuth();
   const response = await api.post<AuthResponse>("/api/v1/auth/login", {
     email: data.email,
     password: data.password,
     rememberMe: data.rememberMe || false,
   });
+  setUser(response.data.user);
 
   // Store tokens and user data
   localStorage.setItem("accessToken", response.data.accessToken);
@@ -139,7 +142,7 @@ export async function login(data: LoginData): Promise<AuthResponse> {
 
 // Register user
 export async function register(
-  data: RegisterData,
+  data: RegisterData
 ): Promise<{ message: string; user: User }> {
   const response = await api.post<{ message: string; user: User }>(
     "/api/v1/auth/register",
@@ -149,7 +152,7 @@ export async function register(
       email: data.email,
       password: data.password,
       role: data.role || "USER",
-    },
+    }
   );
 
   return response.data;
@@ -158,7 +161,7 @@ export async function register(
 // Get user profile
 export async function getProfile(): Promise<User | null> {
   try {
-    const response = await api.get<User>("/auth/profile");
+    const response = await api.get<User>("/users/profile");
 
     localStorage.setItem("user", JSON.stringify(response.data));
 
@@ -215,14 +218,14 @@ export async function logout(): Promise<void> {
 // Reset password
 export async function resetPassword(
   token: string,
-  password: string,
+  password: string
 ): Promise<void> {
   try {
     await api.post("/auth/reset-password", { token, password });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_: unknown) {
     throw new Error(
-      "Password reset failed. The link may be invalid or expired.",
+      "Password reset failed. The link may be invalid or expired."
     );
   }
 }

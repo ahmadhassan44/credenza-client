@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Text } from "@/components/ui/text";
+import { useAuth } from "@/context/auth.context";
+import { authService } from "@/services/auth.service";
 
 interface ProfileData {
   name: string;
@@ -17,12 +19,12 @@ interface ProfileData {
 }
 
 const initialProfile: ProfileData = {
-  name: "John Doe",
-  email: "john.doe@email.com",
-  phone: "+1 234 567 8901",
-  address: "123 Main St, City, Country",
-  occupation: "Product Manager",
-  company: "Credenza Inc.",
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
+  occupation: "",
+  company: "",
   profilePicture: "/credenzaLogo.svg",
 };
 
@@ -31,6 +33,42 @@ export default function ProfileForm() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  console.log("User from context:", user);
+
+  // Load user profile data when component mounts
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      setLoading(true);
+      try {
+        if (user) {
+          setProfile({
+            ...profile,
+            name: `${user.firstName} ${user.lastName}`,
+            email: user.email,
+            // Keep other fields as is until we have API to fetch them
+          });
+        } else {
+          // If user is not in context, try to fetch it from API
+          const userData = await authService.getProfile();
+          if (userData) {
+            setProfile({
+              ...profile,
+              name: `${userData.firstName} ${userData.lastName}`,
+              email: userData.email,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -47,7 +85,22 @@ export default function ProfileForm() {
       setTimeout(() => setSuccess(false), 2000);
     }, 1200);
   };
-
+  if (loading) {
+    return (
+      <div className="max-w-xl w-full mx-auto bg-zinc-900 rounded-xl shadow-lg p-8 flex justify-center items-center min-h-[400px]">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="rounded-full bg-zinc-700 h-24 w-24"></div>
+          <div className="h-4 bg-zinc-700 rounded w-24"></div>
+          <div className="h-3 bg-zinc-700 rounded w-32"></div>
+          <div className="space-y-3 w-full max-w-md">
+            <div className="h-3 bg-zinc-700 rounded"></div>
+            <div className="h-3 bg-zinc-700 rounded"></div>
+            <div className="h-3 bg-zinc-700 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="max-w-xl w-full mx-auto bg-zinc-900 rounded-xl shadow-lg p-8 flex flex-col gap-6">
       <div className="flex flex-col items-center gap-2">
@@ -117,7 +170,10 @@ export default function ProfileForm() {
           />
         </div>
         <div>
-          <label className="block text-sm text-zinc-400 mb-1" htmlFor="occupation">
+          <label
+            className="block text-sm text-zinc-400 mb-1"
+            htmlFor="occupation"
+          >
             Occupation
           </label>
           <Input
