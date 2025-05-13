@@ -144,6 +144,7 @@ export async function login(data: LoginData): Promise<AuthResponse> {
 export async function register(
   data: RegisterData
 ): Promise<{ message: string; user: User }> {
+  const { setUser } = useAuth();
   const response = await api.post<{ message: string; user: User }>(
     "/api/v1/auth/register",
     {
@@ -154,7 +155,7 @@ export async function register(
       role: data.role || "USER",
     }
   );
-
+  setUser(response.data.user);
   return response.data;
 }
 
