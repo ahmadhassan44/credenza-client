@@ -34,12 +34,13 @@ interface ApiError {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+
   isAuthenticated: boolean;
   error: string | null;
   login: (
     email: string,
     password: string,
-    rememberMe?: boolean,
+    rememberMe?: boolean
   ) => Promise<void>;
   register: (
     firstName: string,
@@ -47,12 +48,13 @@ interface AuthContextType {
     email: string,
     password: string,
     role?: "USER" | "CREATOR" | "ADMIN",
-    location?: { latitude: number; longitude: number },
+    location?: { latitude: number; longitude: number }
   ) => Promise<void>;
   logout: () => Promise<void>;
   testModeLogin: () => Promise<void>;
   guestLogin: () => Promise<void>;
   clearError: () => void;
+  setUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -156,7 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     email: string,
     password: string,
     role: "USER" | "CREATOR" | "ADMIN" = "USER",
-    location?: { latitude: number; longitude: number },
+    location?: { latitude: number; longitude: number }
   ) => {
     setIsLoading(true);
     setError(null);
@@ -287,6 +289,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     testModeLogin,
     guestLogin, // <-- add guestLogin to context
     clearError,
+    setUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

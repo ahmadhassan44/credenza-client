@@ -5,10 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Text } from "@/components/ui/text";
+import { useAuth } from "@/context/auth.context";
+import { authService } from "@/services/auth.service";
 import authApi from "@/services/api/auth";
 import { useRouter } from "next/navigation";
+import router from "next/router";
 
 interface ProfileData {
+  name: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -20,9 +24,14 @@ interface ProfileData {
 }
 
 const initialProfile: ProfileData = {
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
+  occupation: "",
+  company: "",
   firstName: "",
   lastName: "",
-  email: "",
   profilePicture: "/credenzaLogo.svg",
 };
 
@@ -31,33 +40,43 @@ export default function ProfileForm() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  console.log("User from context:", user);
 
-  // Fetch user profile from API on mount
+  // Load user profile data when component mounts
   useEffect(() => {
-    setLoading(true);
-    authApi
-      .getCurrentUser()
-      .then((user) => {
-        console.log("[Profile] Received user from API:", user);
-        setProfile((prev) => ({
-          ...prev,
-          firstName: user.firstName ?? "",
-          lastName: user.lastName ?? "",
-          email: user.email ?? "",
-        }));
-        // Update localStorage with latest user info for consistency
-        if (typeof window !== "undefined") {
-          localStorage.setItem("user", JSON.stringify(user));
+    const fetchUserProfile = async () => {
+      setLoading(true);
+      try {
+        if (user) {
+          setProfile({
+            ...profile,
+            name: `${user.firstName} ${user.lastName}`,
+            email: user.email,
+            // Keep other fields as is until we have API to fetch them
+          });
+        } else {
+          // If user is not in context, try to fetch it from API
+          const userData = await authService.getProfile();
+          if (userData) {
+            setProfile({
+              ...profile,
+              name: `${userData.firstName} ${userData.lastName}`,
+              email: userData.email,
+            });
+          }
         }
-      })
-      .catch(() => {
-        setError("Failed to load profile from server");
-      })
-      .finally(() => setLoading(false));
-  }, []);
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -92,7 +111,12 @@ export default function ProfileForm() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+      )
+    )
+      return;
     setSaving(true);
     setError(null);
     try {
@@ -107,7 +131,22 @@ export default function ProfileForm() {
     }
   };
 
-  if (loading) return <div className="text-white">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="max-w-xl w-full mx-auto bg-zinc-900 rounded-xl shadow-lg p-8 flex justify-center items-center min-h-[400px]">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="rounded-full bg-zinc-700 h-24 w-24"></div>
+          <div className="h-4 bg-zinc-700 rounded w-24"></div>
+          <div className="h-3 bg-zinc-700 rounded w-32"></div>
+          <div className="space-y-3 w-full max-w-md">
+            <div className="h-3 bg-zinc-700 rounded"></div>
+            <div className="h-3 bg-zinc-700 rounded"></div>
+            <div className="h-3 bg-zinc-700 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-xl w-full mx-auto bg-zinc-900 rounded-xl shadow-lg p-8 flex flex-col gap-6">
@@ -124,7 +163,10 @@ export default function ProfileForm() {
       <form className="flex flex-col gap-4">
         <div className="flex gap-4">
           <div className="flex-1">
-            <label className="block text-sm text-zinc-400 mb-1" htmlFor="firstName">
+            <label
+              className="block text-sm text-zinc-400 mb-1"
+              htmlFor="firstName"
+            >
               First Name
             </label>
             <Input
@@ -137,7 +179,10 @@ export default function ProfileForm() {
             />
           </div>
           <div className="flex-1">
-            <label className="block text-sm text-zinc-400 mb-1" htmlFor="lastName">
+            <label
+              className="block text-sm text-zinc-400 mb-1"
+              htmlFor="lastName"
+            >
               Last Name
             </label>
             <Input
