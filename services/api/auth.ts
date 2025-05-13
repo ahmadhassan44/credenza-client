@@ -47,7 +47,7 @@ const authApi = {
 
   // Login with email and password
   login: async (params: LoginParams): Promise<AuthResponse> => {
-    const response = await apiClient.post("api/v1/auth/login", params); // Removed duplicate /api/v1
+    const response = await apiClient.post("api/v1/auth/login", params);
 
     return response.data;
   },
@@ -56,33 +56,44 @@ const authApi = {
   refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
     const response = await apiClient.post("api/v1/auth/refresh", {
       refreshToken,
-    }); // Removed duplicate /api/v1
+    });
 
     return response.data;
   },
 
   // Logout and invalidate tokens
   logout: async (): Promise<{ success: boolean; message: string }> => {
-    const response = await apiClient.post("/auth/logout"); // Removed duplicate /api/v1
+    const response = await apiClient.post("/api/v1/auth/logout"); 
 
     return response.data;
   },
 
   // Get the current user's profile
   getCurrentUser: async (): Promise<AuthResponse["user"]> => {
-    const response = await apiClient.post("/auth/profile"); // Removed duplicate /api/v1
-
+    const response = await apiClient.get("/api/v1/users/profile");
     return response.data;
   },
 
   // For test mode - always logs in with predetermined credentials
   testModeLogin: async (): Promise<AuthResponse> => {
-    const response = await apiClient.post("/auth/login", {
-      // Removed duplicate /api/v1
+    const response = await apiClient.post("api/v1/auth/login", {
+      
       email: "test@example.com",
       password: "password123",
     });
 
+    return response.data;
+  },
+
+  // Update the current user's profile
+  updateProfile: async (updates: Partial<RegisterParams & { password?: string }>): Promise<AuthResponse["user"]> => {
+    const response = await apiClient.patch("/api/v1/users/profile", updates);
+    return response.data;
+  },
+
+  // Delete the current user's profile
+  deleteProfile: async (): Promise<{ success: boolean; message: string }> => {
+    const response = await apiClient.delete("/api/v1/users/profile");
     return response.data;
   },
 };
