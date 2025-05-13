@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import DashboardSidebar from "../dashboard/sidebar";
+import DashboardSidebar from "../sidebar";
 import { sidebarItems } from "../income/income-streams";
 import SkeletonLoader from "../skeleton-loader"; 
 

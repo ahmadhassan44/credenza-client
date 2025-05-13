@@ -9,7 +9,7 @@ import YouTubeBarChart from "./youtubeBarChart";
 import ScoreProgress from "./ScoreProgress";
 
 import { dummyData } from "@/data/dummyData";
-import DashboardSidebar from "@/app/(dashboard)/dashboard/sidebar";
+import DashboardSidebar from "@/app/(dashboard)/sidebar";
 import DashboardMain from "@/app/(dashboard)/dashboard/main";
 import {
   fetchLatestCreditScore,

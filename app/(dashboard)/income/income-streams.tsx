@@ -13,7 +13,7 @@ import {
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
-import DashboardSidebar from "../dashboard/sidebar";
+import DashboardSidebar from "../sidebar";
 
 import { Input } from "@/components/ui/input";
 import { connectPlatform } from "@/services/api/platforms";

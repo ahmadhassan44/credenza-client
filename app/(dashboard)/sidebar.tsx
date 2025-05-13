@@ -56,6 +56,16 @@ export default function DashboardSidebar({
                 setActive(item.label);
                 if (item.label === "Income Streams") {
                   router.push("/income");
+                } else if (item.label === "Profile") {
+                  router.push("/profile");
+                } else if (item.label === "Dashboard") {
+                  router.push("/dashboard");
+                } else if (item.label === "Credit Score") {
+                  router.push("/credit-score");
+                } else if (item.label === "Metrics & Analytics") {
+                  router.push("/metrics");
+                } else if (item.label === "Fintech Tools") {
+                  router.push("/fintech-tools");
                 }
               }}
             >
