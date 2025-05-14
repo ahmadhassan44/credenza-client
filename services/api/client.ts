@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 // Create an Axios instance with the base URL and default settings
 const apiClient = axios.create({
@@ -93,7 +93,7 @@ apiClient.interceptors.response.use(
 );
 
 export function getApiUrl() {
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/v1";
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 }
 
 export default apiClient;

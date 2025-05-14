@@ -1,25 +1,25 @@
 Authentication Endpoints
-POST /api/v1/auth/register - Register a new user
-POST /api/v1/auth/login - User login
-POST /api/v1/auth/logout - User logout (requires JWT)
-POST /api/v1/auth/refresh - Refresh access token
-GET /api/v1/auth/profile - Get current user profile (requires JWT)
+POST /auth/register - Register a new user
+POST /auth/login - User login
+POST /auth/logout - User logout (requires JWT)
+POST /auth/refresh - Refresh access token
+GET /auth/profile - Get current user profile (requires JWT)
 User Endpoints
-GET /api/v1/users/profile - Get current user profile (requires JWT)
-PATCH /api/v1/users/profile - Update current user profile (requires JWT)
-DELETE /api/v1/users/profile - Delete current user account (requires JWT)
-GET /api/v1/users/:id - Get user by ID (Admin only)
-PATCH /api/v1/users/:id - Update user by ID (Admin only)
-DELETE /api/v1/users/:id - Delete user by ID (Admin only)
+GET /users/profile - Get current user profile (requires JWT)
+PATCH /users/profile - Update current user profile (requires JWT)
+DELETE /users/profile - Delete current user account (requires JWT)
+GET /users/:id - Get user by ID (Admin only)
+PATCH /users/:id - Update user by ID (Admin only)
+DELETE /users/:id - Delete user by ID (Admin only)
 Platform Endpoints
-POST /api/v1/platforms/connect - Connect a platform for a creator (Creator or Admin)
-GET /api/v1/platforms - Get all platforms (Admin only)
-POST /api/v1/platforms/:id/refresh - Manually refresh metrics for a platform (Creator or Admin)
-GET /api/v1/platforms/:id - Get platform by ID (implied from service)
+POST /platforms/connect - Connect a platform for a creator (Creator or Admin)
+GET /platforms - Get all platforms (Admin only)
+POST /platforms/:id/refresh - Manually refresh metrics for a platform (Creator or Admin)
+GET /platforms/:id - Get platform by ID (implied from service)
 Credit Scoring Endpoints
-POST /api/v1/credit-scoring/generate/:creatorId - Generate credit score for a creator (Creator or Admin)
-GET /api/v1/credit-scoring/latest/:creatorId - Get latest credit score for a creator (Creator or Admin)
-GET /api/v1/credit-scoring/history/:creatorId - Get credit score history for a creator (Creator or Admin)
+POST /credit-scoring/generate/:creatorId - Generate credit score for a creator (Creator or Admin)
+GET /credit-scoring/latest/:creatorId - Get latest credit score for a creator (Creator or Admin)
+GET /credit-scoring/history/:creatorId - Get credit score history for a creator (Creator or Admin)
 Application Status Endpoints
-GET /api/v1 - Hello World endpoint
-GET /api/v1/health - Health check endpoint
+GET  - Hello World endpoint
+GET /health - Health check endpoint

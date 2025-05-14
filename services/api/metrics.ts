@@ -10,7 +10,7 @@ export interface MetricsRequestBody {
 
 export async function fetchYouTubeMetrics(body: MetricsRequestBody) {
   try {
-    const response = await apiClient.get("/api/v1/metrics", { params: body });
+    const response = await apiClient.get("/metrics", { params: body });
     return response.data;
   } catch (error) {
     throw error;

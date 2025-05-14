@@ -3,7 +3,7 @@ import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
 // Define API base URL
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 console.log("API URL: ", process.env.NEXT_PUBLIC_API_URL);
 
@@ -125,7 +125,7 @@ export function isAuthenticated(): boolean {
 // Login user
 export async function login(data: LoginData): Promise<AuthResponse> {
   const { setUser } = useAuth();
-  const response = await api.post<AuthResponse>("/api/v1/auth/login", {
+  const response = await api.post<AuthResponse>("/auth/login", {
     email: data.email,
     password: data.password,
     rememberMe: data.rememberMe || false,
@@ -146,7 +146,7 @@ export async function register(
 ): Promise<{ message: string; user: User }> {
   const { setUser } = useAuth();
   const response = await api.post<{ message: string; user: User }>(
-    "/api/v1/auth/register",
+    "/auth/register",
     {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -162,7 +162,7 @@ export async function register(
 // Get user profile
 export async function getProfile(): Promise<User | null> {
   try {
-    const response = await api.get<User>("/api/v1/users/profile");
+    const response = await api.get<User>("/users/profile");
 
     localStorage.setItem("user", JSON.stringify(response.data));
 

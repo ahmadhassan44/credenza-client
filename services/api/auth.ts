@@ -63,14 +63,14 @@ const authApi = {
 
   // Logout and invalidate tokens
   logout: async (): Promise<{ success: boolean; message: string }> => {
-    const response = await apiClient.post("/api/v1/auth/logout"); 
+    const response = await apiClient.post("/auth/logout"); 
 
     return response.data;
   },
 
   // Get the current user's profile
   getCurrentUser: async (): Promise<AuthResponse["user"]> => {
-    const response = await apiClient.get("/api/v1/users/profile");
+    const response = await apiClient.get("/users/profile");
     return response.data;
   },
 
@@ -87,13 +87,13 @@ const authApi = {
 
   // Update the current user's profile
   updateProfile: async (updates: Partial<RegisterParams & { password?: string }>): Promise<AuthResponse["user"]> => {
-    const response = await apiClient.patch("/api/v1/users/profile", updates);
+    const response = await apiClient.patch("/users/profile", updates);
     return response.data;
   },
 
   // Delete the current user's profile
   deleteProfile: async (): Promise<{ success: boolean; message: string }> => {
-    const response = await apiClient.delete("/api/v1/users/profile");
+    const response = await apiClient.delete("/users/profile");
     return response.data;
   },
 };

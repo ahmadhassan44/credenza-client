@@ -71,7 +71,7 @@ export default function IncomeStreamsPage() {
   // Helper: fetch metrics for a channel
   const fetchChannelMetrics = async (creatorId: string, platformId: string) => {
     try {
-      const res = await apiClient.get("/api/v1/metrics", {
+      const res = await apiClient.get("/metrics", {
         params: {
           creatorId,
           platformType: "YOUTUBE",
@@ -92,7 +92,7 @@ export default function IncomeStreamsPage() {
         const creatorId = getCreatorId();
         
         if (!creatorId) return;
-        const res = await apiClient.get(`/api/v1/platforms/${creatorId}`);
+        const res = await apiClient.get(`/platforms/${creatorId}`);
         const youtubeChannels = Array.isArray(res.data)
           ? res.data.filter((ch) => ch.type === "YOUTUBE")
           : [];
@@ -170,7 +170,7 @@ export default function IncomeStreamsPage() {
     try {
       const creatorId = getCreatorId();
       
-      const baseurl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/v1";
+      const baseurl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
       const body = {
         creatorId,
         lastXMonths: 6,
@@ -187,7 +187,7 @@ export default function IncomeStreamsPage() {
       };
       
       if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
-      const response = await fetch(`${baseurl}/api/v1/mock/metric`, {
+      const response = await fetch(`${baseurl}/mock/metric`, {
         method: "POST",
         headers,
         body: JSON.stringify(body),
