@@ -314,14 +314,14 @@ export default function DashboardPage() {
               description="Based on upload frequency and schedule"
               label="Consistency Score"
               max={100}
-              value={creditScoreData.scoreFactors.consistency}
+              value={creditScoreData?.scoreFactors?.consistency ?? 0}
             />
             <ScoreProgress
               color="#9E00F9"
               description="Avg engagement vs. audience size"
               label="Engagement Score"
               max={100}
-              value={creditScoreData.scoreFactors.engagement}
+              value={creditScoreData?.scoreFactors?.engagement ?? 0}
             />
           </div>
         </div>

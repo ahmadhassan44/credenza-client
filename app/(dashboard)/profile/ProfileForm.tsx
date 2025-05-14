@@ -9,32 +9,57 @@ import { useAuth } from "@/context/auth.context";
 import { authService } from "@/services/auth.service";
 import authApi from "@/services/api/auth";
 
-interface ProfileData {
-  name: string;
+interface User {
+  email: string;
   firstName: string;
   lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  occupation: string;
-  company: string;
-  profilePicture: string;
+  role?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-const initialProfile: ProfileData = {
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  userId: string;
+  contentCategory?: string;
+  geographicLocationId?: string;
+  lifecycleStage?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  user: User;
+  profilePicture?: string;
+}
+
+const initialProfile: UserProfile = {
+  id: "",
   name: "",
   email: "",
-  phone: "",
-  address: "",
-  occupation: "",
-  company: "",
-  firstName: "",
-  lastName: "",
+  userId: "",
+  user: {
+    email: "",
+    firstName: "",
+    lastName: "",
+  },
   profilePicture: "/credenzaLogo.svg",
 };
 
+function extractNames(user: any) {
+  let firstName = user?.firstName || "";
+  let lastName = user?.lastName || "";
+
+  if ((!firstName || !lastName) && user?.name) {
+    const [first, ...rest] = user.name.split(" ");
+    firstName = first || "";
+    lastName = rest.join(" ") || "";
+  }
+
+  return { firstName, lastName };
+}
+
 export default function ProfileForm() {
-  const [profile, setProfile] = useState<ProfileData>(initialProfile);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -46,60 +71,135 @@ export default function ProfileForm() {
     const fetchUserProfile = async () => {
       setLoading(true);
       try {
-        if (user) {
-          const firstName = user.firstName || "";
-          const lastName = user.lastName || "";
-          const email = user.email || "";
-          setProfile({
-            ...profile,
+        let userProfile: UserProfile | null = null;
+        let localUser = null;
+
+        if (typeof window !== "undefined") {
+          const local = localStorage.getItem("user");
+
+          if (local) localUser = JSON.parse(local);
+        }
+
+        let sourceUser = user || localUser;
+        if (sourceUser) {
+          const { firstName, lastName } = extractNames(sourceUser);
+          userProfile = {
+            ...initialProfile,
+            user: {
+              email: sourceUser.email || "",
+              firstName,
+              lastName,
+            },
+            email: sourceUser.email || "",
             name: `${firstName} ${lastName}`.trim(),
-            firstName,
-            lastName,
-            email,
-          });
+            profilePicture: sourceUser.profilePicture || "/credenzaLogo.svg",
+          };
         } else {
           const userData = await authService.getProfile();
           if (userData) {
-            const firstName = userData.user?.firstName || "";
-            const lastName = userData.user?.lastName || "";
-            const email = userData.email || "";
-            setProfile({
-              ...profile,
-              name: `${firstName} ${lastName}`.trim(),
-              firstName,
-              lastName,
-              email,
-            });
+            let nestedUser: User;
+            if (
+              (userData as any).user &&
+              typeof (userData as any).user === "object"
+            ) {
+              const u = (userData as any).user;
+              const { firstName, lastName } = extractNames(u);
+              nestedUser = {
+                email: u.email || "",
+                firstName,
+                lastName,
+                role: u.role,
+                createdAt: u.createdAt,
+                updatedAt: u.updatedAt,
+              };
+              userProfile = {
+                ...initialProfile,
+                ...userData,
+                user: nestedUser,
+                email: nestedUser.email,
+                name: `${firstName} ${lastName}`.trim(),
+                profilePicture:
+                  (userData as any).profilePicture || "/credenzaLogo.svg",
+              };
+            } else {
+              const { firstName, lastName } = extractNames(userData);
+              nestedUser = {
+                email: userData.email || "",
+                firstName,
+                lastName,
+                role: userData.role,
+                createdAt: userData.createdAt,
+                updatedAt: userData.updatedAt,
+              };
+              userProfile = {
+                ...initialProfile,
+                ...userData,
+                user: nestedUser,
+                email: nestedUser.email,
+                name: `${firstName} ${lastName}`.trim(),
+                profilePicture:
+                  (userData as any).profilePicture || "/credenzaLogo.svg",
+              };
+            }
           }
         }
+        setProfile(userProfile);
       } catch {
         setError("Failed to fetch user profile");
       } finally {
         setLoading(false);
       }
     };
+
     fetchUserProfile();
   }, [user]);
 
+  useEffect(() => {
+    if (!loading && profile) {
+      // console.log("PROFILE: ", profile);
+    }
+  }, [profile, loading]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (!profile) return;
+    if (["firstName", "lastName", "email"].includes(name)) {
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              user: {
+                ...prev.user,
+                [name]: value,
+              },
+              ...(name === "email" ? { email: value } : {}),
+            }
+          : prev,
+      );
+    } else {
+      setProfile((prev) => (prev ? { ...prev, [name]: value } : prev));
+    }
   };
 
   const handleEdit = () => setEditing(true);
 
   const handleSave = async () => {
+    if (!profile) return;
     setSaving(true);
     setError(null);
     try {
       const updatePayload = {
-        email: profile.email,
-        firstName: profile.firstName,
-        lastName: profile.lastName,
+        email: profile.user.email,
+        firstName: profile.user.firstName,
+        lastName: profile.user.lastName,
       };
       const updatedUser = await authApi.updateProfile(updatePayload);
+
       if (typeof window !== "undefined") {
         localStorage.setItem("user", JSON.stringify(updatedUser));
       }
+
       setSuccess(true);
       setEditing(false);
       setTimeout(() => setSuccess(false), 2000);
@@ -113,7 +213,7 @@ export default function ProfileForm() {
   const handleDelete = async () => {
     if (
       !window.confirm(
-        "Are you sure you want to delete your account? This action cannot be undone."
+        "Are you sure you want to delete your account? This action cannot be undone.",
       )
     )
       return;
@@ -130,7 +230,7 @@ export default function ProfileForm() {
     }
   };
 
-  if (loading) {
+  if (loading || !profile) {
     return (
       <div className="max-w-xl w-full mx-auto bg-zinc-900 rounded-xl shadow-lg p-8 flex justify-center items-center min-h-[400px]">
         <div className="animate-pulse flex flex-col items-center gap-4">
@@ -153,10 +253,10 @@ export default function ProfileForm() {
         <Avatar
           alt="Profile Picture"
           className="w-24 h-24 border-4 border-zinc-700"
-          src={profile.profilePicture}
+          src={profile.profilePicture ?? "/credenzaLogo.svg"}
         />
         <Text className="text-white" fontSize="xl" fontWeight="semibold">
-          {profile.firstName} {profile.lastName}
+          {profile.user.firstName} {profile.user.lastName}
         </Text>
       </div>
       <form className="flex flex-col gap-4">
@@ -173,7 +273,7 @@ export default function ProfileForm() {
               disabled={!editing}
               id="firstName"
               name="firstName"
-              value={profile.firstName}
+              value={profile.user.firstName}
               onChange={handleChange}
             />
           </div>
@@ -189,7 +289,7 @@ export default function ProfileForm() {
               disabled={!editing}
               id="lastName"
               name="lastName"
-              value={profile.lastName}
+              value={profile.user.lastName}
               onChange={handleChange}
             />
           </div>
@@ -203,7 +303,7 @@ export default function ProfileForm() {
             disabled={!editing}
             id="email"
             name="email"
-            value={profile.email}
+            value={profile.user.email}
             onChange={handleChange}
           />
         </div>
