@@ -162,7 +162,7 @@ export async function register(
 // Get user profile
 export async function getProfile(): Promise<User | null> {
   try {
-    const response = await api.get<User>("/users/profile");
+    const response = await api.get<User>("/api/v1/users/profile");
 
     localStorage.setItem("user", JSON.stringify(response.data));
 

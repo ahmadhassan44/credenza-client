@@ -1,6 +1,6 @@
-"use client";
-
+import router from "next/router";
 import { useState, useEffect } from "react";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
@@ -8,8 +8,6 @@ import { Text } from "@/components/ui/text";
 import { useAuth } from "@/context/auth.context";
 import { authService } from "@/services/auth.service";
 import authApi from "@/services/api/auth";
-import { useRouter } from "next/navigation";
-import router from "next/router";
 
 interface ProfileData {
   name: string;
@@ -43,38 +41,43 @@ export default function ProfileForm() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
-  console.log("User from context:", user);
 
-  // Load user profile data when component mounts
   useEffect(() => {
     const fetchUserProfile = async () => {
       setLoading(true);
       try {
         if (user) {
+          const firstName = user.firstName || "";
+          const lastName = user.lastName || "";
+          const email = user.email || "";
           setProfile({
             ...profile,
-            name: `${user.firstName} ${user.lastName}`,
-            email: user.email,
-            // Keep other fields as is until we have API to fetch them
+            name: `${firstName} ${lastName}`.trim(),
+            firstName,
+            lastName,
+            email,
           });
         } else {
-          // If user is not in context, try to fetch it from API
           const userData = await authService.getProfile();
           if (userData) {
+            const firstName = userData.user?.firstName || "";
+            const lastName = userData.user?.lastName || "";
+            const email = userData.email || "";
             setProfile({
               ...profile,
-              name: `${userData.firstName} ${userData.lastName}`,
-              email: userData.email,
+              name: `${firstName} ${lastName}`.trim(),
+              firstName,
+              lastName,
+              email,
             });
           }
         }
-      } catch (error) {
-        console.error("Failed to fetch user profile:", error);
+      } catch {
+        setError("Failed to fetch user profile");
       } finally {
         setLoading(false);
       }
     };
-
     fetchUserProfile();
   }, [user]);
 
@@ -89,21 +92,18 @@ export default function ProfileForm() {
     setError(null);
     try {
       const updatePayload = {
+        email: profile.email,
         firstName: profile.firstName,
         lastName: profile.lastName,
-        email: profile.email,
       };
-      console.log("[Profile] Sending update payload:", updatePayload);
       const updatedUser = await authApi.updateProfile(updatePayload);
-      console.log("[Profile] Received updated user from API:", updatedUser);
-      // Update localStorage with new user info to prevent logout
       if (typeof window !== "undefined") {
         localStorage.setItem("user", JSON.stringify(updatedUser));
       }
       setSuccess(true);
       setEditing(false);
       setTimeout(() => setSuccess(false), 2000);
-    } catch (e) {
+    } catch {
       setError("Failed to update profile");
     } finally {
       setSaving(false);
@@ -121,10 +121,9 @@ export default function ProfileForm() {
     setError(null);
     try {
       await authApi.deleteProfile();
-      // Clear localStorage and redirect to login
       localStorage.clear();
       router.push("/login");
-    } catch (e) {
+    } catch {
       setError("Failed to delete account");
     } finally {
       setSaving(false);
@@ -135,13 +134,13 @@ export default function ProfileForm() {
     return (
       <div className="max-w-xl w-full mx-auto bg-zinc-900 rounded-xl shadow-lg p-8 flex justify-center items-center min-h-[400px]">
         <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="rounded-full bg-zinc-700 h-24 w-24"></div>
-          <div className="h-4 bg-zinc-700 rounded w-24"></div>
-          <div className="h-3 bg-zinc-700 rounded w-32"></div>
+          <div className="rounded-full bg-zinc-700 h-24 w-24" />
+          <div className="h-4 bg-zinc-700 rounded w-24" />
+          <div className="h-3 bg-zinc-700 rounded w-32" />
           <div className="space-y-3 w-full max-w-md">
-            <div className="h-3 bg-zinc-700 rounded"></div>
-            <div className="h-3 bg-zinc-700 rounded"></div>
-            <div className="h-3 bg-zinc-700 rounded"></div>
+            <div className="h-3 bg-zinc-700 rounded" />
+            <div className="h-3 bg-zinc-700 rounded" />
+            <div className="h-3 bg-zinc-700 rounded" />
           </div>
         </div>
       </div>
@@ -152,9 +151,9 @@ export default function ProfileForm() {
     <div className="max-w-xl w-full mx-auto bg-zinc-900 rounded-xl shadow-lg p-8 flex flex-col gap-6">
       <div className="flex flex-col items-center gap-2">
         <Avatar
+          alt="Profile Picture"
           className="w-24 h-24 border-4 border-zinc-700"
           src={profile.profilePicture}
-          alt="Profile Picture"
         />
         <Text className="text-white" fontSize="xl" fontWeight="semibold">
           {profile.firstName} {profile.lastName}
@@ -170,11 +169,11 @@ export default function ProfileForm() {
               First Name
             </label>
             <Input
+              className="bg-zinc-800 text-white border-zinc-700"
+              disabled={!editing}
               id="firstName"
               name="firstName"
               value={profile.firstName}
-              className="bg-zinc-800 text-white border-zinc-700"
-              disabled={!editing}
               onChange={handleChange}
             />
           </div>
@@ -186,11 +185,11 @@ export default function ProfileForm() {
               Last Name
             </label>
             <Input
+              className="bg-zinc-800 text-white border-zinc-700"
+              disabled={!editing}
               id="lastName"
               name="lastName"
               value={profile.lastName}
-              className="bg-zinc-800 text-white border-zinc-700"
-              disabled={!editing}
               onChange={handleChange}
             />
           </div>
@@ -200,11 +199,11 @@ export default function ProfileForm() {
             Email
           </label>
           <Input
+            className="bg-zinc-800 text-white border-zinc-700"
+            disabled={!editing}
             id="email"
             name="email"
             value={profile.email}
-            className="bg-zinc-800 text-white border-zinc-700"
-            disabled={!editing}
             onChange={handleChange}
           />
         </div>
@@ -221,16 +220,16 @@ export default function ProfileForm() {
           ) : (
             <Button
               className="bg-green-600 hover:bg-green-700 text-white"
-              onClick={handleSave}
               disabled={saving}
+              onClick={handleSave}
             >
               {saving ? "Saving..." : "Save"}
             </Button>
           )}
           <Button
             className="bg-red-600 hover:bg-red-700 text-white"
-            onClick={handleDelete}
             disabled={saving}
+            onClick={handleDelete}
           >
             Delete Account
           </Button>
