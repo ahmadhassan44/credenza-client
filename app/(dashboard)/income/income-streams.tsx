@@ -21,7 +21,15 @@ import { Input } from "@/components/ui/input";
 import { connectPlatform, fetchAllPlatforms } from "@/services/api/platforms";
 import apiClient from "@/services/api/client";
 
-const getCreatorId = () => localStorage.getItem("creatorId") || "";
+const getCreatorId = () => {
+  const user =
+    typeof window !== "undefined" ? localStorage.getItem("user") : null;
+  if (user) {
+    const parsedUser = JSON.parse(user);
+    return parsedUser.creatorId || "";
+  }
+  return "";
+};
 
 export default function IncomeStreamsPage() {
   const [handle, setHandle] = useState("");
@@ -77,7 +85,7 @@ export default function IncomeStreamsPage() {
           youtubeChannels.map(async (ch) => {
             const metrics = await fetchChannelMetrics(
               creatorId,
-              ch.platformId || ch.id || ch.connectionId,
+              ch.platformId || ch.id || ch.connectionId
             );
 
             // Try to get metricsQuality from channel or metrics (if stored)
@@ -88,7 +96,7 @@ export default function IncomeStreamsPage() {
             }
 
             return { ...ch, metrics, metricsQuality: quality };
-          }),
+          })
         );
 
         setLinkedChannels(channelsWithMetrics);
@@ -151,7 +159,7 @@ export default function IncomeStreamsPage() {
 
   const handleGenerateMockMetrics = async (
     connectionId: string,
-    quality: string,
+    quality: string
   ) => {
     // Prevent repeated generation
     if (hasGeneratedMock[connectionId]) return;
@@ -366,7 +374,8 @@ export default function IncomeStreamsPage() {
             </div>
           ) : linkedChannels.length > 0 ? (
             linkedChannels.map((channel, idx) => {
-              const channelKey = channel.connectionId || channel.platformId || channel.id || idx;
+              const channelKey =
+                channel.connectionId || channel.platformId || channel.id || idx;
 
               return (
                 <YouTubeChannelCard
