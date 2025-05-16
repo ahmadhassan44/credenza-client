@@ -43,3 +43,15 @@ export async function refreshPlatform(id: string) {
   );
   return response.data;
 }
+
+// Delete a connected platform by id
+export async function deletePlatform(id: string) {
+  const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+  const response = await apiClient.delete(
+    `/platforms/${id}`,
+    accessToken
+      ? { headers: { Authorization: `Bearer ${accessToken}` } }
+      : undefined
+  );
+  return response.data;
+}

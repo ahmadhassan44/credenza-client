@@ -2,11 +2,15 @@
 
 import { useEffect, useState } from "react";
 
+
 import DashboardSidebar from "../sidebar";
 import DashboardMain from "./main";
 import DashboardSummaryCards from "./DashboardSummaryCards";
 import DashboardCharts from "./DashboardCharts";
 import DashboardProgressBars from "./DashboardProgressBars";
+import { mapFetchedMetricsToDashboard } from "./dashboardUtils";
+import { mapFetchedMetricsToDashboardMulti } from "./dashboardUtils.multi";
+
 import { dummyData } from "@/data/dummyData";
 import { useAuth } from "@/context/auth.context";
 import { fetchAllPlatforms } from "@/services/api/platforms";
@@ -15,7 +19,6 @@ import {
   fetchCreditScoreHistory,
   fetchYouTubeMetrics,
 } from "@/services/api/metrics";
-import { mapFetchedMetricsToDashboard } from "./dashboardUtils";
 
 const sidebarItems = [
   { label: "Profile" },
@@ -29,7 +32,7 @@ const sidebarItems = [
 ];
 
 export default function DashboardPage() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const [active, setActive] = useState("Dashboard");
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [creditScore, setCreditScore] = useState<any>(null);
@@ -55,15 +58,18 @@ export default function DashboardPage() {
       setLoading(false);
       setHasPlatforms(false);
       setPlatforms([]);
+
       return;
     }
+
     async function fetchPlatforms() {
       setLoading(true);
       try {
         const fetchedPlatforms = await fetchAllPlatforms(creatorId);
         setPlatforms(Array.isArray(fetchedPlatforms) ? fetchedPlatforms : []);
+
         setHasPlatforms(
-          Array.isArray(fetchedPlatforms) && fetchedPlatforms.length > 0
+          Array.isArray(fetchedPlatforms) && fetchedPlatforms.length > 0,
         );
       } catch {
         setPlatforms([]);
@@ -72,41 +78,57 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
+
     fetchPlatforms();
   }, [isAuthenticated, isGuest, creatorId]);
 
   // Generate and fetch dashboard metrics for real users with platforms
   useEffect(() => {
     if (!isAuthenticated || isGuest || !hasPlatforms) return;
+
     const fetched =
       typeof window !== "undefined"
         ? JSON.parse(localStorage.getItem("mockMetricsData") || "null")
         : null;
+
     async function generateAndFetchMetrics() {
       if (!creatorId || !platforms.length) return;
       setGeneratingMetrics(true);
       try {
-        // For each platform, fetch metrics (for now, only YOUTUBE is used in dashboard)
-        const ytPlatform = platforms.find((p: any) => p.type === "YOUTUBE");
-        let metricsData = null;
-        if (ytPlatform) {
+        // Fetch metrics for all YouTube channels
+        const ytPlatforms = platforms.filter((p: any) => p.type === "YOUTUBE");
+        const allMetrics: any[] = [];
+        for (const ytPlatform of ytPlatforms) {
           const today = new Date();
           const startDate = new Date(
             today.getFullYear(),
             today.getMonth() - 6,
-            1
+            1,
           ).toISOString();
           const endDate = today.toISOString();
-          metricsData = await fetchYouTubeMetrics({
+          const metricsData = await fetchYouTubeMetrics({
             creatorId,
             platformType: "YOUTUBE",
             startDate,
             endDate,
           });
+          if (Array.isArray(metricsData)) {
+            // Attach channel info to each metric
+            metricsData.forEach((m) => {
+              allMetrics.push({
+                ...m,
+                platformId:
+                  ytPlatform.platformId ||
+                  ytPlatform.id ||
+                  ytPlatform.connectionId,
+                channelName: ytPlatform.handle || ytPlatform.name,
+              });
+            });
+          }
         }
-        if (metricsData) {
-          localStorage.setItem("mockMetricsData", JSON.stringify(metricsData));
-          setDashboardData(mapFetchedMetricsToDashboard(metricsData));
+        if (allMetrics.length > 0) {
+          localStorage.setItem("mockMetricsData", JSON.stringify(allMetrics));
+          setDashboardData(mapFetchedMetricsToDashboardMulti(allMetrics));
         }
       } catch {
         setDashboardData(null);
@@ -114,16 +136,18 @@ export default function DashboardPage() {
         setGeneratingMetrics(false);
       }
     }
+
     if (!fetched) {
       generateAndFetchMetrics();
     } else {
-      setDashboardData(mapFetchedMetricsToDashboard(fetched));
+      setDashboardData(mapFetchedMetricsToDashboardMulti(fetched));
     }
   }, [isAuthenticated, isGuest, hasPlatforms, creatorId, platforms]);
 
   // Fetch credit score for real users
   useEffect(() => {
     if (!isAuthenticated || isGuest || !hasPlatforms) return;
+
     async function fetchCreditScoreData() {
       if (!creatorId) return;
       try {
@@ -132,6 +156,7 @@ export default function DashboardPage() {
           fetchCreditScoreHistory(creatorId),
         ]);
         setCreditScore(latest);
+
         setCreditScoreHistory(history);
         localStorage.setItem("creditScore", JSON.stringify(latest));
         localStorage.setItem("creditScoreHistory", JSON.stringify(history));
@@ -140,6 +165,7 @@ export default function DashboardPage() {
         setCreditScoreHistory([]);
       }
     }
+
     fetchCreditScoreData();
   }, [creatorId, isAuthenticated, isGuest, hasPlatforms]);
 
@@ -158,10 +184,10 @@ export default function DashboardPage() {
   // 1. Guest user: show dummyData
   if (isGuest) {
     const ytIncome = dummyData.incomeSources.find(
-      (i) => i.platform === "YOUTUBE"
+      (i) => i.platform === "YOUTUBE",
     ) || { monthlyIncome: 0 };
     const ytMetrics = dummyData.platformMetrics.find(
-      (m) => m.platform === "YOUTUBE"
+      (m) => m.platform === "YOUTUBE",
     ) || { views: 0 };
     return (
       <div className="w-full bg-black">
@@ -242,14 +268,14 @@ export default function DashboardPage() {
                 // Generate metrics for the user and save to localStorage
                 if (!creatorId || !platforms.length) return;
                 const ytPlatform = platforms.find(
-                  (p: any) => p.type === "YOUTUBE"
+                  (p: any) => p.type === "YOUTUBE",
                 );
                 if (ytPlatform) {
                   const today = new Date();
                   const startDate = new Date(
                     today.getFullYear(),
                     today.getMonth() - 6,
-                    1
+                    1,
                   ).toISOString();
                   const endDate = today.toISOString();
                   try {
@@ -262,10 +288,10 @@ export default function DashboardPage() {
                     if (metricsData) {
                       localStorage.setItem(
                         "mockMetricsData",
-                        JSON.stringify(metricsData)
+                        JSON.stringify(metricsData),
                       );
                       setDashboardData(
-                        mapFetchedMetricsToDashboard(metricsData)
+                        mapFetchedMetricsToDashboard(metricsData),
                       );
                     }
                   } catch {
@@ -284,10 +310,22 @@ export default function DashboardPage() {
 
   // 4. User with platforms and metrics
   const isFetched = !!dashboardData;
-  const creditScoreData =
-    creditScore ||
-    (isFetched ? dashboardData.creditScore : dummyData.creditScore);
 
+  // For multi-channel, extract the new structure
+  const channelMetrics = isFetched ? dashboardData.channelMetrics : {};
+  const barChartData = isFetched ? dashboardData.barChartData : [];
+  const months = isFetched ? dashboardData.months : [];
+  const channels = isFetched ? dashboardData.channels : [];
+
+  // Use new aggregated summary values
+  const totalViews = isFetched ? dashboardData.totalViewsLatestMonth : 0;
+  const totalSubscribersGained = isFetched
+    ? dashboardData.totalSubscribersGained
+    : 0;
+  const totalIncome = isFetched ? dashboardData.totalIncomeLatestMonth : 0;
+
+  // Use dummyData for credit score if not available
+  const creditScoreData = creditScore || dummyData.creditScore;
   const creditScoreTrend =
     creditScoreHistory.length > 0
       ? creditScoreHistory.map((item: any) => ({
@@ -299,24 +337,7 @@ export default function DashboardPage() {
             : item.date,
           score: item.overallScore ?? 0,
         }))
-      : isFetched
-        ? dashboardData.creditScore.trendData
-        : dummyData.creditScore.trendData;
-
-  const ytIncome = isFetched
-    ? dashboardData.ytIncome
-    : dummyData.incomeSources.find((i) => i.platform === "YOUTUBE") || {
-        monthlyIncome: 0,
-      };
-  const ytMetrics = isFetched
-    ? dashboardData.ytMetrics
-    : dummyData.platformMetrics.find((m) => m.platform === "YOUTUBE") || {
-        views: 0,
-      };
-  const subscribersGained = isFetched ? dashboardData.subscribersGained : 2400;
-  const barChartData = isFetched
-    ? dashboardData.barChartData
-    : dummyData.youtubeMonthlyStats.slice(-6);
+      : dummyData.creditScore.trendData;
 
   return (
     <div className="w-full bg-black">
@@ -337,10 +358,13 @@ export default function DashboardPage() {
             </p>
           </div>
           <DashboardSummaryCards
+            channelMetrics={channelMetrics}
+            channels={channels}
             creditScore={creditScoreData.overallScore}
-            subscribersGained={subscribersGained}
-            ytIncome={ytIncome.monthlyIncome}
-            ytViews={ytMetrics.views}
+            months={months}
+            subscribersGained={totalSubscribersGained}
+            ytIncome={totalIncome}
+            ytViews={totalViews}
           />
           <DashboardCharts
             barChartData={barChartData}

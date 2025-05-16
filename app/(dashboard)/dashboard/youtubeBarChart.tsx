@@ -53,14 +53,18 @@ function CustomTooltip({ active, payload, label }: any) {
 
 export default function YouTubeBarChart({
   data,
+  channels,
 }: {
-  data: { month: string; views: number; cpm: number }[];
+  data: any[];
+  channels?: string[];
 }) {
+  // If multi-channel, render a bar for each channel's views per month
+  // Otherwise, fallback to single-channel
   return (
     <Card className="bg-[#080808] rounded-xl w-full h-[373px] flex flex-col items-center justify-center mt-8">
       <div className="w-full flex flex-col items-start px-8 pt-8">
         <span className="text-[#F4F4F5] font-['Space_Grotesk'] text-base mb-2">
-          YouTube Views &amp; CPM by Month
+          YouTube Views & CPM by Month
         </span>
       </div>
       <div className="w-full h-[240px] flex flex-row">
@@ -111,27 +115,6 @@ export default function YouTubeBarChart({
               tickFormatter={(v) => v.toLocaleString()}
               yAxisId="left"
             />
-            <YAxis
-              label={{
-                value: "CPM ($)",
-                angle: -90,
-                position: "insideRight",
-                style: {
-                  fill: "#CA2EE9",
-                  fontSize: 14,
-                  fontFamily: "Space Grotesk",
-                },
-                dx: 10,
-                dy: 40,
-              }}
-              orientation="right"
-              tick={{
-                fill: "#CA2EE9",
-                fontSize: 12,
-                fontFamily: "Space Grotesk",
-              }}
-              yAxisId="right"
-            />
             <Tooltip content={<CustomTooltip />} />
             <Legend
               align="center"
@@ -147,22 +130,28 @@ export default function YouTubeBarChart({
                 justifyContent: "center",
               }}
             />
-            <Bar
-              barSize={28}
-              dataKey="views"
-              fill="#9E00F9"
-              name="Views"
-              radius={[6, 6, 0, 0]}
-              yAxisId="left"
-            />
-            <Bar
-              barSize={18}
-              dataKey="cpm"
-              fill="#CA2EE9"
-              name="CPM"
-              radius={[6, 6, 0, 0]}
-              yAxisId="right"
-            />
+            {channels && channels.length > 1
+              ? channels.map((channel, idx) => (
+                  <Bar
+                    key={channel}
+                    barSize={18}
+                    dataKey={`views_${channel}`}
+                    fill={["#9E00F9", "#CA2EE9", "#00C2F9", "#F9A602"][idx % 4]}
+                    name={`Views (${channel})`}
+                    radius={[6, 6, 0, 0]}
+                    yAxisId="left"
+                  />
+                ))
+              : (
+                <Bar
+                  barSize={28}
+                  dataKey="views"
+                  fill="#9E00F9"
+                  name="Views"
+                  radius={[6, 6, 0, 0]}
+                  yAxisId="left"
+                />
+              )}
           </BarChart>
         </ResponsiveContainer>
       </div>

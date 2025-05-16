@@ -18,7 +18,11 @@ import { sidebarItems } from "./sidebarItems";
 import { getPerformanceSummary } from "./helpers";
 
 import { Input } from "@/components/ui/input";
-import { connectPlatform, fetchAllPlatforms } from "@/services/api/platforms";
+import {
+  connectPlatform,
+  fetchAllPlatforms,
+  deletePlatform,
+} from "@/services/api/platforms";
 import apiClient from "@/services/api/client";
 
 const getCreatorId = () => {
@@ -41,13 +45,15 @@ export default function IncomeStreamsPage() {
   const [metricsQuality, setMetricsQuality] = useState<string>("");
   const [linkedChannels, setLinkedChannels] = useState<any[]>([]);
   const [channelsLoading, setChannelsLoading] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0); // for refetching after login
+  const [refreshKey, setRefreshKey] = useState(0); // for refetching
   const [hasGeneratedMock, setHasGeneratedMock] = useState<{
     [key: string]: boolean;
   }>({});
-  const [allPlatforms, setAllPlatforms] = useState<any[]>([]); // <-- new state
+  const [allPlatforms, setAllPlatforms] = useState<any[]>([]);
   const [qualityModalOpen, setQualityModalOpen] = useState(false);
-  const [qualityChannelKey, setQualityChannelKey] = useState<string | null>(null);
+  const [qualityChannelKey, setQualityChannelKey] = useState<string | null>(
+    null,
+  );
   const [qualityLoading, setQualityLoading] = useState(false);
   const router = useRouter();
 
@@ -72,26 +78,22 @@ export default function IncomeStreamsPage() {
     const fetchChannels = async () => {
       setChannelsLoading(true);
       try {
-        // Use the correct API to fetch all connected platforms
         const creatorId = getCreatorId();
         const platforms = await fetchAllPlatforms(creatorId);
 
         setAllPlatforms(Array.isArray(platforms) ? platforms : []);
 
-        // Only filter for YouTube channels for the channel cards
         const youtubeChannels = Array.isArray(platforms)
           ? platforms.filter((ch) => ch.type === "YOUTUBE")
           : [];
 
-        // For each channel, fetch metrics and attach metricsQuality
         const channelsWithMetrics = await Promise.all(
           youtubeChannels.map(async (ch) => {
             const metrics = await fetchChannelMetrics(
               creatorId,
-              ch.platformId || ch.id || ch.connectionId
+              ch.platformId || ch.id || ch.connectionId,
             );
 
-            // Try to get metricsQuality from channel or metrics (if stored)
             let quality = ch.metricsQuality;
 
             if (!quality && metrics.length > 0 && metrics[0].metricsQuality) {
@@ -99,7 +101,7 @@ export default function IncomeStreamsPage() {
             }
 
             return { ...ch, metrics, metricsQuality: quality };
-          })
+          }),
         );
 
         setLinkedChannels(channelsWithMetrics);
@@ -114,7 +116,6 @@ export default function IncomeStreamsPage() {
     fetchChannels();
   }, [refreshKey]);
 
-  // On mount, load mock generation flags from localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("mockMetricsGenerated");
@@ -132,17 +133,15 @@ export default function IncomeStreamsPage() {
     setError("");
     const creatorId = getCreatorId();
     try {
-      // Pass metricsQuality as part of handle (if API supports, else store locally)
       await connectPlatform({
         creatorId,
         type: "YOUTUBE",
         handle,
-        // metricsQuality is not part of connectPlatform API, so we store it locally after linking
       });
       setSuccess("YouTube channel linked! Now generate mock metrics.");
       setHandle("");
       setShowModal(false);
-      setRefreshKey((k) => k + 1); // refetch channels
+      setRefreshKey((k) => k + 1);
     } catch (err: any) {
       if (
         err?.response?.status === 409 &&
@@ -162,9 +161,7 @@ export default function IncomeStreamsPage() {
 
   const handleGenerateMockMetrics = async (
     connectionId: string,
-    quality: string
   ) => {
-    // Prevent repeated generation
     if (hasGeneratedMock[connectionId]) return;
     setQualityChannelKey(connectionId);
     setQualityModalOpen(true);
@@ -177,17 +174,21 @@ export default function IncomeStreamsPage() {
     setError("");
     const baseurl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
     const platform = allPlatforms.find(
-      (p) => p.connectionId === qualityChannelKey || p.platformId === qualityChannelKey || p.id === qualityChannelKey
+      (p) =>
+        p.connectionId === qualityChannelKey ||
+        p.platformId === qualityChannelKey ||
+        p.id === qualityChannelKey,
     );
     const platformId = platform?.platformId || platform?.id || qualityChannelKey;
     const body = {
       creatorId: getCreatorId(),
-      lastXMonths: 6, // changed from 1 to 6
+      lastXMonths: 6,
       platformId,
       platformType: "YOUTUBE",
       metricsQuality: quality,
     };
-    const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    const accessToken =
+      typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
     try {
@@ -198,17 +199,41 @@ export default function IncomeStreamsPage() {
       });
       if (!response.ok) throw new Error("Failed to generate mock metrics");
       setSuccess("Mock metrics generated!");
-      // Set flag in localStorage
-      const updated = { ...hasGeneratedMock, [qualityChannelKey]: true };
-      setHasGeneratedMock(updated);
-      localStorage.setItem("mockMetricsGenerated", JSON.stringify(updated));
-      setRefreshKey((k) => k + 1); // refetch channels
-      setQualityModalOpen(false);
-      setQualityChannelKey(null);
+      setHasGeneratedMock((prev) => ({
+        ...prev,
+        [qualityChannelKey]: true,
+      }));
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "mockMetricsGenerated",
+          JSON.stringify({ ...hasGeneratedMock, [qualityChannelKey]: true }),
+        );
+      }
+      setRefreshKey((k) => k + 1);
     } catch (err: any) {
-      setError(err.message || "Failed to generate mock metrics");
+      setError(err.message || "Something went wrong");
     } finally {
       setQualityLoading(false);
+      setQualityModalOpen(false);
+    }
+  };
+
+  const handleDeletePlatform = async (platformId: string) => {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      await deletePlatform(platformId);
+      setSuccess("Platform deleted successfully.");
+      setRefreshKey((k) => k + 1); // Refresh the list of channels
+    } catch (err: any) {
+      setError(err.message || "Failed to delete platform. Please try again.");
+      if (err?.response?.status === 401) {
+        setError("Session expired. Please log in again.");
+        // router.push("/login"); // or trigger a re-login flow
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -237,6 +262,7 @@ export default function IncomeStreamsPage() {
         router.push("/settings");
         break;
       case "Logout":
+        // Handle logout logic if needed, e.g., clear localStorage, redirect
         break;
       default:
         break;
@@ -245,11 +271,6 @@ export default function IncomeStreamsPage() {
 
   const handleOpenModal = () => {
     setShowModal(true);
-  };
-
-  const handleOpenQualityModal = (connectionId: string) => {
-    setQualityChannelKey(connectionId);
-    setQualityModalOpen(true);
   };
 
   // Show onboarding if no platforms of any type are connected
@@ -280,7 +301,6 @@ export default function IncomeStreamsPage() {
             </button>
           </div>
         </main>
-        {/* Move modal here so it is always rendered and not blocked by conditional returns */}
         <SimpleModal open={showModal} onClose={() => setShowModal(false)}>
           <div className="text-2xl font-bold mb-4 text-white">
             Link Your YouTube Channel
@@ -374,28 +394,27 @@ export default function IncomeStreamsPage() {
           Link Your Accounts
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
-          {/* Render linked YouTube channels */}
           {channelsLoading ? (
             <div className="col-span-3 flex justify-center items-center min-h-[180px]">
               <span className="text-white/70">Loading channels...</span>
             </div>
           ) : linkedChannels.length > 0 ? (
-            linkedChannels.map((channel, idx) => {
-              const channelKey =
-                channel.connectionId || channel.platformId || channel.id || idx;
-
-              return (
-                <YouTubeChannelCard
-                  key={channelKey}
-                  channel={channel}
-                  getPerformanceSummary={getPerformanceSummary}
-                  hasGeneratedMock={hasGeneratedMock}
-                  loading={loading}
-                  metricsQuality={metricsQuality}
-                  onOpenMockMetricsModal={handleOpenQualityModal}
-                />
-              );
-            })
+            linkedChannels.map((channel) => (
+              <YouTubeChannelCard
+                key={channel.platformId || channel.connectionId || channel.id}
+                channel={channel}
+                getPerformanceSummary={getPerformanceSummary}
+                hasGeneratedMock={hasGeneratedMock}
+                loading={loading || qualityLoading}
+                metricsQuality={channel.metricsQuality || "-"}
+                onDelete={handleDeletePlatform}
+                onOpenMockMetricsModal={(connectionId) =>
+                  handleGenerateMockMetrics(
+                    connectionId,
+                  )
+                }
+              />
+            ))
           ) : (
             <div className="col-span-3 flex justify-center items-center min-h-[180px]">
               <span className="text-white/70">
@@ -432,10 +451,11 @@ export default function IncomeStreamsPage() {
           </div>
           {/* Add Channel Card */}
           <div
-            className="bg-[#18181b] bg-opacity-60 border-2 border-dashed border-[#9E00F9] flex flex-col items-center justify-center shadow-lg p-6 rounded-xl cursor-pointer hover:bg-[#232326] transition min-h-[200px]"
+            className="bg-[#18181b] text-white flex flex-col justify-center items-center shadow-lg p-6 rounded-xl cursor-pointer hover:bg-[#232326] transition-colors duration-200 min-h-[280px] md:min-h-[320px]"
             role="button"
             tabIndex={0}
             onClick={handleOpenModal}
+            onKeyDown={(e) => e.key === "Enter" && handleOpenModal()}
           >
             <div className="flex flex-col items-center justify-center h-full w-full">
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#9E00F9] bg-opacity-20 mb-2">
@@ -444,15 +464,15 @@ export default function IncomeStreamsPage() {
                   fill="none"
                   height="32"
                   stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
                   viewBox="0 0 24 24"
                   width="32"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path
-                    d="M12 4v16m8-8H4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                  />
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
               </div>
               <span className="text-[#9E00F9] font-semibold">
@@ -535,20 +555,30 @@ export default function IncomeStreamsPage() {
             </div>
           </form>
         </SimpleModal>
-        <SimpleModal open={qualityModalOpen} onClose={() => setQualityModalOpen(false)}>
-          <div className="text-2xl font-bold mb-4 text-white">Select Metrics Quality</div>
+        {/* Modal for selecting metrics quality */}
+        <SimpleModal
+          open={qualityModalOpen}
+          onClose={() => setQualityModalOpen(false)}
+        >
+          <div className="text-2xl font-bold mb-4 text-white">
+            Select Metrics Quality
+          </div>
           <div className="flex flex-col gap-4">
             {["GOOD", "NORMAL", "BAD"].map((q) => (
               <button
                 key={q}
-                className={`px-6 py-3 rounded-xl font-bold text-lg text-white transition-colors duration-200 ${q === "GOOD" ? "bg-green-600 hover:bg-green-700" : q === "NORMAL" ? "bg-yellow-600 hover:bg-yellow-700" : "bg-red-600 hover:bg-red-700"}`}
+                className="bg-[#9E00F9] hover:bg-[#7a00c2] text-white px-4 py-2 rounded font-bold w-full disabled:bg-gray-700 disabled:cursor-not-allowed"
                 disabled={qualityLoading}
                 onClick={() => handleGenerateWithQuality(q)}
               >
-                {q}
+                {qualityLoading ? `Generating ${q}...` : q}
               </button>
             ))}
-            {qualityLoading && <div className="text-white mt-2">Generating...</div>}
+            {qualityLoading && (
+              <div className="text-white mt-2 text-center">Generating...</div>
+            )}
+            {error && <div className="text-red-500 mt-2">{error}</div>} 
+            {success && <div className="text-green-500 mt-2">{success}</div>} 
           </div>
         </SimpleModal>
         <div className="mt-12 max-w-3xl text-center text-white/80 font-['Space_Grotesk']">
