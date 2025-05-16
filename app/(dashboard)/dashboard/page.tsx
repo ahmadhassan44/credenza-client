@@ -15,6 +15,8 @@ import {
   fetchLatestCreditScore,
   fetchCreditScoreHistory,
 } from "@/services/api/metrics";
+import { useAuth } from "@/context/auth.context";
+import { fetchAllPlatforms } from "@/services/api/platforms";
 
 const sidebarItems = [
   { label: "Profile" },
@@ -124,19 +126,58 @@ function mapFetchedMetricsToDashboard(metricsArr: Metric[]): any {
 }
 
 export default function DashboardPage() {
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [active, setActive] = useState("Dashboard");
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [creditScore, setCreditScore] = useState<any>(null);
   const [creditScoreHistory, setCreditScoreHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
-  // Replace with actual creatorId from auth/user context if available
+  // Detect guest/test user
+  const isGuest = typeof window !== "undefined" && !!localStorage.getItem("guestUser");
+
+  // Get creatorId from user context or localStorage
   const creatorId =
     typeof window !== "undefined"
-      ? localStorage.getItem("creatorId") ||
-        "e0583f69-0220-4ccd-8cac-154b1f4b0b85"
+      ? localStorage.getItem("creatorId") || user?.creatorId || ""
       : "";
 
+  // Fetch connected platforms for real users
   useEffect(() => {
+    if (!isAuthenticated || isGuest) {
+      setLoading(false);
+      return;
+    }
+    async function fetchPlatforms() {
+      setLoading(true);
+      try {
+        // Use the fetchAllPlatforms endpoint
+        const platforms = await fetchAllPlatforms();
+        setShowOnboarding(!Array.isArray(platforms) || platforms.length === 0);
+      } catch {
+        setShowOnboarding(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPlatforms();
+  }, [isAuthenticated, isGuest]);
+
+  // Fetch dashboard metrics for real users with platforms
+  useEffect(() => {
+    if (!isAuthenticated || isGuest || showOnboarding) return;
+    const fetched = getFetchedMetrics();
+    if (fetched) {
+      setDashboardData(mapFetchedMetricsToDashboard(fetched));
+    } else {
+      setDashboardData(null);
+    }
+  }, [isAuthenticated, isGuest, showOnboarding]);
+
+  // Fetch credit score for real users
+  useEffect(() => {
+    if (!isAuthenticated || isGuest || showOnboarding) return;
     async function fetchCreditScoreData() {
       if (!creatorId) return;
       try {
@@ -146,48 +187,211 @@ export default function DashboardPage() {
         ]);
         setCreditScore(latest);
         setCreditScoreHistory(history);
-        // Store in localStorage for persistence (optional)
         localStorage.setItem("creditScore", JSON.stringify(latest));
         localStorage.setItem("creditScoreHistory", JSON.stringify(history));
-      } catch (err) {
-        // fallback to dummyData if needed
-        setCreditScore(dummyData.creditScore);
-        setCreditScoreHistory(dummyData.creditScore.trendData);
+      } catch {
+        setCreditScore(null);
+        setCreditScoreHistory([]);
       }
     }
     fetchCreditScoreData();
-  }, [creatorId]);
+  }, [creatorId, isAuthenticated, isGuest, showOnboarding]);
 
-  useEffect(() => {
-    const updateData = () => {
-      const fetched = getFetchedMetrics();
-      if (fetched) {
-        setDashboardData(mapFetchedMetricsToDashboard(fetched));
-      } else {
-        setDashboardData(null);
-      }
-    };
-    updateData();
-    window.addEventListener("storage", updateData);
-    return () => window.removeEventListener("storage", updateData);
-  }, []);
+  // Responsive onboarding UI for new users
+  if (loading || isLoading) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-black">
+        <div className="animate-pulse text-center">
+          <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-gray-700" />
+          <div className="h-4 w-32 mx-auto rounded bg-gray-700" />
+        </div>
+      </div>
+    );
+  }
 
-  useEffect(() => {
-    const fetched = getFetchedMetrics();
-    if (fetched) {
-      setDashboardData(mapFetchedMetricsToDashboard(fetched));
-    } else {
-      setDashboardData(null);
-    }
-  }, []);
+  if (isGuest) {
+    // Guest/test user: use dummyData
+    const isFetched = !!dashboardData;
+    const creditScoreData =
+      creditScore ||
+      (isFetched ? dashboardData.creditScore : dummyData.creditScore);
 
+    const creditScoreTrend = creditScoreHistory.length > 0
+      ? creditScoreHistory.map((item: any) => ({
+          date: item.timestamp
+            ? new Date(item.timestamp).toLocaleString("default", { month: "short", year: "numeric" })
+            : item.date,
+          score: item.overallScore ?? 0,
+        }))
+      : isFetched
+        ? dashboardData.creditScore.trendData
+        : dummyData.creditScore.trendData;
+
+    const ytIncome = isFetched
+      ? dashboardData.ytIncome
+      : dummyData.incomeSources.find((i) => i.platform === "YOUTUBE");
+    const ytMetrics = isFetched
+      ? dashboardData.ytMetrics
+      : dummyData.platformMetrics.find((m) => m.platform === "YOUTUBE");
+    const subscribersGained = isFetched ? dashboardData.subscribersGained : 2400;
+    const barChartData = isFetched
+      ? dashboardData.barChartData
+      : dummyData.youtubeMonthlyStats.slice(-6);
+    const topVideo = isFetched
+      ? dashboardData.topVideo
+      : {
+          title: "How to Grow on YouTube in 2025",
+          thumbnailUrl: "/credenzaLogo.svg",
+          views: 120000,
+          estimatedRevenue: 320.5,
+        };
+    const youtubeConnected = true;
+
+    return (
+      <div className="w-full bg-black">
+        <DashboardSidebar
+          active={active}
+          setActive={setActive}
+          sidebarItems={sidebarItems}
+        />
+        <DashboardMain>
+          <div className="flex flex-col gap-7 h-full min-h-[calc(100vh-63px-60px)] justify-between">
+            <div className="flex flex-col gap-[33px] w-full">
+              <p className="text-white text-5xl font-['Space_Grotesk'] font-medium leading-6">
+                Dashboard
+              </p>
+              <p className="text-white text-2xl font-['Space_Grotesk'] font-medium leading-6">
+                Overview of your creator metrics and income performance from
+                YouTube
+              </p>
+            </div>
+            <div className="flex flex-1 flex-wrap gap-y-2 gap-x-3.5 w-full items-stretch">
+              <Card className="bg-[#9E00F9] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
+                <div className="flex flex-col h-full justify-between p-3">
+                  <div>
+                    <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
+                      Credit Score →
+                    </p>
+                    <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
+                      {creditScoreData.overallScore}
+                    </p>
+                  </div>
+                  <p className="text-[#F4F4F5] text-sm font-['Inter'] leading-[14px]">
+                    Based on your consistency, engagement, and income
+                  </p>
+                </div>
+              </Card>
+              <Card className="bg-[#080808] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
+                <div className="flex flex-col h-full justify-between p-3">
+                  <div>
+                    <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
+                      Monthly Income Estimate (YouTube)
+                    </p>
+                    <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
+                      $
+                      {ytIncome.monthlyIncome?.toLocaleString(undefined, {
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                  </div>
+                  <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
+                    Estimated from current CPM and view trends
+                  </p>
+                </div>
+              </Card>
+              <Card className="bg-[#080808] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
+                <div className="flex flex-col h-full justify-between p-3">
+                  <div>
+                    <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
+                      YouTube Views (Latest Month)
+                    </p>
+                    <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
+                      {ytMetrics.views?.toLocaleString()}
+                    </p>
+                  </div>
+                  <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
+                    Total views for the most recent month
+                  </p>
+                </div>
+              </Card>
+              <Card className="bg-[#080808] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
+                <div className="flex flex-col h-full justify-between p-3">
+                  <div>
+                    <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
+                      Subscribers Gained (YTD)
+                    </p>
+                    <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
+                      {subscribersGained?.toLocaleString()}
+                    </p>
+                  </div>
+                  <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
+                    Net audience growth this year
+                  </p>
+                </div>
+              </Card>
+            </div>
+            {/* Line graph Section */}
+            <div className="flex-1 min-h-[350px] w-full flex">
+              <div className="flex-1 flex">
+                <CreditScoreLineChart data={creditScoreTrend} />
+              </div>
+            </div>
+            {/* Chart Section */}
+            <div className="flex-1 min-h-[350px] w-full flex gap-6">
+              <div className="flex-1 flex">
+                <YouTubeBarChart data={barChartData} />
+              </div>
+            </div>
+            {/* Progress Bars Section */}
+            <div className="flex flex-row gap-6 w-full mt-2">
+              <ScoreProgress
+                color="#9E00F9"
+                description="Based on upload frequency and schedule"
+                label="Consistency Score"
+                max={100}
+                value={creditScoreData?.scoreFactors?.consistency ?? 0}
+              />
+              <ScoreProgress
+                color="#9E00F9"
+                description="Avg engagement vs. audience size"
+                label="Engagement Score"
+                max={100}
+                value={creditScoreData?.scoreFactors?.engagement ?? 0}
+              />
+            </div>
+          </div>
+        </DashboardMain>
+      </div>
+    );
+  } else if (showOnboarding) {
+    // Onboarding for new users with no platforms
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-black px-4">
+        <DashboardSidebar active={active} setActive={setActive} sidebarItems={sidebarItems} />
+        <main className="flex-1 flex flex-col items-center justify-center w-full max-w-xl mx-auto">
+          <div className="bg-[#18181b] rounded-xl shadow-lg p-8 w-full text-center">
+            <h2 className="text-3xl font-bold text-white mb-4 font-['Space_Grotesk']">Welcome to Credenza!</h2>
+            <p className="text-lg text-white/80 mb-6 font-['Space_Grotesk']">
+              Get started by connecting your first platform (YouTube, Patreon, etc.) to see your dashboard metrics.
+            </p>
+            <a
+              href="/income"
+              className="inline-block bg-[#9E00F9] hover:bg-[#7a00c2] text-white px-6 py-3 rounded-xl font-bold text-lg transition-colors duration-200"
+            >
+              Connect a Platform
+            </a>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Real user with data
   const isFetched = !!dashboardData;
-  // Use fetched credit score and history if available
   const creditScoreData =
     creditScore ||
     (isFetched ? dashboardData.creditScore : dummyData.creditScore);
 
-  // Map creditScoreHistory to chart data for CreditScoreLineChart
   const creditScoreTrend = creditScoreHistory.length > 0
     ? creditScoreHistory.map((item: any) => ({
         date: item.timestamp

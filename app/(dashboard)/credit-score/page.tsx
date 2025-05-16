@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import DashboardSidebar from "../sidebar";
-import { sidebarItems } from "../income/income-streams";
+import { sidebarItems } from "../income/sidebarItems";
 import SkeletonLoader from "../skeleton-loader";
 import CreditScoreDashboard from "./CreditScoreDashboard";
 
