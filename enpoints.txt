@@ -1,25 +1,78 @@
-Authentication Endpoints
-POST /auth/register - Register a new user
-POST /auth/login - User login
-POST /auth/logout - User logout (requires JWT)
-POST /auth/refresh - Refresh access token
-GET /auth/profile - Get current user profile (requires JWT)
-User Endpoints
-GET /users/profile - Get current user profile (requires JWT)
-PATCH /users/profile - Update current user profile (requires JWT)
-DELETE /users/profile - Delete current user account (requires JWT)
-GET /users/:id - Get user by ID (Admin only)
-PATCH /users/:id - Update user by ID (Admin only)
-DELETE /users/:id - Delete user by ID (Admin only)
+POST /api/v1/auth/register
+
+Purpose: Register a new user.
+Body: { "email": "user@example.com", "password": "password", "firstName": "John", "lastName": "Doe" }
+Auth: None
+Returns: User details
+POST /api/v1/auth/login
+
+Purpose: Log in with email and password.
+Body: { "email": "user@example.com", "password": "password" }
+Auth: None
+Returns: Access token, refresh token, and user details
+POST /api/v1/auth/refresh
+
+Purpose: Refresh an expired access token.
+Body: { "refreshToken": "token" }
+Auth: None
+Returns: New access token, refresh token, and user details
+POST /api/v1/auth/logout
+
+Purpose: Log out and invalidate tokens.
+Auth: Requires Authorization header with valid JWT
+Returns: Success message
+GET /api/v1/auth/profile
+
+Purpose: Get current user profile.
+Auth: Requires Authorization header with valid JWT
+Returns: User profile information
+User Management Endpoints
+GET /api/v1/users/profile
+
+Purpose: Get current user's profile.
+Auth: Requires Authorization header with valid JWT
+Returns: User details
+PATCH /api/v1/users/profile
+
+Purpose: Update current user's profile.
+Body: { "firstName": "John", "lastName": "Smith" }
+Auth: Requires Authorization header with valid JWT
+Returns: Updated user details
+DELETE /api/v1/users/profile
+
+Purpose: Delete current user's account.
+Auth: Requires Authorization header with valid JWT
+Returns: Success message
 Platform Endpoints
-POST /platforms/connect - Connect a platform for a creator (Creator or Admin)
-GET /platforms - Get all platforms (Admin only)
-POST /platforms/:id/refresh - Manually refresh metrics for a platform (Creator or Admin)
-GET /platforms/:id - Get platform by ID (implied from service)
+POST /api/v1/platforms/connect
+
+Purpose: Connect a new platform for a creator.
+Body: { "type": "YOUTUBE", "creatorId": "user-id", "credentials": { ... } }
+Auth: Requires Authorization header with valid JWT and CREATOR or ADMIN role
+Returns: Platform data with initial metrics
+GET /api/v1/platforms
+
+Purpose: Get all connected platforms.
+Auth: Requires Authorization header with valid JWT and ADMIN role
+Returns: Array of platform objects
+POST /api/v1/platforms/:id/refresh
+
+Purpose: Manually trigger metrics refresh for a platform.
+Auth: Requires Authorization header with valid JWT and CREATOR or ADMIN role
+Returns: Array of new metrics collected
 Credit Scoring Endpoints
-POST /credit-scoring/generate/:creatorId - Generate credit score for a creator (Creator or Admin)
-GET /credit-scoring/latest/:creatorId - Get latest credit score for a creator (Creator or Admin)
-GET /credit-scoring/history/:creatorId - Get credit score history for a creator (Creator or Admin)
-Application Status Endpoints
-GET  - Hello World endpoint
-GET /health - Health check endpoint
+POST /api/v1/credit-scoring/generate/:creatorId
+
+Purpose: Generate a new credit score for a creator.
+Auth: Requires Authorization header with valid JWT and CREATOR or ADMIN role
+Returns: Complete credit score with platform breakdowns
+GET /api/v1/credit-scoring/latest/:creatorId
+
+Purpose: Get the latest credit score for a creator.
+Auth: Requires Authorization header with valid JWT and CREATOR or ADMIN role
+Returns: Latest credit score with platform breakdowns
+GET /api/v1/credit-scoring/history/:creatorId
+
+Purpose: Get the credit score history for a creator.
+Auth: Requires Authorization header with valid JWT and CREATOR or ADMIN role
+Returns: Array of historical credit scores

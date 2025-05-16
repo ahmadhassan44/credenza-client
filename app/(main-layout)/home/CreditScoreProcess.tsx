@@ -1,12 +1,24 @@
 // CreditScoreProcess.tsx
 "use client";
 
+import { motion } from "framer-motion";
+import { fadeInUp, staggerContainer } from "./animations";
+
 export default function CreditScoreProcess() {
   return (
-    <section className="relative z-10 max-w-7xl mx-auto px-6 py-24">
-      <h2 className="text-3xl sm:text-4xl font-bold text-white mb-12 text-center">
+    <motion.section
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      className="relative z-10 max-w-7xl mx-auto px-6 py-24"
+    >
+      <motion.h2
+        variants={fadeInUp}
+        className="text-3xl sm:text-4xl font-bold text-white mb-12 text-center"
+      >
         How Your Score is Built
-      </h2>
+      </motion.h2>
       <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4">
         {[
           {
@@ -30,7 +42,8 @@ export default function CreditScoreProcess() {
             desc: "Access financial tools and offers.",
           },
         ].map((step, i) => (
-          <div
+          <motion.div
+            variants={fadeInUp}
             key={i}
             className="flex flex-col items-center text-center flex-1 min-w-[150px] max-w-[200px]"
           >
@@ -44,9 +57,9 @@ export default function CreditScoreProcess() {
             {i < 3 && (
               <div className="hidden md:block w-12 h-1 bg-gradient-to-r from-[#9E00F9] to-[#CA6EFF] rounded-full my-2" />
             )}
-          </div>
+          </motion.div>
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 }

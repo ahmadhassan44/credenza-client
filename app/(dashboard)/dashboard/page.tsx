@@ -186,12 +186,19 @@ export default function DashboardPage() {
   const creditScoreData =
     creditScore ||
     (isFetched ? dashboardData.creditScore : dummyData.creditScore);
-  const creditScoreTrend =
-    creditScoreHistory.length > 0
-      ? creditScoreHistory
-      : isFetched
-        ? dashboardData.creditScore.trendData
-        : dummyData.creditScore.trendData;
+
+  // Map creditScoreHistory to chart data for CreditScoreLineChart
+  const creditScoreTrend = creditScoreHistory.length > 0
+    ? creditScoreHistory.map((item: any) => ({
+        date: item.timestamp
+          ? new Date(item.timestamp).toLocaleString("default", { month: "short", year: "numeric" })
+          : item.date,
+        score: item.overallScore ?? 0,
+      }))
+    : isFetched
+      ? dashboardData.creditScore.trendData
+      : dummyData.creditScore.trendData;
+
   const ytIncome = isFetched
     ? dashboardData.ytIncome
     : dummyData.incomeSources.find((i) => i.platform === "YOUTUBE");

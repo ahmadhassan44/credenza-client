@@ -1,10 +1,18 @@
 import Link from "next/link";
 import { Button } from "@heroui/react";
+import { motion } from "framer-motion";
+import { fadeInUp, staggerContainer } from "./animations";
 
 const Footer = () => (
-  <footer className="relative z-10 w-full bg-[#18122B] border-t border-[#9E00F9]/20 py-12 px-6 mt-auto">
+  <motion.footer
+    variants={staggerContainer}
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.3 }}
+    className="relative z-10 w-full bg-[#18122B] border-t border-[#9E00F9]/20 py-12 px-6 mt-auto"
+  >
     <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-      <div className="flex-1 mb-8 md:mb-0">
+      <motion.div variants={fadeInUp} className="flex-1 mb-8 md:mb-0">
         <h3 className="text-xl font-semibold text-white mb-2">
           Ready to understand your creator credit score?
         </h3>
@@ -16,9 +24,9 @@ const Footer = () => (
         >
           Get Started for Free
         </Button>
-      </div>
+      </motion.div>
       <div className="flex-[2] grid grid-cols-2 sm:grid-cols-4 gap-8 w-full">
-        <div>
+        <motion.div variants={fadeInUp}>
           <h4 className="text-white font-semibold mb-2">Company</h4>
           <ul className="text-gray-400 text-sm space-y-1">
             <li>
@@ -37,8 +45,8 @@ const Footer = () => (
               </a>
             </li>
           </ul>
-        </div>
-        <div>
+        </motion.div>
+        <motion.div variants={fadeInUp}>
           <h4 className="text-white font-semibold mb-2">Resources</h4>
           <ul className="text-gray-400 text-sm space-y-1">
             <li>
@@ -52,8 +60,8 @@ const Footer = () => (
               </a>
             </li>
           </ul>
-        </div>
-        <div>
+        </motion.div>
+        <motion.div variants={fadeInUp}>
           <h4 className="text-white font-semibold mb-2">Contact</h4>
           <ul className="text-gray-400 text-sm space-y-1">
             <li>
@@ -72,8 +80,8 @@ const Footer = () => (
               </a>
             </li>
           </ul>
-        </div>
-        <div>
+        </motion.div>
+        <motion.div variants={fadeInUp}>
           <h4 className="text-white font-semibold mb-2">Legal</h4>
           <ul className="text-gray-400 text-sm space-y-1">
             <li>
@@ -87,13 +95,13 @@ const Footer = () => (
               </a>
             </li>
           </ul>
-        </div>
+        </motion.div>
       </div>
     </div>
     <div className="mt-10 text-center text-gray-500 text-xs">
       © 2025 Credenza Technologies Inc. All rights reserved.
     </div>
-  </footer>
+  </motion.footer>
 );
 
 export default Footer;

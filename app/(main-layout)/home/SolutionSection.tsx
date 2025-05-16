@@ -1,19 +1,27 @@
 "use client";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import { fadeInUp, staggerContainer } from "./animations";
 
 export default function SolutionSection() {
   return (
-    <section className="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 px-6 py-24">
+    <motion.section
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      className="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 px-6 py-24"
+    >
       {/* Left: Text Block */}
-      <div className="flex-1 max-w-xl">
-        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+      <motion.div variants={fadeInUp} className="flex-1 max-w-xl">
+        <motion.h2 variants={fadeInUp} className="text-3xl sm:text-4xl font-bold text-white mb-4">
           Built for modern creators, powered by intelligent finance.
-        </h2>
-        <p className="text-lg text-gray-300 mb-8">
+        </motion.h2>
+        <motion.p variants={fadeInUp} className="text-lg text-gray-300 mb-8">
           Whether you&apos;re a YouTuber, streamer, or freelancer — Credenza
           transforms your platform data into credit scores and actionable income insights to unlock financial opportunities.
-        </p>
-        <div className="flex gap-4 mt-4">
+        </motion.p>
+        <motion.div variants={fadeInUp} className="flex gap-4 mt-4">
           <div className="flex flex-col items-center group cursor-pointer">
             <Image
               alt="YouTube"
@@ -50,10 +58,10 @@ export default function SolutionSection() {
               Patreon
             </span>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
       {/* Right: Animated Graph/Illustration */}
-      <div className="flex-1 flex items-center justify-center">
+      <motion.div variants={fadeInUp} className="flex-1 flex items-center justify-center">
         <div className="w-full max-w-md aspect-[4/3] bg-gradient-to-br from-[#9E00F9]/30 via-[#CA6EFF]/20 to-[#F1C7FF]/10 rounded-3xl shadow-2xl flex items-center justify-center relative overflow-hidden">
           {/* Placeholder for animated graph/illustration */}
           <Image
@@ -64,7 +72,7 @@ export default function SolutionSection() {
             width={320}
           />
         </div>
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }

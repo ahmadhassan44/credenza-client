@@ -36,3 +36,12 @@ export async function fetchCreditScoreHistory(creatorId: string) {
     throw error;
   }
 }
+
+export async function generateCreditScore(creatorId: string) {
+  try {
+    const response = await apiClient.post(`/credit-scoring/generate/${creatorId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
