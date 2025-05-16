@@ -19,11 +19,11 @@ export async function connectPlatform(payload: ConnectPlatformPayload) {
   return response.data;
 }
 
-// Get all connected platforms (ADMIN only)
-export async function fetchAllPlatforms() {
+// Get all connected platforms for a creator
+export async function fetchAllPlatforms(creatorId: string) {
   const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
   const response = await apiClient.get(
-    "/platforms",
+    `/platforms/creator?creatorId=${creatorId}`,
     accessToken
       ? { headers: { Authorization: `Bearer ${accessToken}` } }
       : undefined

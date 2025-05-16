@@ -62,7 +62,8 @@ export default function IncomeStreamsPage() {
       setChannelsLoading(true);
       try {
         // Use the correct API to fetch all connected platforms
-        const platforms = await fetchAllPlatforms();
+        const creatorId = getCreatorId();
+        const platforms = await fetchAllPlatforms(creatorId);
 
         setAllPlatforms(Array.isArray(platforms) ? platforms : []);
 
@@ -72,7 +73,6 @@ export default function IncomeStreamsPage() {
           : [];
 
         // For each channel, fetch metrics and attach metricsQuality
-        const creatorId = getCreatorId();
         const channelsWithMetrics = await Promise.all(
           youtubeChannels.map(async (ch) => {
             const metrics = await fetchChannelMetrics(
