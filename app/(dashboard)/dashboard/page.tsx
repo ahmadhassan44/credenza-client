@@ -10,7 +10,11 @@ import DashboardProgressBars from "./DashboardProgressBars";
 import { dummyData } from "@/data/dummyData";
 import { useAuth } from "@/context/auth.context";
 import { fetchAllPlatforms } from "@/services/api/platforms";
-import { fetchLatestCreditScore, fetchCreditScoreHistory, fetchYouTubeMetrics } from "@/services/api/metrics";
+import {
+  fetchLatestCreditScore,
+  fetchCreditScoreHistory,
+  fetchYouTubeMetrics,
+} from "@/services/api/metrics";
 import { mapFetchedMetricsToDashboard } from "./dashboardUtils";
 
 const sidebarItems = [
@@ -36,13 +40,14 @@ export default function DashboardPage() {
   const [generatingMetrics, setGeneratingMetrics] = useState(false);
 
   // Detect guest/test user
-  const isGuest = typeof window !== "undefined" && !!localStorage.getItem("guestUser");
+  const isGuest =
+    typeof window !== "undefined" && !!localStorage.getItem("guestUser");
 
   // Get creatorId from user context or localStorage
-  const creatorId =
-    typeof window !== "undefined"
-      ? localStorage.getItem("creatorId") || user?.creatorId || ""
-      : "";
+  const localUser =
+    typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
+  const creatorId = localUser ? JSON.parse(localUser).creatorId : null;
 
   // Fetch connected platforms for real users
   useEffect(() => {
@@ -57,7 +62,9 @@ export default function DashboardPage() {
       try {
         const fetchedPlatforms = await fetchAllPlatforms(creatorId);
         setPlatforms(Array.isArray(fetchedPlatforms) ? fetchedPlatforms : []);
-        setHasPlatforms(Array.isArray(fetchedPlatforms) && fetchedPlatforms.length > 0);
+        setHasPlatforms(
+          Array.isArray(fetchedPlatforms) && fetchedPlatforms.length > 0
+        );
       } catch {
         setPlatforms([]);
         setHasPlatforms(false);
@@ -84,7 +91,11 @@ export default function DashboardPage() {
         let metricsData = null;
         if (ytPlatform) {
           const today = new Date();
-          const startDate = new Date(today.getFullYear(), today.getMonth() - 6, 1).toISOString();
+          const startDate = new Date(
+            today.getFullYear(),
+            today.getMonth() - 6,
+            1
+          ).toISOString();
           const endDate = today.toISOString();
           metricsData = await fetchYouTubeMetrics({
             creatorId,
@@ -146,8 +157,12 @@ export default function DashboardPage() {
 
   // 1. Guest user: show dummyData
   if (isGuest) {
-    const ytIncome = dummyData.incomeSources.find((i) => i.platform === "YOUTUBE") || { monthlyIncome: 0 };
-    const ytMetrics = dummyData.platformMetrics.find((m) => m.platform === "YOUTUBE") || { views: 0 };
+    const ytIncome = dummyData.incomeSources.find(
+      (i) => i.platform === "YOUTUBE"
+    ) || { monthlyIncome: 0 };
+    const ytMetrics = dummyData.platformMetrics.find(
+      (m) => m.platform === "YOUTUBE"
+    ) || { views: 0 };
     return (
       <div className="w-full bg-black">
         <DashboardSidebar
@@ -177,7 +192,9 @@ export default function DashboardPage() {
               creditScoreTrend={dummyData.creditScore.trendData}
             />
             <DashboardProgressBars
-              consistency={dummyData.creditScore?.scoreFactors?.consistency ?? 0}
+              consistency={
+                dummyData.creditScore?.scoreFactors?.consistency ?? 0
+              }
               engagement={dummyData.creditScore?.scoreFactors?.engagement ?? 0}
             />
           </div>
@@ -191,7 +208,9 @@ export default function DashboardPage() {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-black">
         <div className="text-center">
-          <p className="text-white text-2xl mb-4">Connect a platform to get started!</p>
+          <p className="text-white text-2xl mb-4">
+            Connect a platform to get started!
+          </p>
           <a
             href="/dashboard/income"
             className="inline-block px-6 py-3 bg-[#9E00F9] text-white rounded-lg font-bold hover:bg-[#7a00c2] transition"
@@ -214,16 +233,24 @@ export default function DashboardPage() {
         />
         <DashboardMain>
           <div className="flex flex-col gap-7 h-full min-h-[calc(100vh-63px-60px)] justify-center items-center">
-            <p className="text-white text-2xl mb-4">No metrics found for your account.</p>
+            <p className="text-white text-2xl mb-4">
+              No metrics found for your account.
+            </p>
             <button
               className="inline-block px-6 py-3 bg-[#9E00F9] text-white rounded-lg font-bold hover:bg-[#7a00c2] transition"
               onClick={async () => {
                 // Generate metrics for the user and save to localStorage
                 if (!creatorId || !platforms.length) return;
-                const ytPlatform = platforms.find((p: any) => p.type === "YOUTUBE");
+                const ytPlatform = platforms.find(
+                  (p: any) => p.type === "YOUTUBE"
+                );
                 if (ytPlatform) {
                   const today = new Date();
-                  const startDate = new Date(today.getFullYear(), today.getMonth() - 6, 1).toISOString();
+                  const startDate = new Date(
+                    today.getFullYear(),
+                    today.getMonth() - 6,
+                    1
+                  ).toISOString();
                   const endDate = today.toISOString();
                   try {
                     const metricsData = await fetchYouTubeMetrics({
@@ -233,8 +260,13 @@ export default function DashboardPage() {
                       endDate,
                     });
                     if (metricsData) {
-                      localStorage.setItem("mockMetricsData", JSON.stringify(metricsData));
-                      setDashboardData(mapFetchedMetricsToDashboard(metricsData));
+                      localStorage.setItem(
+                        "mockMetricsData",
+                        JSON.stringify(metricsData)
+                      );
+                      setDashboardData(
+                        mapFetchedMetricsToDashboard(metricsData)
+                      );
                     }
                   } catch {
                     // Optionally show error
@@ -256,26 +288,31 @@ export default function DashboardPage() {
     creditScore ||
     (isFetched ? dashboardData.creditScore : dummyData.creditScore);
 
-  const creditScoreTrend = creditScoreHistory.length > 0
-    ? creditScoreHistory.map((item: any) => ({
-        date: item.timestamp
-          ? new Date(item.timestamp).toLocaleString("default", {
-              month: "short",
-              year: "numeric",
-            })
-          : item.date,
-        score: item.overallScore ?? 0,
-      }))
-    : isFetched
-      ? dashboardData.creditScore.trendData
-      : dummyData.creditScore.trendData;
+  const creditScoreTrend =
+    creditScoreHistory.length > 0
+      ? creditScoreHistory.map((item: any) => ({
+          date: item.timestamp
+            ? new Date(item.timestamp).toLocaleString("default", {
+                month: "short",
+                year: "numeric",
+              })
+            : item.date,
+          score: item.overallScore ?? 0,
+        }))
+      : isFetched
+        ? dashboardData.creditScore.trendData
+        : dummyData.creditScore.trendData;
 
   const ytIncome = isFetched
     ? dashboardData.ytIncome
-    : dummyData.incomeSources.find((i) => i.platform === "YOUTUBE") || { monthlyIncome: 0 };
+    : dummyData.incomeSources.find((i) => i.platform === "YOUTUBE") || {
+        monthlyIncome: 0,
+      };
   const ytMetrics = isFetched
     ? dashboardData.ytMetrics
-    : dummyData.platformMetrics.find((m) => m.platform === "YOUTUBE") || { views: 0 };
+    : dummyData.platformMetrics.find((m) => m.platform === "YOUTUBE") || {
+        views: 0,
+      };
   const subscribersGained = isFetched ? dashboardData.subscribersGained : 2400;
   const barChartData = isFetched
     ? dashboardData.barChartData
