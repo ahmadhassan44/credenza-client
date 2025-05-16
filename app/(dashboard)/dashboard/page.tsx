@@ -2,12 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-import { Card } from "@heroui/react";
-
-import CreditScoreLineChart from "./creditScoreLineChart";
-import YouTubeBarChart from "./youtubeBarChart";
-import ScoreProgress from "./ScoreProgress";
-
 import { dummyData } from "@/data/dummyData";
 import DashboardSidebar from "@/app/(dashboard)/sidebar";
 import DashboardMain from "@/app/(dashboard)/dashboard/main";
@@ -17,6 +11,12 @@ import {
 } from "@/services/api/metrics";
 import { useAuth } from "@/context/auth.context";
 import { fetchAllPlatforms } from "@/services/api/platforms";
+
+import DashboardSummaryCards from "./DashboardSummaryCards";
+import DashboardCharts from "./DashboardCharts";
+import DashboardProgressBars from "./DashboardProgressBars";
+import OnboardingSection from "./OnboardingSection";
+import { mapFetchedMetricsToDashboard } from "./dashboardUtils";
 
 const sidebarItems = [
   { label: "Profile" },
@@ -28,102 +28,6 @@ const sidebarItems = [
   { label: "Settings" },
   { label: "Logout" },
 ];
-
-type Metric = {
-  date: string;
-  views?: number;
-  audienceSize?: number;
-  postCount?: number;
-  estimatedRevenueUsd?: number;
-  cpm?: number;
-};
-
-const getFetchedMetrics = (): Metric[] | null => {
-  if (typeof window === "undefined") return null;
-  const data = localStorage.getItem("mockMetricsData");
-  if (!data) return null;
-
-  try {
-    const parsed = JSON.parse(data);
-    if (Array.isArray(parsed)) return parsed;
-    if (parsed.metrics && Array.isArray(parsed.metrics)) return parsed.metrics;
-    return [parsed];
-  } catch {
-    return null;
-  }
-};
-
-function mapFetchedMetricsToDashboard(metricsArr: Metric[]): any {
-  if (!Array.isArray(metricsArr) || metricsArr.length === 0) return null;
-  const sorted = [...metricsArr].sort((a, b) => {
-    const da = new Date(a.date).getTime();
-    const db = new Date(b.date).getTime();
-    return da - db;
-  });
-
-  // Calculate monthly view deltas
-  const monthlyViewDeltas = sorted.map((m, i, arr) => {
-    if (i === 0) return m.views || 0;
-    return (m.views || 0) - (arr[i - 1].views || 0);
-  });
-
-  // Bar chart data: use monthly deltas
-  const barChartData = sorted.map((m, i) => {
-    let cpm = 0;
-    const viewsDelta = monthlyViewDeltas[i];
-    if (m.estimatedRevenueUsd && viewsDelta > 0) {
-      cpm = m.estimatedRevenueUsd / (viewsDelta / 1000);
-    }
-    // Use full month and year for clarity and uniqueness
-    const dateObj = new Date(m.date);
-    const monthLabel = dateObj.toLocaleString("default", { month: "short" }) +
-      " " + dateObj.getFullYear();
-    return {
-      month: monthLabel,
-      views: viewsDelta,
-      cpm: cpm || 0,
-    };
-  });
-
-  // Total YouTube views (sum of monthly deltas)
-  const totalViews = monthlyViewDeltas.reduce((sum, v) => sum + v, 0);
-
-  // Subscribers gained: difference between first and last audienceSize
-  const subscribersGained =
-    (sorted[sorted.length - 1].audienceSize || 0) -
-    (sorted[0].audienceSize || 0);
-
-  const creditScore = {
-    overallScore: 80,
-    scoreFactors: {
-      consistency: 75,
-      engagement: 70,
-    },
-    trendData: sorted.map((m) => ({
-      date: new Date(m.date).toLocaleString("default", { month: "short" }),
-      score: 70 + Math.round((m.views || 0) / 1000),
-    })),
-  };
-  const latest = sorted[sorted.length - 1];
-  const ytIncome = {
-    monthlyIncome: latest.estimatedRevenueUsd || 0,
-  };
-  const ytMetrics = {
-    views: totalViews,
-    audienceSize: latest.audienceSize || 0,
-    postCount: latest.postCount || 0,
-  };
-  const topVideo = null;
-  return {
-    creditScore,
-    ytIncome,
-    ytMetrics,
-    subscribersGained,
-    barChartData,
-    topVideo,
-    totalViews,
-  };
-}
 
 export default function DashboardPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -152,8 +56,8 @@ export default function DashboardPage() {
     async function fetchPlatforms() {
       setLoading(true);
       try {
-        // Use the fetchAllPlatforms endpoint
-        const platforms = await fetchAllPlatforms();
+        const platforms = await fetchAllPlatforms(creatorId);
+
         setShowOnboarding(!Array.isArray(platforms) || platforms.length === 0);
       } catch {
         setShowOnboarding(true);
@@ -162,12 +66,16 @@ export default function DashboardPage() {
       }
     }
     fetchPlatforms();
-  }, [isAuthenticated, isGuest]);
+  }, [isAuthenticated, isGuest, creatorId]);
 
   // Fetch dashboard metrics for real users with platforms
   useEffect(() => {
     if (!isAuthenticated || isGuest || showOnboarding) return;
-    const fetched = getFetchedMetrics();
+    const fetched =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("mockMetricsData") || "null")
+        : null;
+
     if (fetched) {
       setDashboardData(mapFetchedMetricsToDashboard(fetched));
     } else {
@@ -185,6 +93,7 @@ export default function DashboardPage() {
           fetchLatestCreditScore(creatorId),
           fetchCreditScoreHistory(creatorId),
         ]);
+
         setCreditScore(latest);
         setCreditScoreHistory(history);
         localStorage.setItem("creditScore", JSON.stringify(latest));
@@ -209,181 +118,9 @@ export default function DashboardPage() {
     );
   }
 
-  if (isGuest) {
-    // Guest/test user: use dummyData
-    const isFetched = !!dashboardData;
-    const creditScoreData =
-      creditScore ||
-      (isFetched ? dashboardData.creditScore : dummyData.creditScore);
-
-    const creditScoreTrend = creditScoreHistory.length > 0
-      ? creditScoreHistory.map((item: any) => ({
-          date: item.timestamp
-            ? new Date(item.timestamp).toLocaleString("default", { month: "short", year: "numeric" })
-            : item.date,
-          score: item.overallScore ?? 0,
-        }))
-      : isFetched
-        ? dashboardData.creditScore.trendData
-        : dummyData.creditScore.trendData;
-
-    const ytIncome = isFetched
-      ? dashboardData.ytIncome
-      : dummyData.incomeSources.find((i) => i.platform === "YOUTUBE");
-    const ytMetrics = isFetched
-      ? dashboardData.ytMetrics
-      : dummyData.platformMetrics.find((m) => m.platform === "YOUTUBE");
-    const subscribersGained = isFetched ? dashboardData.subscribersGained : 2400;
-    const barChartData = isFetched
-      ? dashboardData.barChartData
-      : dummyData.youtubeMonthlyStats.slice(-6);
-    const topVideo = isFetched
-      ? dashboardData.topVideo
-      : {
-          title: "How to Grow on YouTube in 2025",
-          thumbnailUrl: "/credenzaLogo.svg",
-          views: 120000,
-          estimatedRevenue: 320.5,
-        };
-    const youtubeConnected = true;
-
-    return (
-      <div className="w-full bg-black">
-        <DashboardSidebar
-          active={active}
-          setActive={setActive}
-          sidebarItems={sidebarItems}
-        />
-        <DashboardMain>
-          <div className="flex flex-col gap-7 h-full min-h-[calc(100vh-63px-60px)] justify-between">
-            <div className="flex flex-col gap-[33px] w-full">
-              <p className="text-white text-5xl font-['Space_Grotesk'] font-medium leading-6">
-                Dashboard
-              </p>
-              <p className="text-white text-2xl font-['Space_Grotesk'] font-medium leading-6">
-                Overview of your creator metrics and income performance from
-                YouTube
-              </p>
-            </div>
-            <div className="flex flex-1 flex-wrap gap-y-2 gap-x-3.5 w-full items-stretch">
-              <Card className="bg-[#9E00F9] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
-                <div className="flex flex-col h-full justify-between p-3">
-                  <div>
-                    <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
-                      Credit Score →
-                    </p>
-                    <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
-                      {creditScoreData.overallScore}
-                    </p>
-                  </div>
-                  <p className="text-[#F4F4F5] text-sm font-['Inter'] leading-[14px]">
-                    Based on your consistency, engagement, and income
-                  </p>
-                </div>
-              </Card>
-              <Card className="bg-[#080808] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
-                <div className="flex flex-col h-full justify-between p-3">
-                  <div>
-                    <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
-                      Monthly Income Estimate (YouTube)
-                    </p>
-                    <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
-                      $
-                      {ytIncome.monthlyIncome?.toLocaleString(undefined, {
-                        maximumFractionDigits: 2,
-                      })}
-                    </p>
-                  </div>
-                  <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
-                    Estimated from current CPM and view trends
-                  </p>
-                </div>
-              </Card>
-              <Card className="bg-[#080808] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
-                <div className="flex flex-col h-full justify-between p-3">
-                  <div>
-                    <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
-                      YouTube Views (Latest Month)
-                    </p>
-                    <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
-                      {ytMetrics.views?.toLocaleString()}
-                    </p>
-                  </div>
-                  <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
-                    Total views for the most recent month
-                  </p>
-                </div>
-              </Card>
-              <Card className="bg-[#080808] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
-                <div className="flex flex-col h-full justify-between p-3">
-                  <div>
-                    <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
-                      Subscribers Gained (YTD)
-                    </p>
-                    <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
-                      {subscribersGained?.toLocaleString()}
-                    </p>
-                  </div>
-                  <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
-                    Net audience growth this year
-                  </p>
-                </div>
-              </Card>
-            </div>
-            {/* Line graph Section */}
-            <div className="flex-1 min-h-[350px] w-full flex">
-              <div className="flex-1 flex">
-                <CreditScoreLineChart data={creditScoreTrend} />
-              </div>
-            </div>
-            {/* Chart Section */}
-            <div className="flex-1 min-h-[350px] w-full flex gap-6">
-              <div className="flex-1 flex">
-                <YouTubeBarChart data={barChartData} />
-              </div>
-            </div>
-            {/* Progress Bars Section */}
-            <div className="flex flex-row gap-6 w-full mt-2">
-              <ScoreProgress
-                color="#9E00F9"
-                description="Based on upload frequency and schedule"
-                label="Consistency Score"
-                max={100}
-                value={creditScoreData?.scoreFactors?.consistency ?? 0}
-              />
-              <ScoreProgress
-                color="#9E00F9"
-                description="Avg engagement vs. audience size"
-                label="Engagement Score"
-                max={100}
-                value={creditScoreData?.scoreFactors?.engagement ?? 0}
-              />
-            </div>
-          </div>
-        </DashboardMain>
-      </div>
-    );
-  } else if (showOnboarding) {
+  if (showOnboarding) {
     // Onboarding for new users with no platforms
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black px-4">
-        <DashboardSidebar active={active} setActive={setActive} sidebarItems={sidebarItems} />
-        <main className="flex-1 flex flex-col items-center justify-center w-full max-w-xl mx-auto">
-          <div className="bg-[#18181b] rounded-xl shadow-lg p-8 w-full text-center">
-            <h2 className="text-3xl font-bold text-white mb-4 font-['Space_Grotesk']">Welcome to Credenza!</h2>
-            <p className="text-lg text-white/80 mb-6 font-['Space_Grotesk']">
-              Get started by connecting your first platform (YouTube, Patreon, etc.) to see your dashboard metrics.
-            </p>
-            <a
-              href="/income"
-              className="inline-block bg-[#9E00F9] hover:bg-[#7a00c2] text-white px-6 py-3 rounded-xl font-bold text-lg transition-colors duration-200"
-            >
-              Connect a Platform
-            </a>
-          </div>
-        </main>
-      </div>
-    );
+    return <OnboardingSection active={active} setActive={setActive} />;
   }
 
   // Real user with data
@@ -395,7 +132,10 @@ export default function DashboardPage() {
   const creditScoreTrend = creditScoreHistory.length > 0
     ? creditScoreHistory.map((item: any) => ({
         date: item.timestamp
-          ? new Date(item.timestamp).toLocaleString("default", { month: "short", year: "numeric" })
+          ? new Date(item.timestamp).toLocaleString("default", {
+              month: "short",
+              year: "numeric",
+            })
           : item.date,
         score: item.overallScore ?? 0,
       }))
@@ -413,15 +153,6 @@ export default function DashboardPage() {
   const barChartData = isFetched
     ? dashboardData.barChartData
     : dummyData.youtubeMonthlyStats.slice(-6);
-  const topVideo = isFetched
-    ? dashboardData.topVideo
-    : {
-        title: "How to Grow on YouTube in 2025",
-        thumbnailUrl: "/credenzaLogo.svg",
-        views: 120000,
-        estimatedRevenue: 320.5,
-      };
-  const youtubeConnected = true;
 
   return (
     <div className="w-full bg-black">
@@ -441,100 +172,20 @@ export default function DashboardPage() {
               YouTube
             </p>
           </div>
-          <div className="flex flex-1 flex-wrap gap-y-2 gap-x-3.5 w-full items-stretch">
-            <Card className="bg-[#9E00F9] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
-              <div className="flex flex-col h-full justify-between p-3">
-                <div>
-                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
-                    Credit Score →
-                  </p>
-                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
-                    {creditScoreData.overallScore}
-                  </p>
-                </div>
-                <p className="text-[#F4F4F5] text-sm font-['Inter'] leading-[14px]">
-                  Based on your consistency, engagement, and income
-                </p>
-              </div>
-            </Card>
-            <Card className="bg-[#080808] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
-              <div className="flex flex-col h-full justify-between p-3">
-                <div>
-                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
-                    Monthly Income Estimate (YouTube)
-                  </p>
-                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
-                    $
-                    {ytIncome.monthlyIncome?.toLocaleString(undefined, {
-                      maximumFractionDigits: 2,
-                    })}
-                  </p>
-                </div>
-                <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
-                  Estimated from current CPM and view trends
-                </p>
-              </div>
-            </Card>
-            <Card className="bg-[#080808] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
-              <div className="flex flex-col h-full justify-between p-3">
-                <div>
-                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
-                    YouTube Views (Latest Month)
-                  </p>
-                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
-                    {ytMetrics.views?.toLocaleString()}
-                  </p>
-                </div>
-                <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
-                  Total views for the most recent month
-                </p>
-              </div>
-            </Card>
-            <Card className="bg-[#080808] rounded-xl flex-1 min-w-[220px] min-h-[160px] h-full">
-              <div className="flex flex-col h-full justify-between p-3">
-                <div>
-                  <p className="text-[#F4F4F5] text-xs font-bold leading-4 opacity-60 font-['Inter']">
-                    Subscribers Gained (YTD)
-                  </p>
-                  <p className="text-[#F4F4F5] text-3xl font-['Space_Grotesk'] font-medium leading-9">
-                    {subscribersGained?.toLocaleString()}
-                  </p>
-                </div>
-                <p className="text-[#D4D4D8] text-sm font-['Inter'] leading-[14px]">
-                  Net audience growth this year
-                </p>
-              </div>
-            </Card>
-          </div>
-          {/* Line graph Section */}
-          <div className="flex-1 min-h-[350px] w-full flex">
-            <div className="flex-1 flex">
-              <CreditScoreLineChart data={creditScoreTrend} />
-            </div>
-          </div>
-          {/* Chart Section */}
-          <div className="flex-1 min-h-[350px] w-full flex gap-6">
-            <div className="flex-1 flex">
-              <YouTubeBarChart data={barChartData} />
-            </div>
-          </div>
-          {/* Progress Bars Section */}
-          <div className="flex flex-row gap-6 w-full mt-2">
-            <ScoreProgress
-              color="#9E00F9"
-              description="Based on upload frequency and schedule"
-              label="Consistency Score"
-              max={100}
-              value={creditScoreData?.scoreFactors?.consistency ?? 0}
-            />
-            <ScoreProgress
-              color="#9E00F9"
-              description="Avg engagement vs. audience size"
-              label="Engagement Score"
-              max={100}
-              value={creditScoreData?.scoreFactors?.engagement ?? 0}
-            />
-          </div>
+          <DashboardSummaryCards
+            creditScore={creditScoreData.overallScore}
+            subscribersGained={subscribersGained}
+            ytIncome={ytIncome.monthlyIncome}
+            ytViews={ytMetrics.views}
+          />
+          <DashboardCharts
+            barChartData={barChartData}
+            creditScoreTrend={creditScoreTrend}
+          />
+          <DashboardProgressBars
+            consistency={creditScoreData?.scoreFactors?.consistency ?? 0}
+            engagement={creditScoreData?.scoreFactors?.engagement ?? 0}
+          />
         </div>
       </DashboardMain>
     </div>
