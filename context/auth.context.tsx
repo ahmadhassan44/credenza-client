@@ -175,10 +175,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const { accessToken, refreshToken, user } = response;
 
-      // Store tokens in localStorage
+      // Store tokens in localStorage (ensure both are always set)
       if (typeof window !== "undefined") {
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
+        if (accessToken) localStorage.setItem("accessToken", accessToken);
+        if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
       }
 
       // Update user state
