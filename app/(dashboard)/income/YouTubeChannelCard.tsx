@@ -6,7 +6,7 @@ interface YouTubeChannelCardProps {
   loading: boolean;
   hasGeneratedMock: { [key: string]: boolean };
   metricsQuality: string;
-  onGenerateMockMetrics: (connectionId: string, quality: string) => void;
+  onOpenMockMetricsModal: (connectionId: string) => void;
   getPerformanceSummary: (channel: any) => React.ReactNode;
 }
 
@@ -15,11 +15,11 @@ const YouTubeChannelCard: React.FC<YouTubeChannelCardProps> = ({
   loading,
   hasGeneratedMock,
   metricsQuality,
-  onGenerateMockMetrics,
+  onOpenMockMetricsModal,
   getPerformanceSummary,
 }) => {
   const hasMetrics = channel.metrics && channel.metrics.length > 0;
-  const channelKey = channel.connectionId || channel.platformId || channel.id;
+  const channelKey = channel.platformId || channel.connectionId || channel.id;
   return (
     <div className="bg-[#18181b] text-white flex flex-col justify-between shadow-lg p-6 rounded-xl font-['Space_Grotesk']">
       <div>
@@ -38,11 +38,10 @@ const YouTubeChannelCard: React.FC<YouTubeChannelCardProps> = ({
         {!hasMetrics && !hasGeneratedMock[channelKey] ? (
           <button
             className="bg-[#9E00F9] hover:bg-[#7a00c2] text-white px-4 py-2 rounded font-bold w-full"
-            disabled={loading || !channel.metricsQuality}
+            disabled={loading}
             onClick={() =>
-              onGenerateMockMetrics(
-                channelKey,
-                channel.metricsQuality || metricsQuality,
+              onOpenMockMetricsModal(
+                channel.platformId || channel.connectionId || channel.id
               )
             }
           >

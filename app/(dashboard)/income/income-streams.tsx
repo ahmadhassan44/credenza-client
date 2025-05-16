@@ -46,6 +46,9 @@ export default function IncomeStreamsPage() {
     [key: string]: boolean;
   }>({});
   const [allPlatforms, setAllPlatforms] = useState<any[]>([]); // <-- new state
+  const [qualityModalOpen, setQualityModalOpen] = useState(false);
+  const [qualityChannelKey, setQualityChannelKey] = useState<string | null>(null);
+  const [qualityLoading, setQualityLoading] = useState(false);
   const router = useRouter();
 
   // Helper: fetch metrics for a channel
@@ -163,50 +166,49 @@ export default function IncomeStreamsPage() {
   ) => {
     // Prevent repeated generation
     if (hasGeneratedMock[connectionId]) return;
-    setLoading(true);
+    setQualityChannelKey(connectionId);
+    setQualityModalOpen(true);
+  };
+
+  const handleGenerateWithQuality = async (quality: string) => {
+    if (!qualityChannelKey) return;
+    setQualityLoading(true);
     setSuccess("");
     setError("");
-
     const baseurl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
+    const platform = allPlatforms.find(
+      (p) => p.connectionId === qualityChannelKey || p.platformId === qualityChannelKey || p.id === qualityChannelKey
+    );
+    const platformId = platform?.platformId || platform?.id || qualityChannelKey;
     const body = {
       creatorId: getCreatorId(),
-      lastXMonths: 6,
+      lastXMonths: 6, // changed from 1 to 6
+      platformId,
       platformType: "YOUTUBE",
       metricsQuality: quality,
-      connectionId,
     };
-    const accessToken =
-      typeof window !== "undefined"
-        ? localStorage.getItem("accessToken")
-        : null;
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
+    const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
-
     try {
       const response = await fetch(`${baseurl}/mock/metric`, {
         method: "POST",
         headers,
         body: JSON.stringify(body),
       });
-
       if (!response.ok) throw new Error("Failed to generate mock metrics");
-
       setSuccess("Mock metrics generated!");
-
       // Set flag in localStorage
-      const updated = { ...hasGeneratedMock, [connectionId]: true };
-
+      const updated = { ...hasGeneratedMock, [qualityChannelKey]: true };
       setHasGeneratedMock(updated);
       localStorage.setItem("mockMetricsGenerated", JSON.stringify(updated));
       setRefreshKey((k) => k + 1); // refetch channels
+      setQualityModalOpen(false);
+      setQualityChannelKey(null);
     } catch (err: any) {
       setError(err.message || "Failed to generate mock metrics");
     } finally {
-      setLoading(false);
+      setQualityLoading(false);
     }
   };
 
@@ -243,6 +245,11 @@ export default function IncomeStreamsPage() {
 
   const handleOpenModal = () => {
     setShowModal(true);
+  };
+
+  const handleOpenQualityModal = (connectionId: string) => {
+    setQualityChannelKey(connectionId);
+    setQualityModalOpen(true);
   };
 
   // Show onboarding if no platforms of any type are connected
@@ -385,7 +392,7 @@ export default function IncomeStreamsPage() {
                   hasGeneratedMock={hasGeneratedMock}
                   loading={loading}
                   metricsQuality={metricsQuality}
-                  onGenerateMockMetrics={handleGenerateMockMetrics}
+                  onOpenMockMetricsModal={handleOpenQualityModal}
                 />
               );
             })
@@ -527,6 +534,22 @@ export default function IncomeStreamsPage() {
               </Button>
             </div>
           </form>
+        </SimpleModal>
+        <SimpleModal open={qualityModalOpen} onClose={() => setQualityModalOpen(false)}>
+          <div className="text-2xl font-bold mb-4 text-white">Select Metrics Quality</div>
+          <div className="flex flex-col gap-4">
+            {["GOOD", "NORMAL", "BAD"].map((q) => (
+              <button
+                key={q}
+                className={`px-6 py-3 rounded-xl font-bold text-lg text-white transition-colors duration-200 ${q === "GOOD" ? "bg-green-600 hover:bg-green-700" : q === "NORMAL" ? "bg-yellow-600 hover:bg-yellow-700" : "bg-red-600 hover:bg-red-700"}`}
+                disabled={qualityLoading}
+                onClick={() => handleGenerateWithQuality(q)}
+              >
+                {q}
+              </button>
+            ))}
+            {qualityLoading && <div className="text-white mt-2">Generating...</div>}
+          </div>
         </SimpleModal>
         <div className="mt-12 max-w-3xl text-center text-white/80 font-['Space_Grotesk']">
           <h3 className="text-xl font-semibold mb-2">
