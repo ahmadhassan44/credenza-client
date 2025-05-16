@@ -127,6 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (typeof window !== "undefined") {
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("user", JSON.stringify(response.user));
 
         // Store user email if remember me is checked
         if (rememberMe) {
