@@ -7,8 +7,6 @@ const sidebarItems = [
   { label: "Income Streams" },
   { label: "Credit Score" },
   { label: "Metrics & Analytics" },
-  { label: "Fintech Tools" },
-  { label: "Settings" },
   { label: "Logout" },
 ];
 

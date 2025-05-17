@@ -15,7 +15,6 @@ const getActiveLabelFromPath = (pathname: string): string => {
   if (pathname.includes("/income")) return "Income Streams";
   if (pathname.includes("/profile")) return "Profile";
   if (pathname.includes("/metrics")) return "Metrics & Analytics";
-  if (pathname.includes("/fintech-tools")) return "Fintech Tools";
   return defaultSidebarItems[0]?.label || ""; 
 };
 

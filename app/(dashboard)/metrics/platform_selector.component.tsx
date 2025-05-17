@@ -39,7 +39,7 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ className }) => {
   // Show loading state during first load
   if (initializing || loading) {
     return (
-      <div className="bg-gray-800 border border-gray-700 h-10 rounded w-48 flex items-center justify-center gap-2 px-3">
+      <div className="bg-[#080808] border border-gray-700 h-10 rounded w-48 flex items-center justify-center gap-2 px-3">
         <Spinner />
         <span className="text-sm text-gray-300">Loading platforms...</span>
       </div>
@@ -48,7 +48,7 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ className }) => {
 
   if (error) {
     return (
-      <div className="text-red-500 bg-gray-800 border border-gray-700 rounded px-3 py-2">
+      <div className="text-red-500 bg-[#080808] border border-gray-700 rounded px-3 py-2">
         Error: {error}
       </div>
     );
@@ -56,7 +56,7 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ className }) => {
 
   if (platforms.length === 0) {
     return (
-      <div className="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-400 text-sm flex items-center h-10">
+      <div className="bg-[#080808] border border-gray-700 rounded px-3 py-2 text-gray-400 text-sm flex items-center h-10">
         No platforms connected
       </div>
     );
@@ -91,7 +91,7 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ className }) => {
             platforms.find((p) => p.id === e.target.value) || null;
           setSelectedPlatform(platform);
         }}
-        className="bg-gray-800 border border-gray-600 text-white rounded-md px-1 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-500"
+        className="bg-[#080808] border border-gray-600 text-white rounded-md px-1 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-500"
       >
         {platforms.map((platform) => (
           <option key={platform.id} value={platform.id}>

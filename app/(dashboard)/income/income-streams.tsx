@@ -260,12 +260,6 @@ export default function IncomeStreamsPage() {
       case "Metrics & Analytics":
         router.push("/metrics");
         break;
-      case "Fintech Tools":
-        router.push("/fintech-tools");
-        break;
-      case "Settings":
-        router.push("/settings");
-        break;
       case "Logout":
         // Handle logout logic if needed, e.g., clear localStorage, redirect
         break;

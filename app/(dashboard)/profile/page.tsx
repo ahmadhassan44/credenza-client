@@ -31,12 +31,6 @@ export default function ProfilePage() {
       case "Metrics & Analytics":
         router.push("/metrics");
         break;
-      case "Fintech Tools":
-        router.push("/fintech-tools");
-        break;
-      case "Settings":
-        router.push("/settings");
-        break;
       case "Logout":
         break;
       default:

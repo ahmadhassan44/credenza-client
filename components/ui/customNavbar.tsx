@@ -115,7 +115,6 @@ export function CustomNavbar() {
                   Dashboard
                 </NextLink>
               </DropdownItem>
-              <DropdownItem key="settings">Account Settings</DropdownItem>
               <DropdownItem key="logout" color="danger" onClick={handleLogout}>
                 Log Out
               </DropdownItem>
