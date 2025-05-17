@@ -7,10 +7,41 @@ export interface MetricsRequestBody {
   startDate: string;
   endDate: string;
 }
-
+export interface PlatformMetric {
+  id: string;
+  creatorId: string;
+  date: string;
+  views: number;
+  audienceSize: number;
+  postCount: number;
+  avgViewDurationSec: number;
+  engagementRatePct: number;
+  estimatedRevenueUsd: number;
+  adRevenueUsd: number;
+  otherRevenueUsd: number;
+  platformId: string;
+  createdAt: string;
+  updatedAt: string;
+}
 export async function fetchYouTubeMetrics(body: MetricsRequestBody) {
   try {
-    const response = await apiClient.get("/metrics", { params: body });
+    const accessToken =
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken")
+        : null;
+
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    // Add header to bypass ngrok warning
+    headers["ngrok-skip-browser-warning"] = "true";
+
+    const response = await apiClient.get("/metrics", {
+      params: body,
+      headers,
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -29,7 +60,7 @@ export async function fetchLatestCreditScore(creatorId: string) {
 export async function fetchCreditScoreHistory(creatorId: string) {
   try {
     const response = await apiClient.get(
-      `/credit-scoring/history/${creatorId}`,
+      `/credit-scoring/history/${creatorId}`
     );
     return response.data;
   } catch (error) {
@@ -39,7 +70,9 @@ export async function fetchCreditScoreHistory(creatorId: string) {
 
 export async function generateCreditScore(creatorId: string) {
   try {
-    const response = await apiClient.post(`/credit-scoring/generate/${creatorId}`);
+    const response = await apiClient.post(
+      `/credit-scoring/generate/${creatorId}`
+    );
     return response.data;
   } catch (error) {
     throw error;

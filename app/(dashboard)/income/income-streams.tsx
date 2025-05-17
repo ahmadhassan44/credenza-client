@@ -25,7 +25,7 @@ import {
 } from "@/services/api/platforms";
 import apiClient from "@/services/api/client";
 
-const getCreatorId = () => {
+export const getCreatorId = () => {
   const user =
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   if (user) {
