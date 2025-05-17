@@ -1,32 +1,50 @@
 import React from "react";
 import { Button } from "@heroui/react";
+import { useRouter } from "next/navigation";
 
 interface YouTubeChannelCardProps {
   channel: any;
-  loading: boolean;
+  getPerformanceSummary: (metrics: any[]) => string;
+  onDelete: (id: string) => Promise<void>;
+  onOpenMockMetricsModal: (id: string) => void;
   hasGeneratedMock: { [key: string]: boolean };
+  loading: boolean;
   metricsQuality: string;
-  onOpenMockMetricsModal: (connectionId: string) => void;
-  getPerformanceSummary: (channel: any) => React.ReactNode;
-  onDelete: (platformId: string) => void;
+  onViewMetrics?: (channel: any) => void;
 }
 
 const YouTubeChannelCard: React.FC<YouTubeChannelCardProps> = ({
   channel,
-  loading,
-  hasGeneratedMock,
-  // metricsQuality, // This prop was unused, consider removing if not needed
-  onOpenMockMetricsModal,
   getPerformanceSummary,
   onDelete,
+  onOpenMockMetricsModal,
+  hasGeneratedMock,
+  loading,
+  metricsQuality,
+  onViewMetrics,
 }) => {
+  const router = useRouter();
+  const channelId = channel.platformId || channel.connectionId || channel.id;
   const hasMetrics = channel.metrics && channel.metrics.length > 0;
   const channelKey = channel.platformId || channel.connectionId || channel.id;
 
   return (
-    <div className="bg-[#18181b] text-white flex flex-col justify-between shadow-lg p-6 rounded-xl font-['Space_Grotesk']">
+    <div className="bg-[#18181b] text-white flex flex-col justify-between shadow-lg p-6 rounded-xl font-['Space_Grotesk'] relative">
+      {/* View Metrics button in top right corner */}
+      <div className="absolute top-4 right-4">
+        <Button
+          className="bg-[#9E00F9] hover:bg-[#7a00c2] text-white font-semibold text-xs"
+          onClick={() => onViewMetrics && onViewMetrics(channel)}
+          size="sm"
+        >
+          View Metrics
+        </Button>
+      </div>
+
       <div>
-        <div className="text-lg font-bold mb-2">
+        <div className="text-lg font-bold mb-2 pr-24">
+          {" "}
+          {/* Added right padding to make space for the button */}
           {channel.handle || channel.name || "YouTube Channel"}
         </div>
         <div className="mb-2 text-sm text-gray-400">
@@ -47,7 +65,7 @@ const YouTubeChannelCard: React.FC<YouTubeChannelCardProps> = ({
             disabled={loading}
             onClick={() =>
               onOpenMockMetricsModal(
-                channel.platformId || channel.connectionId || channel.id,
+                channel.platformId || channel.connectionId || channel.id
               )
             }
           >
