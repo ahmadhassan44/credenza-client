@@ -42,7 +42,7 @@ export default function CreditScoreSectionLayout({
         setActive={handleSetActive}
         sidebarItems={defaultSidebarItems}
       />
-      <main className="flex-1 bg-black text-white pl-[15vw] p-8">
+      <main className="flex-1 bg-black text-white ml-[15vw] p-8">
         {children}
       </main>
     </div>
