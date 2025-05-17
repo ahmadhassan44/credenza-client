@@ -287,7 +287,7 @@ export default function DashboardPage() {
             Connect a platform to get started!
           </p>
           <a
-            href="/dashboard/income"
+            href="/income"
             className="inline-block px-6 py-3 bg-[#9E00F9] text-white rounded-lg font-bold hover:bg-[#7a00c2] transition"
           >
             Connect Platform
