@@ -168,14 +168,64 @@ export default function DashboardPage() {
     fetchCreditScoreData();
   }, [creatorId, isAuthenticated, isGuest, hasPlatforms]);
 
-  // Responsive onboarding UI for new users
   if (loading || isLoading || generatingMetrics) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-black">
-        <div className="animate-pulse text-center">
-          <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-gray-700" />
-          <div className="h-4 w-32 mx-auto rounded bg-gray-700" />
-        </div>
+      <div className="w-full bg-black">
+        <DashboardSidebar
+          active={active}
+          setActive={setActive}
+          sidebarItems={sidebarItems}
+        />
+        <DashboardMain>
+          <div className="flex flex-col gap-7 h-full min-h-[calc(100vh-63px-60px)] justify-between">
+            <div className="flex flex-col gap-[33px] w-full">
+              <div className="h-6 w-48 bg-gray-800 rounded animate-pulse"></div>
+              <div className="h-6 w-96 bg-gray-800 rounded animate-pulse"></div>
+            </div>
+
+            {/* Summary Cards Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="bg-gray-800 rounded-lg p-6 h-32 animate-pulse"
+                >
+                  <div className="h-4 w-24 bg-gray-700 rounded mb-3"></div>
+                  <div className="h-6 w-16 bg-gray-700 rounded"></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Charts Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+              <div className="bg-gray-800 rounded-lg p-6 h-64 animate-pulse">
+                <div className="h-4 w-32 bg-gray-700 rounded mb-8"></div>
+                <div className="flex items-end space-x-2 h-40">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div
+                      key={i}
+                      className="bg-gray-700 rounded w-full"
+                      style={{ height: `${20 + i * 10}%` }}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-6 h-64 animate-pulse">
+                <div className="h-4 w-32 bg-gray-700 rounded mb-4"></div>
+                <div className="h-40 w-full bg-gray-700 rounded-lg opacity-50"></div>
+              </div>
+            </div>
+
+            {/* Progress Bars Skeleton */}
+            <div className="w-full">
+              <div className="bg-gray-800 rounded-lg p-6 animate-pulse">
+                <div className="h-4 w-48 bg-gray-700 rounded mb-6"></div>
+                <div className="h-6 bg-gray-700 rounded mb-4"></div>
+                <div className="h-6 bg-gray-700 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </DashboardMain>
       </div>
     );
   }
