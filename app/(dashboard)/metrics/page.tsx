@@ -7,6 +7,7 @@ import { sidebarItems } from "../income/sidebarItems";
 import SkeletonLoader from "../skeleton-loader";
 import { usePlatform } from "@/context/platform.context";
 import PlatformSelector from "./platform_selector.component";
+import { fetchMetricsByPlatformId } from "@/services/api/metrics";
 import { getCreatorId } from "../income/income-streams";
 import { PlatformMetric } from "@/services/api/metrics";
 import {
@@ -69,89 +70,17 @@ const MetricsContent = () => {
 
       try {
         setLoading(true);
-        // const data = await fetchPlatformMetrics(selectedPlatform.id);
-        const data = [
-          {
-            id: "9664c723-7e03-49a9-a6b4-fca14cb4b3d5",
-            creatorId: "d8998530-17e9-48c5-907e-0174ae99a5ca",
-            date: "2025-01-17T07:00:08.839Z",
-            views: 4097,
-            audienceSize: 6864,
-            postCount: 6,
-            avgViewDurationSec: 584,
-            engagementRatePct: 3.7,
-            estimatedRevenueUsd: 18.54,
-            adRevenueUsd: 14.832,
-            otherRevenueUsd: 3.708,
-            platformId: "99fd2841-f758-4fd2-8f06-cc52d73eba64",
-            createdAt: "2025-05-17T07:00:08.851Z",
-            updatedAt: "2025-05-17T07:00:08.851Z",
-          },
-          {
-            id: "20be4853-7fdd-40b9-832d-35eecfc59dcb",
-            creatorId: "d8998530-17e9-48c5-907e-0174ae99a5ca",
-            date: "2025-02-17T07:00:08.839Z",
-            views: 3477,
-            audienceSize: 5616,
-            postCount: 7,
-            avgViewDurationSec: 606,
-            engagementRatePct: 4.6,
-            estimatedRevenueUsd: 15.71,
-            adRevenueUsd: 12.568,
-            otherRevenueUsd: 3.142,
-            platformId: "99fd2841-f758-4fd2-8f06-cc52d73eba64",
-            createdAt: "2025-05-17T07:00:08.863Z",
-            updatedAt: "2025-05-17T07:00:08.863Z",
-          },
-          {
-            id: "411c04be-518f-48ce-b88b-b61cf1bc261c",
-            creatorId: "d8998530-17e9-48c5-907e-0174ae99a5ca",
-            date: "2025-03-17T07:00:08.839Z",
-            views: 3450,
-            audienceSize: 5928,
-            postCount: 6,
-            avgViewDurationSec: 570,
-            engagementRatePct: 3.7,
-            estimatedRevenueUsd: 12.98,
-            adRevenueUsd: 10.384,
-            otherRevenueUsd: 2.596,
-            platformId: "99fd2841-f758-4fd2-8f06-cc52d73eba64",
-            createdAt: "2025-05-17T07:00:08.873Z",
-            updatedAt: "2025-05-17T07:00:08.873Z",
-          },
-          {
-            id: "28543d47-a9ff-40e4-8f49-263fc210b0cb",
-            creatorId: "d8998530-17e9-48c5-907e-0174ae99a5ca",
-            date: "2025-04-17T07:00:08.839Z",
-            views: 3560,
-            audienceSize: 6240,
-            postCount: 6,
-            avgViewDurationSec: 559,
-            engagementRatePct: 3.2,
-            estimatedRevenueUsd: 14.37,
-            adRevenueUsd: 11.496,
-            otherRevenueUsd: 2.874,
-            platformId: "99fd2841-f758-4fd2-8f06-cc52d73eba64",
-            createdAt: "2025-05-17T07:00:08.881Z",
-            updatedAt: "2025-05-17T07:00:08.881Z",
-          },
-          {
-            id: "059471db-95ed-4e57-8771-6221ff487ae4",
-            creatorId: "d8998530-17e9-48c5-907e-0174ae99a5ca",
-            date: "2025-05-17T07:00:08.839Z",
-            views: 3876,
-            audienceSize: 5928,
-            postCount: 7,
-            avgViewDurationSec: 640,
-            engagementRatePct: 3.7,
-            estimatedRevenueUsd: 16.35,
-            adRevenueUsd: 13.08,
-            otherRevenueUsd: 3.27,
-            platformId: "99fd2841-f758-4fd2-8f06-cc52d73eba64",
-            createdAt: "2025-05-17T07:00:08.887Z",
-            updatedAt: "2025-05-17T07:00:08.887Z",
-          },
-        ];
+        // Use the API function instead of static data
+        const data = await fetchMetricsByPlatformId(selectedPlatform.id);
+
+        // If there's no data, use empty array to show "No metrics" message
+        if (!data || data.length === 0) {
+          setMetrics([]);
+          setError(null);
+          setLoading(false);
+          return;
+        }
+
         const sortedData = [...data].sort(
           (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
         );
