@@ -420,10 +420,10 @@ export default function DashboardPage() {
             creditScoreHistory={creditScoreHistory}
             creditScoreTrend={creditScoreTrend}
           />
-          <DashboardProgressBars
+          {/* <DashboardProgressBars
             consistency={creditScoreData?.scoreFactors?.consistency ?? 0}
             engagement={creditScoreData?.scoreFactors?.engagement ?? 0}
-          />
+          /> */}
         </div>
       </DashboardMain>
     </div>

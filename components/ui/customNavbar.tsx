@@ -27,7 +27,7 @@ export function CustomNavbar() {
 
   return (
     <Navbar
-      className="fixed top-6 left-1/2 z-50 bg-black/60 backdrop-blur-md rounded-xl shadow-lg max-w-4xl w-[95vw] -translate-x-1/2 flex items-center"
+      className="fixed top-6 left-1/2 z-50 border-gray-100 bg-black/60 backdrop-blur-md rounded-xl shadow-lg max-w-4xl w-[95vw] -translate-x-1/2 flex items-center"
       classNames={{
         wrapper: "w-full px-6 flex items-center justify-between min-h-14",
       }}
@@ -46,7 +46,7 @@ export function CustomNavbar() {
         </NextLink>
       </NavbarBrand>
 
-      <NavbarContent className="hidden sm:flex gap-6" justify="center">
+      {/* <NavbarContent className="hidden sm:flex gap-6" justify="center">
         <NavbarItem>
           <HeroLink
             as={NextLink}
@@ -87,7 +87,7 @@ export function CustomNavbar() {
             About
           </HeroLink>
         </NavbarItem>
-      </NavbarContent>
+      </NavbarContent> */}
 
       <NavbarContent justify="end">
         {isAuthenticated ? (
