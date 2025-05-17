@@ -43,9 +43,14 @@ const PlatformScores: React.FC<PlatformScoresProps> = ({ scoreData }) => {
     score: platform.score,
     type: platform.platformType
   }));
-
   // Format data for radar chart (factor breakdown per platform)
-  const radarData: any[] = [];
+  // Define interface for radar data entry with dynamic platform keys
+  interface RadarDataEntry {
+    factor: string;
+    [platformType: string]: string | number; // Allow dynamic platform type keys
+  }
+  
+  const radarData: RadarDataEntry[] = [];
   
   platformScores.forEach(platform => {
     platform.factors.forEach(factor => {
@@ -54,7 +59,7 @@ const PlatformScores: React.FC<PlatformScoresProps> = ({ scoreData }) => {
       if (existingEntry) {
         existingEntry[platform.platformType] = factor.score;
       } else {
-        const newEntry = { factor: factor.factor };
+        const newEntry: RadarDataEntry = { factor: factor.factor };
         newEntry[platform.platformType] = factor.score;
         radarData.push(newEntry);
       }
