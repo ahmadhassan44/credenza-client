@@ -392,14 +392,17 @@ export default function MetricsPage() {
   const [active, setActive] = useState("Metrics & Analytics");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { refreshPlatforms } = usePlatform();
+  const { isInitialized, refreshPlatforms } = usePlatform();
 
+  // In your MetricsPage component
   useEffect(() => {
     const creatorId = getCreatorId();
-    if (creatorId) {
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (creatorId && accessToken && !isInitialized && !loading) {
       refreshPlatforms(creatorId);
     }
-  }, []);
+  }, [isInitialized, loading, refreshPlatforms]);
 
   const handleSetActive = (label: string) => {
     setActive(label);

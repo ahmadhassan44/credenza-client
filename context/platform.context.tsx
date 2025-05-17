@@ -26,6 +26,7 @@ interface PlatformContextType {
   selectedPlatform: Platform | null;
   setSelectedPlatform: (platform: Platform | null) => void;
   refreshPlatforms: (creatorId: string) => Promise<void>;
+  isInitialized: boolean;
 }
 
 const PlatformContext = createContext<PlatformContextType | undefined>(
@@ -39,12 +40,24 @@ export const PlatformProvider = ({ children }: { children: ReactNode }) => {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const refreshPlatforms = useCallback(
     async (creatorId: string) => {
       if (!creatorId) {
         console.log("No creator ID provided to refreshPlatforms");
         setError("No creator ID available");
+        return;
+      }
+
+      // Check if we have an access token before making the request
+      const accessToken =
+        typeof window !== "undefined"
+          ? localStorage.getItem("accessToken")
+          : null;
+      if (!accessToken) {
+        console.log("No access token available, skipping platform fetch");
+        setError("Authentication required");
         return;
       }
 
@@ -63,6 +76,7 @@ export const PlatformProvider = ({ children }: { children: ReactNode }) => {
         }
 
         setError(null);
+        setIsInitialized(true);
       } catch (err) {
         console.error("Error fetching platforms:", err);
         setError(
@@ -73,20 +87,10 @@ export const PlatformProvider = ({ children }: { children: ReactNode }) => {
       }
     },
     [selectedPlatform]
-  ); // Only recreate when selectedPlatform changes
+  );
 
-  // Load platforms when the component mounts
-  useEffect(() => {
-    const creatorId = getCreatorId();
-    console.log("Extracted creator ID from localStorage:", creatorId);
-
-    if (creatorId) {
-      refreshPlatforms(creatorId);
-    } else {
-      console.warn("No valid creator ID found in localStorage");
-      setError("No creator ID found. Please log in again.");
-    }
-  }, []);
+  // Don't automatically fetch on mount - this will be triggered by individual pages
+  // when they need platforms data and can confirm the user is authenticated
 
   return (
     <PlatformContext.Provider
@@ -97,6 +101,7 @@ export const PlatformProvider = ({ children }: { children: ReactNode }) => {
         selectedPlatform,
         setSelectedPlatform,
         refreshPlatforms,
+        isInitialized,
       }}
     >
       {children}
