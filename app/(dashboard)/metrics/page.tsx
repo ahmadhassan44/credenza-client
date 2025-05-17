@@ -100,14 +100,6 @@ const MetricsContent = () => {
     fetchMetrics();
   }, [selectedPlatform]);
 
-  if (!selectedPlatform) {
-    return (
-      <div className="text-center p-8 text-gray-400">
-        <p>Please connect and select a platform to view metrics</p>
-      </div>
-    );
-  }
-
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
@@ -128,6 +120,13 @@ const MetricsContent = () => {
           <div className="h-7 bg-gray-700 rounded w-1/4 mb-4"></div>
           <div className="h-64 bg-gray-700 rounded-md"></div>
         </div>
+      </div>
+    );
+  }
+  if (!selectedPlatform) {
+    return (
+      <div className="text-center p-8 text-gray-400">
+        <p>Please connect and select a platform to view metrics</p>
       </div>
     );
   }
