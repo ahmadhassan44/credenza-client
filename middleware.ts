@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
 
   // Check if the path is protected or auth-only
   const isProtectedPath = protectedPaths.some((path) =>
-    pathname.startsWith(path),
+    pathname.startsWith(path)
   );
   const isAuthOnlyPath = authOnlyPaths.some((path) => pathname === path);
 
@@ -23,9 +23,7 @@ export function middleware(request: NextRequest) {
   // If the path is protected and there's no token, redirect to login
   if (isProtectedPath && !hasToken) {
     const url = new URL("/login", request.url);
-
     url.searchParams.set("callbackUrl", encodeURI(pathname));
-
     return NextResponse.redirect(url);
   }
 

@@ -215,8 +215,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
       setIsLoading(false);
 
-      // Redirect to dashboard
-      router.push("/dashboard");
+      router.push("/login");
     }
   };
 
