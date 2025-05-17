@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -46,9 +46,19 @@ export default function MetricsPage() {
 
   return (
     <div className="flex w-full bg-black min-h-screen">
-      <DashboardSidebar active={active} setActive={handleSetActive} sidebarItems={sidebarItems} />
+      <DashboardSidebar
+        active={active}
+        setActive={handleSetActive}
+        sidebarItems={sidebarItems}
+      />
       <div className="flex-1">
-        {loading ? <SkeletonLoader /> : <div className="p-8 text-white">Metrics & Analytics Page (dummy content)</div>}
+        {loading ? (
+          <SkeletonLoader />
+        ) : (
+          <div className="p-8 text-white">
+            Metrics & Analytics Page (dummy content)
+          </div>
+        )}
       </div>
     </div>
   );
