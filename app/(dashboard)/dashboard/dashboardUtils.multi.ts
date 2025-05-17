@@ -94,34 +94,49 @@ export function mapFetchedMetricsToDashboardMulti(metricsArr: any[]): any {
 
   // 5. Bar chart: aggregate views and CPM per month (across all channels)
   // Only keep the last 6 months
-  const last6Months = months.slice(-6);
-  const barChartDataAggregated = last6Months.map((month) => {
-    let views = 0;
-    let adRevenue = 0;
+  const last6MonthsKeys = months.slice(-6); // These are "YYYY-M" formatted
+
+  const barChartData = last6MonthsKeys.map((monthKey) => {
+    const monthData: any = {
+      month: monthKey, // Keep "YYYY-M" for now, can be formatted in component if needed
+    };
+
+    let totalViewsThisMonth = 0;
+    let totalAdRevenueThisMonth = 0;
 
     for (const channel of channels) {
-      const arr = channelMetrics[channel] || [];
-      const m = arr.find((x: any) => x.month === month);
+      const channelSpecificMetrics = channelMetrics[channel] || [];
+      const metricForMonth = channelSpecificMetrics.find((m: any) => m.month === monthKey);
 
-      if (m) {
-        views += m.views || 0;
-        adRevenue += m.adRevenueUsd || 0;
+      let views = 0;
+      let adRevenue = 0;
+
+      if (metricForMonth) {
+        views = metricForMonth.views || 0;
+        adRevenue = metricForMonth.adRevenueUsd || 0;
       }
+
+      const cpm = views > 0 ? (adRevenue / views) * 1000 : 0;
+
+      monthData[`views_${channel}`] = views;
+      monthData[`cpm_${channel}`] = Math.round(cpm * 100) / 100;
+
+      totalViewsThisMonth += views;
+      totalAdRevenueThisMonth += adRevenue;
     }
 
-    const cpm = views > 0 ? (adRevenue / views) * 1000 : 0;
+    // Add aggregated values for single channel display or overall summary
+    monthData.views = totalViewsThisMonth;
+    const aggregatedCpm = totalViewsThisMonth > 0 ? (totalAdRevenueThisMonth / totalViewsThisMonth) * 1000 : 0;
+    monthData.cpm = Math.round(aggregatedCpm * 100) / 100;
 
-    return {
-      month,
-      views,
-      cpm: Math.round(cpm * 100) / 100, // round to 2 decimals
-    };
+    return monthData;
   });
 
   return {
     channelMetrics, // { [channelId]: [ { ...metric, month } ] }
-    barChartData: barChartDataAggregated, // [{ month, views, cpm }]
-    months,
+    barChartData, // [{ month, views, cpm, views_channel1, cpm_channel1, ... }]
+    months: last6MonthsKeys, // Pass only the last 6 months keys
     channels,
     totalViewsLatestMonth,
     totalSubscribersGained,
