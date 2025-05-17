@@ -4,15 +4,25 @@ import React from "react";
 interface PlatformSelectorProps {
   className?: string;
 }
-
+const Spinner = () => (
+  <div
+    className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+    role="status"
+  >
+    <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+      Loading...
+    </span>
+  </div>
+);
 const PlatformSelector: React.FC<PlatformSelectorProps> = ({ className }) => {
   const { platforms, selectedPlatform, setSelectedPlatform, loading, error } =
     usePlatform();
 
   if (loading) {
     return (
-      <div className="animate-pulse bg-gray-700 h-10 rounded w-48">
-        Loading platforms...
+      <div className="bg-gray-800 border border-gray-700 h-10 rounded w-48 flex items-center justify-center gap-2 px-3">
+        <Spinner />
+        <span className="text-sm text-gray-300">Loading platforms...</span>
       </div>
     );
   }
