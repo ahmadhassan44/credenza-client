@@ -71,7 +71,10 @@ const MetricsContent = () => {
       try {
         setLoading(true);
         // Use the API function instead of static data
-        const data = await fetchMetricsByPlatformId(selectedPlatform.id);
+        const data = await fetchMetricsByPlatformId(
+          selectedPlatform.id,
+          selectedPlatform.creatorId
+        );
 
         // If there's no data, use empty array to show "No metrics" message
         if (!data || data.length === 0) {
