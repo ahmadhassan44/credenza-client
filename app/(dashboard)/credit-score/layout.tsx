@@ -4,8 +4,8 @@ import { Space_Grotesk } from "next/font/google";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
-import { sidebarItems as defaultSidebarItems } from "../income/sidebarItems";
-import SidebarComponent from "../sidebar";
+import { sidebarItems as defaultSidebarItems } from "../income/sidebarItems"; 
+import SidebarComponent from "../sidebar"; 
 
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"] });
 
@@ -16,7 +16,7 @@ const getActiveLabelFromPath = (pathname: string): string => {
   if (pathname.includes("/profile")) return "Profile";
   if (pathname.includes("/metrics")) return "Metrics & Analytics";
   if (pathname.includes("/fintech-tools")) return "Fintech Tools";
-  return defaultSidebarItems[0]?.label || "";
+  return defaultSidebarItems[0]?.label || ""; 
 };
 
 export default function CreditScoreSectionLayout({
