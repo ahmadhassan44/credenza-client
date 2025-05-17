@@ -90,14 +90,22 @@ export function CustomNavbar() {
       </NavbarContent> */}
 
       <NavbarContent justify="end">
-        {isAuthenticated ? (
-          <Dropdown placement="bottom-end">
+        {isAuthenticated ? (          <Dropdown placement="bottom-end">
             <DropdownTrigger>
               <Avatar
                 as="button"
                 className="transition-transform"
                 name={user ? `${user.firstName} ${user.lastName}` : undefined}
                 size="sm"
+                src={user?.profilePicture || "/profileTab.svg"}
+                fallback={
+                  <Image 
+                    src="/profileTab.svg"
+                    alt="Profile"
+                    width={24} 
+                    height={24}
+                  />
+                }
               />
             </DropdownTrigger>
             <DropdownMenu aria-label="Profile Actions" variant="flat">
@@ -105,11 +113,11 @@ export function CustomNavbar() {
                 <p className="font-semibold">Signed in as</p>
                 <p className="font-semibold">{user?.email}</p>
               </DropdownItem>
-              <DropdownItem key="welcome">
+              {/* <DropdownItem key="welcome">
                 <NextLink className="w-full" href="/welcome">
                   Welcome
                 </NextLink>
-              </DropdownItem>
+              </DropdownItem> */}
               <DropdownItem key="dashboard">
                 <NextLink className="w-full" href="/dashboard">
                   Dashboard
