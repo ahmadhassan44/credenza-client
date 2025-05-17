@@ -24,6 +24,7 @@ import {
   deletePlatform,
 } from "@/services/api/platforms";
 import apiClient from "@/services/api/client";
+import { usePlatform } from "@/context/platform.context";
 
 export const getCreatorId = () => {
   const user =
@@ -52,9 +53,10 @@ export default function IncomeStreamsPage() {
   const [allPlatforms, setAllPlatforms] = useState<any[]>([]);
   const [qualityModalOpen, setQualityModalOpen] = useState(false);
   const [qualityChannelKey, setQualityChannelKey] = useState<string | null>(
-    null,
+    null
   );
   const [qualityLoading, setQualityLoading] = useState(false);
+  const { setSelectedPlatform } = usePlatform();
   const router = useRouter();
 
   // Helper: fetch metrics for a channel
@@ -91,7 +93,7 @@ export default function IncomeStreamsPage() {
           youtubeChannels.map(async (ch) => {
             const metrics = await fetchChannelMetrics(
               creatorId,
-              ch.platformId || ch.id || ch.connectionId,
+              ch.platformId || ch.id || ch.connectionId
             );
 
             let quality = ch.metricsQuality;
@@ -101,7 +103,7 @@ export default function IncomeStreamsPage() {
             }
 
             return { ...ch, metrics, metricsQuality: quality };
-          }),
+          })
         );
 
         setLinkedChannels(channelsWithMetrics);
@@ -159,9 +161,7 @@ export default function IncomeStreamsPage() {
     }
   };
 
-  const handleGenerateMockMetrics = async (
-    connectionId: string,
-  ) => {
+  const handleGenerateMockMetrics = async (connectionId: string) => {
     if (hasGeneratedMock[connectionId]) return;
     setQualityChannelKey(connectionId);
     setQualityModalOpen(true);
@@ -177,9 +177,10 @@ export default function IncomeStreamsPage() {
       (p) =>
         p.connectionId === qualityChannelKey ||
         p.platformId === qualityChannelKey ||
-        p.id === qualityChannelKey,
+        p.id === qualityChannelKey
     );
-    const platformId = platform?.platformId || platform?.id || qualityChannelKey;
+    const platformId =
+      platform?.platformId || platform?.id || qualityChannelKey;
     const body = {
       creatorId: getCreatorId(),
       lastXMonths: 6,
@@ -188,8 +189,12 @@ export default function IncomeStreamsPage() {
       metricsQuality: quality,
     };
     const accessToken =
-      typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken")
+        : null;
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
     if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
     try {
       const response = await fetch(`${baseurl}/mock/metric`, {
@@ -206,7 +211,7 @@ export default function IncomeStreamsPage() {
       if (typeof window !== "undefined") {
         localStorage.setItem(
           "mockMetricsGenerated",
-          JSON.stringify({ ...hasGeneratedMock, [qualityChannelKey]: true }),
+          JSON.stringify({ ...hasGeneratedMock, [qualityChannelKey]: true })
         );
       }
       setRefreshKey((k) => k + 1);
@@ -378,6 +383,11 @@ export default function IncomeStreamsPage() {
     );
   }
 
+  const handleViewMetrics = (channel: any) => {
+    setSelectedPlatform(channel);
+    router.push("/metrics");
+  };
+
   return (
     <div className="flex w-full bg-black min-h-screen font-['Space_Grotesk']">
       <DashboardSidebar
@@ -409,10 +419,9 @@ export default function IncomeStreamsPage() {
                 metricsQuality={channel.metricsQuality || "-"}
                 onDelete={handleDeletePlatform}
                 onOpenMockMetricsModal={(connectionId) =>
-                  handleGenerateMockMetrics(
-                    connectionId,
-                  )
+                  handleGenerateMockMetrics(connectionId)
                 }
+                onViewMetrics={handleViewMetrics} // Add this prop
               />
             ))
           ) : (
@@ -577,8 +586,8 @@ export default function IncomeStreamsPage() {
             {qualityLoading && (
               <div className="text-white mt-2 text-center">Generating...</div>
             )}
-            {error && <div className="text-red-500 mt-2">{error}</div>} 
-            {success && <div className="text-green-500 mt-2">{success}</div>} 
+            {error && <div className="text-red-500 mt-2">{error}</div>}
+            {success && <div className="text-green-500 mt-2">{success}</div>}
           </div>
         </SimpleModal>
         <div className="mt-12 max-w-3xl text-center text-white/80 font-['Space_Grotesk']">
