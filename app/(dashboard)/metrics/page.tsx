@@ -7,6 +7,7 @@ import { sidebarItems } from "../income/sidebarItems";
 import SkeletonLoader from "../skeleton-loader";
 import { usePlatform } from "@/context/platform.context";
 import PlatformSelector from "./platform_selector.component";
+import { getCreatorId } from "../income/income-streams";
 
 // Placeholder component for metrics content
 const MetricsContent = () => {
@@ -71,16 +72,13 @@ export default function MetricsPage() {
   const router = useRouter();
   const { refreshPlatforms } = usePlatform();
 
-  // Get creator ID from localStorage
-  const creatorId =
-    typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
-
   useEffect(() => {
     // Refresh platforms when the metrics page loads
+    const creatorId = getCreatorId();
     if (creatorId) {
       refreshPlatforms(creatorId);
     }
-  }, []);
+  }, [refreshPlatforms]);
 
   const handleSetActive = (label: string) => {
     setActive(label);
@@ -116,20 +114,23 @@ export default function MetricsPage() {
   };
 
   return (
-    <div className="flex w-full bg-black min-h-screen">
+    <div className="flex w-full bg-black min-h-screen font-['Space_Grotesk']">
       <DashboardSidebar
         active={active}
         setActive={handleSetActive}
         sidebarItems={sidebarItems}
+        sidebarWidth="15vw"
       />
-      <div className="flex-1">
+      <div className="flex-1" style={{ marginLeft: "15vw" }}>
         {loading ? (
           <SkeletonLoader />
         ) : (
           <div className="p-8 text-white">
             <div className="flex flex-col space-y-6">
               <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Metrics & Analytics</h1>
+                <h1 className="text-2xl font-bold font-['Space_Grotesk']">
+                  Metrics & Analytics
+                </h1>
                 <PlatformSelector className="w-64" />
               </div>
 
