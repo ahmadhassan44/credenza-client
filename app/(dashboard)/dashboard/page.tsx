@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-
 import DashboardSidebar from "../sidebar";
 import DashboardMain from "./main";
 import DashboardSummaryCards from "./DashboardSummaryCards";
@@ -69,7 +68,7 @@ export default function DashboardPage() {
         setPlatforms(Array.isArray(fetchedPlatforms) ? fetchedPlatforms : []);
 
         setHasPlatforms(
-          Array.isArray(fetchedPlatforms) && fetchedPlatforms.length > 0,
+          Array.isArray(fetchedPlatforms) && fetchedPlatforms.length > 0
         );
       } catch {
         setPlatforms([]);
@@ -103,7 +102,7 @@ export default function DashboardPage() {
           const startDate = new Date(
             today.getFullYear(),
             today.getMonth() - 6,
-            1,
+            1
           ).toISOString();
           const endDate = today.toISOString();
           const metricsData = await fetchYouTubeMetrics({
@@ -184,10 +183,10 @@ export default function DashboardPage() {
   // 1. Guest user: show dummyData
   if (isGuest) {
     const ytIncome = dummyData.incomeSources.find(
-      (i) => i.platform === "YOUTUBE",
+      (i) => i.platform === "YOUTUBE"
     ) || { monthlyIncome: 0 };
     const ytMetrics = dummyData.platformMetrics.find(
-      (m) => m.platform === "YOUTUBE",
+      (m) => m.platform === "YOUTUBE"
     ) || { views: 0 };
     return (
       <div className="w-full bg-black">
@@ -268,14 +267,14 @@ export default function DashboardPage() {
                 // Generate metrics for the user and save to localStorage
                 if (!creatorId || !platforms.length) return;
                 const ytPlatform = platforms.find(
-                  (p: any) => p.type === "YOUTUBE",
+                  (p: any) => p.type === "YOUTUBE"
                 );
                 if (ytPlatform) {
                   const today = new Date();
                   const startDate = new Date(
                     today.getFullYear(),
                     today.getMonth() - 6,
-                    1,
+                    1
                   ).toISOString();
                   const endDate = today.toISOString();
                   try {
@@ -288,10 +287,10 @@ export default function DashboardPage() {
                     if (metricsData) {
                       localStorage.setItem(
                         "mockMetricsData",
-                        JSON.stringify(metricsData),
+                        JSON.stringify(metricsData)
                       );
                       setDashboardData(
-                        mapFetchedMetricsToDashboard(metricsData),
+                        mapFetchedMetricsToDashboard(metricsData)
                       );
                     }
                   } catch {
