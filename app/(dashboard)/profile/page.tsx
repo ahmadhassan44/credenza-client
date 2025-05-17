@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import DashboardSidebar from "../sidebar";
+import Sidebar from "../sidebar";
 import { sidebarItems } from "../income/sidebarItems";
 import SkeletonLoader from "../skeleton-loader";
 import ProfileForm from "./ProfileForm";
@@ -47,7 +47,7 @@ export default function ProfilePage() {
 
   return (
     <div className="flex w-full bg-black min-h-screen">
-      <DashboardSidebar active={active} setActive={handleSetActive} sidebarItems={sidebarItems} />
+      <Sidebar active={active} setActive={handleSetActive} sidebarItems={sidebarItems} />
       <div className="flex-1 flex items-center justify-center p-4">
         {loading ? <SkeletonLoader /> : <ProfileForm />}
       </div>

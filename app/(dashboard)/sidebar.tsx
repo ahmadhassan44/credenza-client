@@ -10,7 +10,7 @@ interface SidebarProps {
   sidebarWidth?: string;
 }
 
-export default function DashboardSidebar({
+export default function Sidebar({
   active,
   setActive,
   sidebarItems,

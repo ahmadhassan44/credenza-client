@@ -10,7 +10,7 @@ import {
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
-import DashboardSidebar from "../sidebar";
+import Sidebar from "../sidebar";
 
 import SimpleModal from "./SimpleModal";
 import YouTubeChannelCard from "./YouTubeChannelCard";
@@ -282,7 +282,7 @@ export default function IncomeStreamsPage() {
   if (!channelsLoading && allPlatforms.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-black px-4">
-        <DashboardSidebar
+        <Sidebar
           active={active}
           setActive={handleSetActive}
           sidebarItems={sidebarItems}
@@ -390,7 +390,7 @@ export default function IncomeStreamsPage() {
 
   return (
     <div className="flex w-full bg-black min-h-screen font-['Space_Grotesk']">
-      <DashboardSidebar
+      <Sidebar
         active={active}
         setActive={handleSetActive}
         sidebarItems={sidebarItems}

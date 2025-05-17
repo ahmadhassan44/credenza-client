@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import DashboardSidebar from "../sidebar";
-import { sidebarItems } from "../income/sidebarItems";
+import Sidebar from "../sidebar";
+import { sidebarItems } from "../income/sidebarItems"; 
 import SkeletonLoader from "../skeleton-loader";
 import CreditScoreDashboard from "./CreditScoreDashboard";
 
@@ -72,7 +72,7 @@ export default function CreditScorePage() {
       // Default sidebar width, can be changed for collapsibility
       ['--sidebar-width' as any]: '15vw',
     }}>
-      <DashboardSidebar
+      <Sidebar
         active={active}
         setActive={handleSetActive}
         sidebarItems={sidebarItems}

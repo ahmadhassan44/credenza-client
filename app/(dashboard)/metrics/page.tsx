@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import DashboardSidebar from "../sidebar";
+import Sidebar from "../sidebar";
 import { sidebarItems } from "../income/sidebarItems";
 import SkeletonLoader from "../skeleton-loader";
 import { usePlatform } from "@/context/platform.context";
@@ -444,7 +444,7 @@ export default function MetricsPage() {
 
   return (
     <div className="flex w-full bg-black min-h-screen font-['Space_Grotesk']">
-      <DashboardSidebar
+      <Sidebar
         active={active}
         setActive={handleSetActive}
         sidebarItems={sidebarItems}

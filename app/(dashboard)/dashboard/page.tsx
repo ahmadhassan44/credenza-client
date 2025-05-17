@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import DashboardSidebar from "../sidebar";
+import Sidebar from "../sidebar";
 import DashboardMain from "./main";
 import DashboardSummaryCards from "./DashboardSummaryCards";
 import DashboardCharts from "./DashboardCharts";
@@ -171,7 +171,7 @@ export default function DashboardPage() {
   if (loading || isLoading || generatingMetrics) {
     return (
       <div className="w-full bg-black">
-        <DashboardSidebar
+        <Sidebar
           active={active}
           setActive={setActive}
           sidebarItems={sidebarItems}
@@ -240,7 +240,7 @@ export default function DashboardPage() {
     ) || { views: 0 };
     return (
       <div className="w-full bg-black">
-        <DashboardSidebar
+        <Sidebar
           active={active}
           setActive={setActive}
           sidebarItems={sidebarItems}
@@ -301,7 +301,7 @@ export default function DashboardPage() {
   if (isAuthenticated && !isGuest && hasPlatforms && !dashboardData) {
     return (
       <div className="w-full bg-black">
-        <DashboardSidebar
+        <Sidebar
           active={active}
           setActive={setActive}
           sidebarItems={sidebarItems}
@@ -392,7 +392,7 @@ export default function DashboardPage() {
 
   return (
     <div className="w-full bg-black">
-      <DashboardSidebar
+      <Sidebar
         active={active}
         setActive={setActive}
         sidebarItems={sidebarItems}
