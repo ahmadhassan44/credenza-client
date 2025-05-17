@@ -1,5 +1,5 @@
 import React from "react";
-import DashboardSidebar from "@/app/(dashboard)/sidebar";
+import Sidebar from "@/app/(dashboard)/sidebar";
 
 const sidebarItems = [
   { label: "Profile" },
@@ -7,14 +7,12 @@ const sidebarItems = [
   { label: "Income Streams" },
   { label: "Credit Score" },
   { label: "Metrics & Analytics" },
-  { label: "Fintech Tools" },
-  { label: "Settings" },
   { label: "Logout" },
 ];
 
 const OnboardingSection: React.FC<{ active: string; setActive: (a: string) => void }> = ({ active, setActive }) => (
   <div className="flex flex-col items-center justify-center min-h-screen bg-black px-4">
-    <DashboardSidebar active={active} setActive={setActive} sidebarItems={sidebarItems} />
+    <Sidebar active={active} setActive={setActive} sidebarItems={sidebarItems} />
     <main className="flex-1 flex flex-col items-center justify-center w-full max-w-xl mx-auto">
       <div className="bg-[#18181b] rounded-xl shadow-lg p-8 w-full text-center">
         <h2 className="text-3xl font-bold text-white mb-4 font-['Space_Grotesk']">Welcome to Credenza!</h2>

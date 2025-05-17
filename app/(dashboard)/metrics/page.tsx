@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import DashboardSidebar from "../sidebar";
+import Sidebar from "../sidebar";
 import { sidebarItems } from "../income/sidebarItems";
 import SkeletonLoader from "../skeleton-loader";
 import { usePlatform } from "@/context/platform.context";
@@ -45,7 +45,7 @@ const calculatePercentChange = (current: number, previous: number): number => {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-gray-900 p-3 border border-gray-700 rounded shadow-lg">
+      <div className="bg-gray-900 p-3 border border-[#18181b] rounded shadow-lg">
         <p className="font-medium text-gray-300">{label}</p>
         {payload.map((entry: any, index: number) => {
           // Check if this is a revenue field to determine whether to show $ sign
@@ -108,22 +108,22 @@ const MetricsContent = () => {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <div className="h-7 bg-gray-700 rounded w-1/4 mb-4"></div>
-          <div className="h-5 bg-gray-700 rounded w-1/3 mb-6"></div>
+        <div className="bg-[#080808] p-6 rounded-lg">
+          <div className="h-7 bg-[#18181b] rounded w-1/4 mb-4"></div>
+          <div className="h-5 bg-[#18181b] rounded w-1/3 mb-6"></div>
           <div className="grid grid-cols-2 gap-4 mt-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-gray-700 p-4 rounded-md">
-                <div className="h-5 bg-gray-600 rounded w-1/2 mb-2"></div>
-                <div className="h-7 bg-gray-600 rounded w-1/3 mt-2 mb-2"></div>
-                <div className="h-4 bg-gray-600 rounded w-2/5 mt-1"></div>
+              <div key={i} className="bg-[#18181b] p-4 rounded-md">
+                <div className="h-5 bg-[#080808] rounded w-1/2 mb-2"></div>
+                <div className="h-7 bg-[#080808] rounded w-1/3 mt-2 mb-2"></div>
+                <div className="h-4 bg-[#080808] rounded w-2/5 mt-1"></div>
               </div>
             ))}
           </div>
         </div>
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <div className="h-7 bg-gray-700 rounded w-1/4 mb-4"></div>
-          <div className="h-64 bg-gray-700 rounded-md"></div>
+        <div className="bg-[#080808] p-6 rounded-lg">
+          <div className="h-7 bg-[#18181b] rounded w-1/4 mb-4"></div>
+          <div className="h-64 bg-[#18181b] rounded-md"></div>
         </div>
       </div>
     );
@@ -199,7 +199,7 @@ const MetricsContent = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-800 p-6 rounded-lg">
+      <div className="bg-[#080808] p-6 rounded-lg">
         <h2 className="text-xl font-bold mb-4">
           {selectedPlatform.type} Analytics
         </h2>
@@ -210,7 +210,7 @@ const MetricsContent = () => {
         </p>
 
         <div className="grid grid-cols-2 gap-4 mt-6">
-          <div className="bg-gray-700 p-4 rounded-md">
+          <div className="bg-[#18181b] p-4 rounded-md">
             <h3 className="text-lg font-medium">Audience</h3>
             <div className="text-2xl font-bold mt-2">
               {formatNumber(currentMetrics.audienceSize)}
@@ -222,7 +222,7 @@ const MetricsContent = () => {
               {audienceChange.toFixed(1)}% this month
             </div>
           </div>
-          <div className="bg-gray-700 p-4 rounded-md">
+          <div className="bg-[#18181b] p-4 rounded-md">
             <h3 className="text-lg font-medium">Engagement Rate</h3>
             <div className="text-2xl font-bold mt-2">
               {currentMetrics.engagementRatePct.toFixed(1)}%
@@ -234,7 +234,7 @@ const MetricsContent = () => {
               {engagementChange.toFixed(1)}% this month
             </div>
           </div>
-          <div className="bg-gray-700 p-4 rounded-md">
+          <div className="bg-[#18181b] p-4 rounded-md">
             <h3 className="text-lg font-medium">Revenue</h3>
             <div className="text-2xl font-bold mt-2">
               ${currentMetrics.estimatedRevenueUsd.toFixed(2)}
@@ -246,7 +246,7 @@ const MetricsContent = () => {
               {revenueChange.toFixed(1)}% this month
             </div>
           </div>
-          <div className="bg-gray-700 p-4 rounded-md">
+          <div className="bg-[#18181b] p-4 rounded-md">
             <h3 className="text-lg font-medium">Views</h3>
             <div className="text-2xl font-bold mt-2">
               {formatNumber(currentMetrics.views)}
@@ -261,7 +261,7 @@ const MetricsContent = () => {
         </div>
       </div>
 
-      <div className="bg-gray-800 p-6 rounded-lg">
+      <div className="bg-[#080808] p-6 rounded-lg">
         <h2 className="text-xl font-bold mb-4">Revenue Trend</h2>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
@@ -305,7 +305,7 @@ const MetricsContent = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gray-800 p-6 rounded-lg">
+        <div className="bg-[#080808] p-6 rounded-lg">
           <h2 className="text-xl font-bold mb-4">Content Performance</h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -329,7 +329,7 @@ const MetricsContent = () => {
           </div>
         </div>
 
-        <div className="bg-gray-800 p-6 rounded-lg">
+        <div className="bg-[#080808] p-6 rounded-lg">
           <h2 className="text-xl font-bold mb-4">Revenue Breakdown</h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -344,7 +344,7 @@ const MetricsContent = () => {
                 ${currentMetrics.otherRevenueUsd.toFixed(2)}
               </span>
             </div>
-            <div className="flex items-center justify-between border-t border-gray-700 pt-2 mt-2">
+            <div className="flex items-center justify-between border-t border-[#18181b] pt-2 mt-2">
               <span className="text-gray-300">Total Revenue:</span>
               <span className="font-bold text-lg">
                 ${currentMetrics.estimatedRevenueUsd.toFixed(2)}
@@ -354,7 +354,7 @@ const MetricsContent = () => {
         </div>
       </div>
 
-      <div className="bg-gray-800 p-6 rounded-lg">
+      <div className="bg-[#080808] p-6 rounded-lg">
         <h2 className="text-xl font-bold mb-4">Audience & Engagement</h2>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
@@ -430,12 +430,6 @@ export default function MetricsPage() {
       case "Metrics & Analytics":
         router.push("/metrics");
         break;
-      case "Fintech Tools":
-        router.push("/fintech-tools");
-        break;
-      case "Settings":
-        router.push("/settings");
-        break;
       default:
         break;
     }
@@ -444,7 +438,7 @@ export default function MetricsPage() {
 
   return (
     <div className="flex w-full bg-black min-h-screen font-['Space_Grotesk']">
-      <DashboardSidebar
+      <Sidebar
         active={active}
         setActive={handleSetActive}
         sidebarItems={sidebarItems}

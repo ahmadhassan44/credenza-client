@@ -1,89 +1,103 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import DashboardSidebar from "../sidebar";
-import { sidebarItems } from "../income/sidebarItems";
-import SkeletonLoader from "../skeleton-loader";
-import CreditScoreDashboard from "./CreditScoreDashboard";
-
-const mockCreditScoreData = {
-  "0": {
-    creatorId: "e0583f69-0220-4ccd-8cac-154b1f4b0b85",
-    overallScore: 30,
-    platformScores: [
-      {
-        platformId: "828be5f3-f8d3-427a-8365-fa8602edd5b3",
-        platformType: "YOUTUBE",
-        score: 30,
-        factors: [
-          { factor: "Audience Size", score: 40, weight: 0.2, description: "Based on audience of 3648" },
-          { factor: "Engagement", score: 30, weight: 0.3, description: "Based on engagement rate of 0.9%" },
-          { factor: "Income Level", score: 10, weight: 0.2, description: "Based on monthly revenue of $2.00" },
-          { factor: "Income Stability", score: 0, weight: 0.15, description: "Strong declining trend (-20%) (CV: 81.9%)" },
-          { factor: "View Duration", score: 70, weight: 0.15, description: "Based on avg view duration of 3 minutes" },
-        ],
-      },
-    ],
-    timestamp: "2025-05-01T00:00:00.000Z",
-  },
-};
+import { useEffect, useState } from 'react';
+import { fetchLatestCreditScore, fetchCreditScoreHistory } from '@/services/api/metrics';
+import CreditScoreSummary from './components/CreditScoreSummary';
+import CreditScoreChart from './components/CreditScoreChart';
+import FactorBreakdown from './components/FactorBreakdown';
+import PlatformScores from './components/PlatformScores';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function CreditScorePage() {
-  const [active, setActive] = useState("Credit Score");
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-
-  const handleSetActive = (label: string) => {
-    setActive(label);
-    setLoading(true);
-    switch (label) {
-      case "Profile":
-        router.push("/profile");
-        break;
-      case "Dashboard":
-        router.push("/dashboard");
-        break;
-      case "Income Streams":
-        router.push("/income");
-        break;
-      case "Credit Score":
-        router.push("/credit-score");
-        break;
-      case "Metrics & Analytics":
-        router.push("/metrics");
-        break;
-      case "Fintech Tools":
-        router.push("/fintech-tools");
-        break;
-      case "Settings":
-        router.push("/settings");
-        break;
-      case "Logout":
-        break;
-      default:
-        break;
-    }
-    setTimeout(() => setLoading(false), 600);
+  const [latestCreditScore, setLatestCreditScore] = useState<any>(null);
+  const [creditScoreHistory, setCreditScoreHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  
+  // Get creatorId from localStorage
+  const getCreatorId = () => {
+    if (typeof window === 'undefined') return null;
+    const localUser = localStorage.getItem("user");
+    return localUser ? JSON.parse(localUser).creatorId : null;
   };
 
-  return (
-    <div className="flex w-full bg-black min-h-screen" style={{
-      // Default sidebar width, can be changed for collapsibility
-      ['--sidebar-width' as any]: '15vw',
-    }}>
-      <DashboardSidebar
-        active={active}
-        setActive={handleSetActive}
-        sidebarItems={sidebarItems}
-      />
-      <div className="flex-1 min-w-0">
-        {loading ? (
-          <SkeletonLoader />
-        ) : (
-          <CreditScoreDashboard data={mockCreditScoreData} />
-        )}
+  useEffect(() => {
+    const creatorId = getCreatorId();
+    if (!creatorId) {
+      setError('User information not found. Please log in again.');
+      setLoading(false);
+      return;
+    }
+
+    const fetchCreditScoreData = async () => {
+      try {
+        const [latest, history] = await Promise.all([
+          fetchLatestCreditScore(creatorId),
+          fetchCreditScoreHistory(creatorId)
+        ]);
+        setLatestCreditScore(latest);
+        setCreditScoreHistory(history || []);
+      } catch (err) {
+        console.error("Error fetching credit score data:", err);
+        setError('Failed to load credit score data. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCreditScoreData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center bg-black min-h-screen">
+        <Spinner size="lg" />
+        <p className="text-[#D4D4D8] mt-4">Loading credit score data...</p>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center bg-black min-h-screen p-8">
+        <div className="bg-[#18181b] rounded-xl p-6 max-w-md text-center">
+          <h1 className="text-white text-2xl font-['Space_Grotesk'] font-bold mb-4">Error</h1>
+          <p className="text-[#D4D4D8] mb-6">{error}</p>
+          <button 
+            className="px-6 py-2 bg-gradient-to-r from-[#6E21DB] to-[#9E00F9] rounded-lg text-white font-medium"
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-8 bg-black min-h-screen p-4 md:p-8">
+      <h1 className="text-white text-3xl md:text-4xl font-['Space_Grotesk'] font-bold mb-2">Credit Score</h1>
+      
+      {latestCreditScore ? (
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="xl:col-span-1">
+            <CreditScoreSummary scoreData={latestCreditScore} />
+            <FactorBreakdown scoreData={latestCreditScore} />
+          </div>
+          <div className="xl:col-span-2 flex flex-col gap-6">
+            <CreditScoreChart 
+              historyData={creditScoreHistory} 
+              rawHistoryForClickHandler={creditScoreHistory} 
+            />
+            <PlatformScores scoreData={latestCreditScore} />
+          </div>
+        </div>
+      ) : (
+        <div className="bg-[#18181b] rounded-xl p-6 text-center">
+          <p className="text-[#D4D4D8] text-lg">No credit score data available yet.</p>
+          <p className="text-[#A1A1AA] mt-2">Connect your platforms to generate a creator credit score.</p>
+        </div>
+      )}
     </div>
   );
 }

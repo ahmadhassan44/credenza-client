@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import DashboardSidebar from "../sidebar";
+import Sidebar from "../sidebar";
 import DashboardMain from "./main";
 import DashboardSummaryCards from "./DashboardSummaryCards";
 import DashboardCharts from "./DashboardCharts";
@@ -25,8 +25,6 @@ const sidebarItems = [
   { label: "Income Streams" },
   { label: "Credit Score" },
   { label: "Metrics & Analytics" },
-  { label: "Fintech Tools" },
-  { label: "Settings" },
   { label: "Logout" },
 ];
 
@@ -171,7 +169,7 @@ export default function DashboardPage() {
   if (loading || isLoading || generatingMetrics) {
     return (
       <div className="w-full bg-black">
-        <DashboardSidebar
+        <Sidebar
           active={active}
           setActive={setActive}
           sidebarItems={sidebarItems}
@@ -240,7 +238,7 @@ export default function DashboardPage() {
     ) || { views: 0 };
     return (
       <div className="w-full bg-black">
-        <DashboardSidebar
+        <Sidebar
           active={active}
           setActive={setActive}
           sidebarItems={sidebarItems}
@@ -287,7 +285,7 @@ export default function DashboardPage() {
             Connect a platform to get started!
           </p>
           <a
-            href="/dashboard/income"
+            href="/income"
             className="inline-block px-6 py-3 bg-[#9E00F9] text-white rounded-lg font-bold hover:bg-[#7a00c2] transition"
           >
             Connect Platform
@@ -301,7 +299,7 @@ export default function DashboardPage() {
   if (isAuthenticated && !isGuest && hasPlatforms && !dashboardData) {
     return (
       <div className="w-full bg-black">
-        <DashboardSidebar
+        <Sidebar
           active={active}
           setActive={setActive}
           sidebarItems={sidebarItems}
@@ -377,20 +375,22 @@ export default function DashboardPage() {
   const creditScoreData = creditScore || dummyData.creditScore;
   const creditScoreTrend =
     creditScoreHistory.length > 0
-      ? creditScoreHistory.map((item: any) => ({
-          date: item.timestamp
-            ? new Date(item.timestamp).toLocaleString("default", {
-                month: "short",
-                year: "numeric",
-              })
-            : item.date,
-          score: item.overallScore ?? 0,
-        }))
+      ? creditScoreHistory.map((item: any) => {
+          const itemDateSource = item.timestamp || item.date;
+          const dateObj = new Date(itemDateSource);
+          return {
+            date: dateObj.toLocaleString("default", {
+              month: "short",
+              year: "numeric",
+            }),
+            score: item.overallScore ?? 0,
+          };
+        })
       : dummyData.creditScore.trendData;
 
   return (
     <div className="w-full bg-black">
-      <DashboardSidebar
+      <Sidebar
         active={active}
         setActive={setActive}
         sidebarItems={sidebarItems}
@@ -417,6 +417,7 @@ export default function DashboardPage() {
           />
           <DashboardCharts
             barChartData={barChartData}
+            creditScoreHistory={creditScoreHistory}
             creditScoreTrend={creditScoreTrend}
           />
           <DashboardProgressBars
