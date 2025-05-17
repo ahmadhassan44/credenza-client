@@ -2,12 +2,12 @@
 
 import React from "react";
 import {
-  ResponsiveContainer,
-  LineChart,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
 } from "recharts";
 import { useRouter } from "next/navigation";
 
@@ -20,51 +20,48 @@ export default function CreditScoreLineChart({
   data,
   creditScoreHistory = [],
 }: CreditScoreLineChartProps) {
-  console.log("CREDIT SCORE HISTORY", creditScoreHistory);
   const router = useRouter();
 
   const getRawDataForDate = (date: string) => {
-    // Try to parse "May 2025" to month and year
     const [monthStr, yearStr] = date.split(" ");
-    if (!monthStr || !yearStr) return undefined;
+
+    if (!monthStr || !yearStr) {
+      return undefined;
+    }
     const month = new Date(`${monthStr} 1, ${yearStr}`).getMonth();
     const year = parseInt(yearStr, 10);
 
     return creditScoreHistory.find((item) => {
       const itemDate = new Date(item.timestamp || item.date);
-      return (
-        itemDate.getFullYear() === year &&
-        itemDate.getMonth() === month
-      );
+      return itemDate.getFullYear() === year && itemDate.getMonth() === month;
     });
   };
 
   const handleDotClick = (payload: any) => {
-    // Debug: log payload
-    console.log("handleDotClick payload:", payload);
     const raw = getRawDataForDate(payload?.date);
-    console.log("Raw data for clicked date:", raw);
+
     if (raw) {
-      console.log("IN RAW");
+      localStorage.setItem("selectedCreditScoreMonth", JSON.stringify(raw));
+
       const d = new Date(raw.timestamp || raw.date);
       const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
         2,
         "0"
       )}`;
+
       router.push(`/credit-score/${monthStr}`);
     }
   };
 
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
-    // Debug: log payload to see what you get
-    console.log("CustomDot payload:", payload);
+
     return (
       <circle
         cx={cx}
         cy={cy}
-        r={6}
         fill="#fff"
+        r={6}
         stroke="#9E00F9"
         strokeWidth={2}
         style={{ cursor: "pointer" }}
@@ -75,14 +72,13 @@ export default function CreditScoreLineChart({
 
   const CustomActiveDot = (props: any) => {
     const { cx, cy, payload } = props;
-    // Debug: log payload to see what you get
-    console.log("CustomActiveDot payload:", payload);
+
     return (
       <circle
         cx={cx}
         cy={cy}
-        r={8}
         fill="#9E00F9"
+        r={8}
         stroke="#fff"
         strokeWidth={2}
         style={{ cursor: "pointer" }}
@@ -107,40 +103,46 @@ export default function CreditScoreLineChart({
             <YAxis
               domain={[60, 100]}
               label={{
-                value: "Credit Score",
                 angle: -90,
+                dx: -10,
+                dy: 40,
+                fill: "#F4F4F5",
+                fontFamily: "Space Grotesk",
+                fontSize: 14,
                 position: "insideLeft",
                 style: {
                   fill: "#F4F4F5",
-                  fontSize: 14,
                   fontFamily: "Space Grotesk",
+                  fontSize: 14,
                 },
-                dx: -10,
-                dy: 40,
+                value: "Credit Score",
               }}
               tick={{
                 fill: "#F4F4F5",
-                fontSize: 12,
                 fontFamily: "Space Grotesk",
+                fontSize: 12,
               }}
               ticks={[100, 90, 80, 60, 40, 20, 0]}
             />
             <XAxis
               dataKey="date"
               label={{
-                value: "Month",
+                dy: 16,
+                fill: "#F4F4F5",
+                fontFamily: "Space Grotesk",
+                fontSize: 14,
                 position: "insideBottom",
                 style: {
                   fill: "#F4F4F5",
-                  fontSize: 14,
                   fontFamily: "Space Grotesk",
+                  fontSize: 14,
                 },
-                dy: 16,
+                value: "Month",
               }}
               tick={{
                 fill: "#F4F4F5",
-                fontSize: 12,
                 fontFamily: "Space Grotesk",
+                fontSize: 12,
               }}
             />
             <Tooltip
@@ -151,12 +153,12 @@ export default function CreditScoreLineChart({
               }}
             />
             <Line
+              activeDot={<CustomActiveDot />}
               dataKey="score"
+              dot={<CustomDot />}
               stroke="#9E00F9"
               strokeWidth={2}
               type="monotone"
-              dot={<CustomDot />}
-              activeDot={<CustomActiveDot />}
             />
           </LineChart>
         </ResponsiveContainer>
