@@ -78,3 +78,19 @@ export async function generateCreditScore(creatorId: string) {
     throw error;
   }
 }
+
+export async function fetchMetricsByPlatformId(
+  platformId: string,
+  creatorId: string
+) {
+  try {
+    const queryParams = new URLSearchParams({
+      platformId: platformId,
+      creatorId: creatorId,
+    });
+    const response = await apiClient.get(`/metrics/?${queryParams.toString()}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
