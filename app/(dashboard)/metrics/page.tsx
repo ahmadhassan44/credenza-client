@@ -47,17 +47,22 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className="bg-gray-900 p-3 border border-gray-700 rounded shadow-lg">
         <p className="font-medium text-gray-300">{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <p key={index} style={{ color: entry.color }} className="text-sm">
-            {entry.name}: ${entry.value.toFixed(2)}
-          </p>
-        ))}
+        {payload.map((entry: any, index: number) => {
+          // Check if this is a revenue field to determine whether to show $ sign
+          const isRevenueField = 
+            entry.name.toLowerCase().includes('revenue');
+          
+          return (
+            <p key={index} style={{ color: entry.color }} className="text-sm">
+              {entry.name}: {isRevenueField ? '$' : ''}{entry.value.toFixed(2)}
+            </p>
+          );
+        })}
       </div>
     );
   }
   return null;
 };
-
 const MetricsContent = () => {
   const { selectedPlatform } = usePlatform();
   const [metrics, setMetrics] = useState<PlatformMetric[]>([]);
