@@ -172,9 +172,8 @@ export default function CreditScoreMonthPage() {
                           fill="#8884d8"
                           dataKey="value"
                           labelLine={false}
-                          cornerRadius={5}
-                        >
-                          {weightPieData.map((entry, index) => (
+                          cornerRadius={5}                        >
+                          {weightPieData.map((entry: { name: string; value: number }, index: number) => (
                             <Cell
                               key={`cell-weight-${idx}-${index}`}
                               fill={FACTOR_WEIGHT_COLORS[index % FACTOR_WEIGHT_COLORS.length]}
