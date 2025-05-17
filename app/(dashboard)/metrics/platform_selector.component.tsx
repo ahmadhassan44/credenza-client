@@ -76,7 +76,7 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ className }) => {
   };
 
   return (
-    <div className={className}>
+    <div className="pr-5">
       <label
         htmlFor="platform-selector"
         className="block text-sm font-medium text-gray-300 mb-1"
@@ -91,7 +91,7 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ className }) => {
             platforms.find((p) => p.id === e.target.value) || null;
           setSelectedPlatform(platform);
         }}
-        className="bg-gray-800 border border-gray-600 text-white rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-500"
+        className="bg-gray-800 border border-gray-600 text-white rounded-md px-1 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-500"
       >
         {platforms.map((platform) => (
           <option key={platform.id} value={platform.id}>

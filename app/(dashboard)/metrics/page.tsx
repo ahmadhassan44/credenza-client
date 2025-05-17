@@ -453,7 +453,7 @@ export default function MetricsPage() {
             <div className="flex flex-col space-y-6">
               <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">Metrics & Analytics</h1>
-                <PlatformSelector className="w-64" />
+                <PlatformSelector className="px-6" />
               </div>
               <MetricsContent />
             </div>
