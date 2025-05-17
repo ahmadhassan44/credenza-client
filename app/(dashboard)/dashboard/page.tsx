@@ -377,15 +377,17 @@ export default function DashboardPage() {
   const creditScoreData = creditScore || dummyData.creditScore;
   const creditScoreTrend =
     creditScoreHistory.length > 0
-      ? creditScoreHistory.map((item: any) => ({
-          date: item.timestamp
-            ? new Date(item.timestamp).toLocaleString("default", {
-                month: "short",
-                year: "numeric",
-              })
-            : item.date,
-          score: item.overallScore ?? 0,
-        }))
+      ? creditScoreHistory.map((item: any) => {
+          const itemDateSource = item.timestamp || item.date;
+          const dateObj = new Date(itemDateSource);
+          return {
+            date: dateObj.toLocaleString("default", {
+              month: "short",
+              year: "numeric",
+            }),
+            score: item.overallScore ?? 0,
+          };
+        })
       : dummyData.creditScore.trendData;
 
   return (
@@ -417,6 +419,7 @@ export default function DashboardPage() {
           />
           <DashboardCharts
             barChartData={barChartData}
+            creditScoreHistory={creditScoreHistory}
             creditScoreTrend={creditScoreTrend}
           />
           <DashboardProgressBars

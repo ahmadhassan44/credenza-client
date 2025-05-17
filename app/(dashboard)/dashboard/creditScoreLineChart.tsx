@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -8,14 +9,88 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
+import { useRouter } from "next/navigation";
 
 interface CreditScoreLineChartProps {
-  data: Array<{ date: string; score: number }>;
+  data: Array<{ date: string; score: number; rawData?: any }>;
+  creditScoreHistory?: any[];
 }
 
 export default function CreditScoreLineChart({
   data,
+  creditScoreHistory = [],
 }: CreditScoreLineChartProps) {
+  console.log("CREDIT SCORE HISTORY", creditScoreHistory);
+  const router = useRouter();
+
+  const getRawDataForDate = (date: string) => {
+    // Try to parse "May 2025" to month and year
+    const [monthStr, yearStr] = date.split(" ");
+    if (!monthStr || !yearStr) return undefined;
+    const month = new Date(`${monthStr} 1, ${yearStr}`).getMonth();
+    const year = parseInt(yearStr, 10);
+
+    return creditScoreHistory.find((item) => {
+      const itemDate = new Date(item.timestamp || item.date);
+      return (
+        itemDate.getFullYear() === year &&
+        itemDate.getMonth() === month
+      );
+    });
+  };
+
+  const handleDotClick = (payload: any) => {
+    // Debug: log payload
+    console.log("handleDotClick payload:", payload);
+    const raw = getRawDataForDate(payload?.date);
+    console.log("Raw data for clicked date:", raw);
+    if (raw) {
+      console.log("IN RAW");
+      const d = new Date(raw.timestamp || raw.date);
+      const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}`;
+      router.push(`/credit-score/${monthStr}`);
+    }
+  };
+
+  const CustomDot = (props: any) => {
+    const { cx, cy, payload } = props;
+    // Debug: log payload to see what you get
+    console.log("CustomDot payload:", payload);
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={6}
+        fill="#fff"
+        stroke="#9E00F9"
+        strokeWidth={2}
+        style={{ cursor: "pointer" }}
+        onClick={() => handleDotClick(payload)}
+      />
+    );
+  };
+
+  const CustomActiveDot = (props: any) => {
+    const { cx, cy, payload } = props;
+    // Debug: log payload to see what you get
+    console.log("CustomActiveDot payload:", payload);
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={8}
+        fill="#9E00F9"
+        stroke="#fff"
+        strokeWidth={2}
+        style={{ cursor: "pointer" }}
+        onClick={() => handleDotClick(payload)}
+      />
+    );
+  };
+
   return (
     <div className="bg-[#080808] rounded-xl w-full h-[373px] flex flex-col items-center justify-center mt-8">
       <div className="w-full flex flex-col items-start px-8 pt-8">
@@ -53,7 +128,7 @@ export default function CreditScoreLineChart({
             <XAxis
               dataKey="date"
               label={{
-                value: "Day",
+                value: "Month",
                 position: "insideBottom",
                 style: {
                   fill: "#F4F4F5",
@@ -77,15 +152,11 @@ export default function CreditScoreLineChart({
             />
             <Line
               dataKey="score"
-              dot={{
-                r: 6,
-                fill: "#fff",
-                stroke: "#9E00F9",
-                strokeWidth: 2,
-              }}
               stroke="#9E00F9"
               strokeWidth={2}
               type="monotone"
+              dot={<CustomDot />}
+              activeDot={<CustomActiveDot />}
             />
           </LineChart>
         </ResponsiveContainer>
