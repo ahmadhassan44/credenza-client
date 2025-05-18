@@ -18,6 +18,7 @@ interface CreditScoreChartProps {
 
 const CreditScoreChart: React.FC<CreditScoreChartProps> = ({ historyData, rawHistoryForClickHandler }) => {
   // Process the history data for the chart
+  
   const chartData = historyData.map(item => {
     const date = new Date(item.timestamp || item.date);
     return {
