@@ -2,7 +2,7 @@
 "use client";
 import { Card } from "@heroui/react";
 import { motion } from "framer-motion";
-import { fadeInUp, fadeInScale, staggerContainer } from "./animations";
+import { fadeInUp, staggerContainer } from "./animations";
 
 export default function ServicesGrid() {
   return (
@@ -20,11 +20,11 @@ export default function ServicesGrid() {
         What Credenza Offers
       </motion.h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 landing-card-grid">
-        <motion.div 
+        <motion.div
           variants={fadeInUp}
-          whileHover={{ 
-            scale: 1.04, 
-            transition: { duration: 0.3 }
+          whileHover={{
+            scale: 1.04,
+            transition: { duration: 0.3 },
           }}
         >
           <Card className="landing-card bg-[#18122B]/80 border border-[#9E00F9]/20 shadow-xl rounded-2xl flex flex-col items-center text-center hover:shadow-2xl hover:border-[#CA6EFF] transition-all duration-300">
