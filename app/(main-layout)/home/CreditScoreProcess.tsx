@@ -4,8 +4,7 @@
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "./animations";
 
-export default function CreditScoreProcess() {
-  return (
+export default function CreditScoreProcess() {  return (
     <motion.section
       variants={staggerContainer}
       initial="hidden"
@@ -19,7 +18,7 @@ export default function CreditScoreProcess() {
       >
         How Your Score is Built
       </motion.h2>
-      <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4">
+      <div className="process-accordion flex flex-col md:flex-row justify-between items-center gap-10 md:gap-4">
         {[
           {
             icon: <span className="text-3xl">🔌</span>,
@@ -43,17 +42,24 @@ export default function CreditScoreProcess() {
           },
         ].map((step, i) => (
           <motion.div
-            variants={fadeInUp}
             key={i}
-            className="flex flex-col items-center text-center flex-1 min-w-[150px] max-w-[200px]"
+            className="process-step flex flex-col items-center text-center flex-1 min-w-[150px] max-w-[250px]"
+            tabIndex={0}
+            aria-expanded="false"
+            variants={fadeInUp}
+            whileHover={{ 
+              scale: 1.03, 
+              transition: { duration: 0.2 }
+            }}
+            whileTap={{ scale: 0.98 }}
           >
-            <div className="mb-3 flex items-center justify-center w-14 h-14 rounded-full bg-[#9E00F9]/20 border border-[#9E00F9]/40 text-3xl shadow-lg">
+            <div className="mb-3 flex items-center justify-center w-14 h-14 rounded-full bg-[#9E00F9]/20 border border-[#9E00F9]/40 text-3xl shadow-lg landing-icon">
               {step.icon}
             </div>
             <h4 className="text-lg font-semibold text-white mb-1">
               {step.title}
             </h4>
-            <p className="text-gray-400 text-sm mb-2">{step.desc}</p>
+            <p className="text-gray-300 leading-relaxed text-sm mb-2">{step.desc}</p>
             {i < 3 && (
               <div className="hidden md:block w-12 h-1 bg-gradient-to-r from-[#9E00F9] to-[#CA6EFF] rounded-full my-2" />
             )}
