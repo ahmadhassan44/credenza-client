@@ -179,7 +179,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { user } = response;
 
       // Update user state
-      setUser(user);
+      setUser(user.user);
       setIsLoading(false);
     } catch (error) {
       const apiError = error as ApiError;
