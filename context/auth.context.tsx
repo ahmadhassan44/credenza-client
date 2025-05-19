@@ -178,6 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // If RegisterApiResponse does not include accessToken/refreshToken, only use user
       const { user } = response;
 
+      
       // Update user state
       setUser(user.user);
       setIsLoading(false);
