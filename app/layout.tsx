@@ -7,6 +7,7 @@ import { Providers } from "./providers";
 import { AuthProvider } from "@/context/auth.context";
 import { ToastProvider } from "@/components/ui/toast";
 import { fontSans, fontSpaceGrotesk } from "@/config/fonts";
+import AuthGuard from "@/guards/auth.guard";
 
 export const metadata: Metadata = {
   title: "Credenza | Credit Scoring for Digital Creators",
@@ -36,12 +37,14 @@ export default function RootLayout({
         className={clsx(
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable,
-          fontSpaceGrotesk.variable,
+          fontSpaceGrotesk.variable
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <AuthProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <AuthGuard>
+              <ToastProvider>{children}</ToastProvider>
+            </AuthGuard>
           </AuthProvider>
         </Providers>
       </body>

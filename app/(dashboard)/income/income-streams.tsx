@@ -10,7 +10,7 @@ import {
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
-import DashboardSidebar from "../sidebar";
+import Sidebar from "../sidebar";
 
 import SimpleModal from "./SimpleModal";
 import YouTubeChannelCard from "./YouTubeChannelCard";
@@ -260,12 +260,6 @@ export default function IncomeStreamsPage() {
       case "Metrics & Analytics":
         router.push("/metrics");
         break;
-      case "Fintech Tools":
-        router.push("/fintech-tools");
-        break;
-      case "Settings":
-        router.push("/settings");
-        break;
       case "Logout":
         // Handle logout logic if needed, e.g., clear localStorage, redirect
         break;
@@ -282,7 +276,7 @@ export default function IncomeStreamsPage() {
   if (!channelsLoading && allPlatforms.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-black px-4">
-        <DashboardSidebar
+        <Sidebar
           active={active}
           setActive={handleSetActive}
           sidebarItems={sidebarItems}
@@ -390,7 +384,7 @@ export default function IncomeStreamsPage() {
 
   return (
     <div className="flex w-full bg-black min-h-screen font-['Space_Grotesk']">
-      <DashboardSidebar
+      <Sidebar
         active={active}
         setActive={handleSetActive}
         sidebarItems={sidebarItems}

@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Dynamic background animation for hero section */
+@keyframes heroRadial {
+  0% { background-position: 50% 50%; background-size: 100% 100%; }
+  50% { background-position: 48% 52%; background-size: 105% 105%; }
+  100% { background-position: 50% 50%; background-size: 100% 100%; }
+}
+
+.hero-dynamic-bg {
+  background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(158, 0, 249, 0.35) 0%, rgba(24, 18, 43, 0.2) 60%, transparent 100%);
+  animation: heroRadial 12s ease-in-out infinite;
+  z-index: 0;
+}

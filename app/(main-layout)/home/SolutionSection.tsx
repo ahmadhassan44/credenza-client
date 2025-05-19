@@ -10,7 +10,7 @@ export default function SolutionSection() {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
-      className="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 px-6 py-24"
+      className="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-16 px-6 py-24"
     >
       {/* Left: Text Block */}
       <motion.div variants={fadeInUp} className="flex-1 max-w-xl">
@@ -21,44 +21,6 @@ export default function SolutionSection() {
           Whether you&apos;re a YouTuber, streamer, or freelancer — Credenza
           transforms your platform data into credit scores and actionable income insights to unlock financial opportunities.
         </motion.p>
-        <motion.div variants={fadeInUp} className="flex gap-4 mt-4">
-          <div className="flex flex-col items-center group cursor-pointer">
-            <Image
-              alt="YouTube"
-              className="w-10 h-10 rounded-full bg-[#222] group-hover:ring-2 group-hover:ring-[#9E00F9] transition"
-              height={40}
-              src="/youtube.svg"
-              width={40}
-            />
-            <span className="text-xs text-gray-400 mt-2 group-hover:text-[#9E00F9] transition">
-              YouTube
-            </span>
-          </div>
-          <div className="flex flex-col items-center group cursor-pointer">
-            <Image
-              alt="Instagram"
-              className="w-10 h-10 rounded-full bg-[#222] group-hover:ring-2 group-hover:ring-[#9E00F9] transition"
-              height={40}
-              src="/instagram.svg"
-              width={40}
-            />
-            <span className="text-xs text-gray-400 mt-2 group-hover:text-[#9E00F9] transition">
-              Instagram
-            </span>
-          </div>
-          <div className="flex flex-col items-center group cursor-pointer">
-            <Image
-              alt="Patreon"
-              className="w-10 h-10 rounded-full bg-[#222] group-hover:ring-2 group-hover:ring-[#9E00F9] transition"
-              height={40}
-              src="/patreon.svg"
-              width={40}
-            />
-            <span className="text-xs text-gray-400 mt-2 group-hover:text-[#9E00F9] transition">
-              Patreon
-            </span>
-          </div>
-        </motion.div>
       </motion.div>
       {/* Right: Animated Graph/Illustration */}
       <motion.div variants={fadeInUp} className="flex-1 flex items-center justify-center">

@@ -14,6 +14,7 @@ export interface LoginParams {
   password: string;
 }
 
+// Existing AuthResponse for login, refreshToken, etc.
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -27,20 +28,42 @@ export interface AuthResponse {
   };
 }
 
+// New interfaces for the register endpoint's response
+interface UserDetails {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: "USER" | "CREATOR" | "ADMIN";
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface RegisteredUserData {
+  user: UserDetails;
+  creatorId?: string;
+}
+
+export interface RegisterApiResponse {
+  message: string;
+  user: RegisteredUserData;
+  // Note: accessToken and refreshToken are not part of this response structure
+}
+
 // Authentication service
 const authApi = {
   // Register a new user
-  register: async (params: RegisterParams): Promise<AuthResponse> => {
+  register: async (params: RegisterParams): Promise<RegisterApiResponse> => {
     const response = await apiClient.post("/auth/register", params);
-    const data = response.data;
+    const data: RegisterApiResponse = response.data;
     // Save user info including creatorId to localStorage
     if (typeof window !== "undefined") {
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("user", JSON.stringify(data.user.user)); // Adjusted to access nested user object
       if (data.user.creatorId) {
-        localStorage.setItem("creatorId", data.user.creatorId);
+        localStorage.setItem("creatorId", data.user.creatorId); // Adjusted to access nested creatorId
       }
+      // accessToken and refreshToken are not expected in this response, so lines setting them are removed.
+      // If tokens are needed immediately after registration, the API or client flow needs to handle that.
     }
     return data;
   },

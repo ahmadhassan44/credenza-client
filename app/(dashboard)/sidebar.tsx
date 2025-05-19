@@ -2,6 +2,7 @@
 
 import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { authService } from "@/services/auth.service";
 
 interface SidebarProps {
   active: string;
@@ -10,7 +11,7 @@ interface SidebarProps {
   sidebarWidth?: string;
 }
 
-export default function DashboardSidebar({
+export default function Sidebar({
   active,
   setActive,
   sidebarItems,
@@ -25,9 +26,17 @@ export default function DashboardSidebar({
     "Income Streams": "/incomeTab.svg",
     "Credit Score": "/creditScoreTab.svg",
     "Metrics & Analytics": "/metricsTab.svg",
-    "Fintech Tools": "/fintechTab.svg",
-    Settings: "/settingsTab.svg",
     Logout: "/logoutTab.svg",
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      // After successful logout, redirect to login page
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
@@ -44,75 +53,69 @@ export default function DashboardSidebar({
           Credenza
         </p>
         <div className="flex flex-col gap-2">
-          {sidebarItems.slice(0, 6).map((item) => (
-            <Button
-              key={item.label}
-              aria-pressed={active === item.label}
-              className={`flex items-center gap-3 px-6 rounded-xl h-12 font-['Space_Grotesk'] text-base ${active === item.label ? "bg-gradient-to-b from-[#9E00F9] to-[#9E00F9] text-white" : "text-white/80 bg-transparent hover:bg-transparent"}`}
-              style={{ height: 48 }}
-              tabIndex={0}
-              variant="flat"
-              onClick={() => {
-                setActive(item.label);
-                if (item.label === "Income Streams") {
-                  router.push("/income");
-                } else if (item.label === "Profile") {
-                  router.push("/profile");
-                } else if (item.label === "Dashboard") {
-                  router.push("/dashboard");
-                } else if (item.label === "Credit Score") {
-                  router.push("/credit-score");
-                } else if (item.label === "Metrics & Analytics") {
-                  router.push("/metrics");
-                } else if (item.label === "Fintech Tools") {
-                  router.push("/fintech-tools");
-                }
-              }}
-            >
-              <img
-                alt={`${item.label} icon`}
-                className="w-5 h-5"
-                src={iconMap[item.label]}
-                style={{
-                  filter:
-                    active === item.label
-                      ? "none"
-                      : "grayscale(1) opacity(0.7)",
+          {sidebarItems
+            .filter((item) => item.label !== "Logout")
+            .map((item) => (
+              <Button
+                key={item.label}
+                aria-pressed={active === item.label}
+                className={`flex items-center gap-3 px-6 rounded-xl h-12 font-['Space_Grotesk'] text-base ${active === item.label ? "bg-gradient-to-b from-[#9E00F9] to-[#9E00F9] text-white" : "text-white/80 bg-transparent hover:bg-transparent"}`}
+                style={{ height: 48 }}
+                tabIndex={0}
+                variant="flat"
+                onClick={() => {
+                  setActive(item.label);
+                  if (item.label === "Income Streams") {
+                    router.push("/income");
+                  } else if (item.label === "Profile") {
+                    router.push("/profile");
+                  } else if (item.label === "Dashboard") {
+                    router.push("/dashboard");
+                  } else if (item.label === "Credit Score") {
+                    router.push("/credit-score");
+                  } else if (item.label === "Metrics & Analytics") {
+                    router.push("/metrics");
+                  }
                 }}
-              />
-              <span>{item.label}</span>
-            </Button>
-          ))}
+              >
+                <img
+                  alt={`${item.label} icon`}
+                  className="w-5 h-5"
+                  src={iconMap[item.label]}
+                  style={{
+                    filter:
+                      active === item.label
+                        ? "none"
+                        : "grayscale(1) opacity(0.7)",
+                  }}
+                />
+                <span>{item.label}</span>
+              </Button>
+            ))}
         </div>
       </div>
-      <div className="flex flex-col gap-2 mt-8">
-        {sidebarItems.slice(6).map((item) => (
+      <div className="mt-auto">
+        {sidebarItems.find((item) => item.label === "Logout") && (
           <Button
-            key={item.label}
-            aria-pressed={active === item.label}
-            className="flex items-center gap-3 px-6 rounded-xl h-12 font-['Space_Grotesk'] text-white/80 hover:bg-[#18181b] text-base"
+            key="Logout"
+            aria-pressed={active === "Logout"}
+            className={`flex items-center gap-3 px-6 rounded-xl h-12 font-['Space_Grotesk'] text-base text-white/80 hover:bg-transparent`}
             style={{ height: 48 }}
             tabIndex={0}
             variant="flat"
-            onClick={() => setActive(item.label)}
-            {...(item.label === "Logout" ? { color: "danger" } : {})}
+            color="danger"
+            onClick={() => {
+              handleLogout();
+            }}
           >
             <img
-              alt={`${item.label} icon`}
+              alt="Logout icon"
               className="w-5 h-5"
-              src={iconMap[item.label]}
-              style={{
-                filter:
-                  item.label === "Logout"
-                    ? "none"
-                    : active === item.label
-                      ? "none"
-                      : "grayscale(1) opacity(0.7)",
-              }}
+              src={iconMap["Logout"]}
             />
-            <span>{item.label}</span>
+            <span>Logout</span>
           </Button>
-        ))}
+        )}
       </div>
     </aside>
   );

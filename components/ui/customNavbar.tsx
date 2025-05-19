@@ -27,7 +27,7 @@ export function CustomNavbar() {
 
   return (
     <Navbar
-      className="fixed top-6 left-1/2 z-50 bg-black/60 backdrop-blur-md rounded-xl shadow-lg max-w-4xl w-[95vw] -translate-x-1/2 flex items-center"
+      className="fixed top-6 left-1/2 z-50 border-gray-100 bg-black/60 backdrop-blur-md rounded-xl shadow-lg max-w-4xl w-[95vw] -translate-x-1/2 flex items-center"
       classNames={{
         wrapper: "w-full px-6 flex items-center justify-between min-h-14",
       }}
@@ -46,7 +46,7 @@ export function CustomNavbar() {
         </NextLink>
       </NavbarBrand>
 
-      <NavbarContent className="hidden sm:flex gap-6" justify="center">
+      {/* <NavbarContent className="hidden sm:flex gap-6" justify="center">
         <NavbarItem>
           <HeroLink
             as={NextLink}
@@ -87,17 +87,25 @@ export function CustomNavbar() {
             About
           </HeroLink>
         </NavbarItem>
-      </NavbarContent>
+      </NavbarContent> */}
 
       <NavbarContent justify="end">
-        {isAuthenticated ? (
-          <Dropdown placement="bottom-end">
+        {isAuthenticated ? (          <Dropdown placement="bottom-end">
             <DropdownTrigger>
               <Avatar
                 as="button"
                 className="transition-transform"
                 name={user ? `${user.firstName} ${user.lastName}` : undefined}
                 size="sm"
+                src={user?.profilePicture || "/profileTab.svg"}
+                fallback={
+                  <Image 
+                    src="/profileTab.svg"
+                    alt="Profile"
+                    width={24} 
+                    height={24}
+                  />
+                }
               />
             </DropdownTrigger>
             <DropdownMenu aria-label="Profile Actions" variant="flat">
@@ -105,17 +113,16 @@ export function CustomNavbar() {
                 <p className="font-semibold">Signed in as</p>
                 <p className="font-semibold">{user?.email}</p>
               </DropdownItem>
-              <DropdownItem key="welcome">
+              {/* <DropdownItem key="welcome">
                 <NextLink className="w-full" href="/welcome">
                   Welcome
                 </NextLink>
-              </DropdownItem>
+              </DropdownItem> */}
               <DropdownItem key="dashboard">
                 <NextLink className="w-full" href="/dashboard">
                   Dashboard
                 </NextLink>
               </DropdownItem>
-              <DropdownItem key="settings">Account Settings</DropdownItem>
               <DropdownItem key="logout" color="danger" onClick={handleLogout}>
                 Log Out
               </DropdownItem>

@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
+import "@/styles/landing-enhancements.css";
 
 import { CustomNavbar } from "@/components/ui/customNavbar";
 

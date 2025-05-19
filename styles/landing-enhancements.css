@@ -1,0 +1,142 @@
+/* Enhanced landing page styles for density, rhythm, accessibility, and animation */
+
+/* Card spacing and rhythm */
+.landing-card-grid {
+  gap: 2.75rem !important; /* ~gap-11, more than gap-8 */
+}
+
+.landing-card {
+  padding: 2.25rem 2rem !important; /* Consistent, slightly larger */
+  border-radius: 1.25rem !important;
+  transition: box-shadow 0.3s ease-out, transform 0.3s ease-out, border-color 0.3s ease-out;
+  will-change: transform, box-shadow;
+  transform-origin: center center;
+}
+
+.landing-card h3, .landing-card .card-title {
+  font-size: 1.375rem !important; /* ~text-2xl */
+  margin-bottom: 0.5rem;
+}
+
+.landing-card .card-body, .landing-card p {
+  color: #ccc !important;
+  line-height: 1.45 !important;
+}
+
+.landing-card .card-btn {
+  margin-top: 1.5rem;
+  width: 100%;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.landing-card .card-btn:hover, .landing-card .card-btn:focus {
+  filter: brightness(1.1);
+  box-shadow: 0 0 0 2px #9E00F9;
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* Accessibility: higher contrast for supporting text */
+.text-supporting, .text-gray-400, .text-gray-500, .text-gray-300 {
+  color: #ccc !important;
+}
+
+/* Button and icon transitions */
+.landing-btn, .landing-icon {
+  transition: all 0.25s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
+}
+
+.landing-btn:hover, .landing-btn:focus {
+  filter: brightness(1.1);
+  box-shadow: 0 0 0 2px #9E00F9;
+  transform: scale(1.04);
+}
+
+.landing-icon {
+  transition: transform 0.3s cubic-bezier(.17,.67,.83,.67);
+}
+.landing-icon:hover {
+  transform: scale(1.15) rotate(5deg);
+}
+
+/* Hero dynamic background (animated radial gradient) */
+@keyframes hero-radial {
+  0% {
+    background-position: 50% 50%;
+    background-size: 100% 100%;
+  }
+  50% {
+    background-position: 48% 52%;
+    background-size: 105% 105%;
+  }
+  100% {
+    background-position: 52% 48%;
+    background-size: 100% 100%;
+  }
+}
+.hero-dynamic-bg {
+  background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(158, 0, 249, 0.35) 0%, rgba(24, 18, 43, 0.2) 60%, transparent 100%);
+  animation: hero-radial 12s ease-in-out infinite;
+  opacity: 0.95;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+/* Enhanced content visibility with parallax-like scrolling */
+@media (min-width: 768px) {
+  .hero-dynamic-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+    z-index: 1;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+/* Better card responsiveness for all screen sizes */
+@media (max-width: 640px) {
+  .landing-card {
+    padding: 1.5rem 1.25rem !important;
+  }
+  .landing-card-grid {
+    gap: 1.25rem !important;
+  }
+}
+
+/* Accordion for mobile process steps */
+@media (max-width: 768px) {
+  .process-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .process-step {
+    border-radius: 1rem;
+    background: #18122B;
+    padding: 1.25rem 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    will-change: transform, background;
+  }
+  .process-step:hover {
+    transform: translateY(-4px);
+    background: #232042;
+  }
+  .process-step[aria-expanded="true"] {
+    background: #232042;
+    border: 1px solid rgba(158, 0, 249, 0.3);
+  }
+  .landing-card {
+    padding: 1.75rem 1.5rem !important;
+  }
+  .landing-card-grid {
+    gap: 1.5rem !important;
+  }
+}
