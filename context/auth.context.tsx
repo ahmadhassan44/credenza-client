@@ -165,7 +165,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
 
     try {
-      const response = await authApi.register({
+      // Call the API to register the user. This step does not log the user in (no tokens returned here).
+      // It stores basic user info from RegisterApiResponse to localStorage via authApi.register.
+      await authApi.register({
         firstName,
         lastName,
         email,
@@ -174,28 +176,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         location,
       });
 
-      const { accessToken, refreshToken, user } = response;
+      // After successful registration, immediately call the login function.
+      // This will fetch and store the accessToken and refreshToken,
+      // and update the user state via setUser() inside the login function.
+      await login(email, password, false); // Assuming rememberMe is false for auto-login after register
 
-      // Store tokens in localStorage (ensure both are always set)
-      if (typeof window !== "undefined") {
-        if (accessToken) localStorage.setItem("accessToken", accessToken);
-        if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
-      }
+      // setIsLoading(false) is handled by the login function's success or error path.
 
-      // Update user state
-      setUser(user);
-      setIsLoading(false);
     } catch (error) {
       const apiError = error as ApiError;
       const errorMessage =
         apiError.response?.data?.message ||
         apiError.message ||
-        "An error occurred during registration";
+        "An error occurred during registration or subsequent login";
 
       setError(errorMessage);
-      setIsLoading(false);
-      throw error;
+      setIsLoading(false); // Ensure loading is stopped if registration or login fails
+      throw error; // Re-throw the error to be handled by the calling component (e.g., form)
     }
+    // Note: setIsLoading(false) should be managed within the try/catch/finally of this function
+    // or within the login function if it's the last async operation.
+    // Since login() handles its own setIsLoading, we only need to ensure it's false on error here.
   };
 
   const logout = async () => {
