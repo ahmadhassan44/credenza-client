@@ -179,8 +179,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { user } = response;
 
       // Update user state
-      setUser(user.user);
-      setIsLoading(false);
+      // setUser(user.user);
+      await login(email, password); // Automatically log in after registration
     } catch (error) {
       const apiError = error as ApiError;
       const errorMessage =
@@ -191,6 +191,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setError(errorMessage);
       setIsLoading(false);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
