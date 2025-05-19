@@ -15,7 +15,7 @@ export default function Sidebar({
   active,
   setActive,
   sidebarItems,
-  sidebarWidth = "15vw",
+  sidebarWidth = "16vw",
 }: SidebarProps) {
   const router = useRouter();
 
@@ -41,7 +41,7 @@ export default function Sidebar({
 
   return (
     <aside
-      className="fixed top-0 left-0 h-screen bg-[#080808] p-8 flex flex-col justify-between z-30"
+      className="fixed top-0 left-0 h-screen bg-[#080808] p-6 flex flex-col justify-between z-30"
       style={{
         width: sidebarWidth,
         minWidth: sidebarWidth,
