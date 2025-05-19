@@ -97,7 +97,7 @@ export function CustomNavbar() {
                 className="transition-transform"
                 name={user ? `${user.firstName} ${user.lastName}` : undefined}
                 size="sm"
-                src="/profileTab.svg"
+                src={user?.profilePicture || "/profileTab.svg"}
                 fallback={
                   <Image 
                     src="/profileTab.svg"
