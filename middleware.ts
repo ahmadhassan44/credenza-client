@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 const protectedPaths: string[] = []; // Add paths like '/dashboard', '/profile' if they need server-side protection
 
 // Define which paths are auth-only (only for non-authenticated users)
-const authOnlyPaths = ["/login", "/signup", "/forgot-password"];
+const authOnlyPaths = ["/login", "/signup", "/forgot-password", "/home"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
