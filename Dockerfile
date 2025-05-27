@@ -10,7 +10,7 @@ WORKDIR /app
 # Copy package.json and package-lock.json (or yarn.lock)
 COPY package.json package-lock.json* ./
 # Install dependencies based on the preferred package manager
-RUN npm ci --only=production
+RUN npm install
 
 # Rebuild the source code only when needed
 FROM base AS builder
