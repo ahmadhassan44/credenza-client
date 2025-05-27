@@ -7,6 +7,7 @@ import { CircularProgress } from "@heroui/react";
 import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 
 const publicRoutes = [
+  "/",
   "/login",
   "/signup",
   "/forgot-password",
