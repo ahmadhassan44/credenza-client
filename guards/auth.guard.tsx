@@ -11,7 +11,7 @@ const publicRoutes = [
   "/signup",
   "/forgot-password",
   "/reset-password",
-  "/", // Landing page
+  "/home", // Landing page
   "/about",
   "/contact",
   // Add any other public routes here
